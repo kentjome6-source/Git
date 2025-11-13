@@ -1,0 +1,254 @@
+@extends('layouts.vet')
+
+@section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-stethoscope me-2"></i>Veterinary Appointments</h2>
+                <div class="d-flex gap-2">
+                    <span class="badge badge-info">{{ $appointments->total() }} Total Appointments</span>
+                </div>
+            </div>
+
+            @if($appointments->count() > 0)
+                <div class="card shadow">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Priority</th>
+                                        <th>Pet Owner</th>
+                                        <th>Pet Name</th>
+                                        <th>Chief Complaint</th>
+                                        <th>Status</th>
+                                        <th>Requested</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($appointments as $appointment)
+                                        <tr class="{{ $appointment->urgency_level === 'emergency' ? 'table-danger' : ($appointment->urgency_level === 'high' ? 'table-warning' : '') }}">
+                                            <td>
+                                                <span class="badge {{ $appointment->getUrgencyBadgeClass() }}">
+                                                    {{ ucfirst($appointment->urgency_level) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <strong>{{ $appointment->owner_name }}</strong>
+                                                    <br>
+                                                    <small class="text-muted">{{ $appointment->owner_email }}</small>
+                                                    <br>
+                                                    <small class="text-muted">{{ $appointment->owner_phone }}</small>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <strong>{{ $appointment->pet_name }}</strong>
+                                                    {{-- Removed pet species and breed information as per user request --}}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="text-truncate" style="max-width: 200px;" title="{{ $appointment->chief_complaint }}">
+                                                    {{ Str::limit($appointment->chief_complaint, 80) }}
+                                                </div>
+                                                <small class="text-muted">
+                                                    Reason: {{ ucfirst(str_replace('_', ' ', $appointment->consultation_reason)) }}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <span class="badge {{ $appointment->getStatusBadgeClass() }}">
+                                                    {{ ucfirst($appointment->status) }}
+                                                </span>
+                                                @if($appointment->vet_id === auth()->id())
+                                                    <br><small class="text-success">Assigned to you</small>
+                                                @elseif($appointment->vet)
+                                                    <br><small class="text-muted">Dr. {{ $appointment->vet->name }}</small>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <small>{{ $appointment->created_at->format('M d, Y') }}</small>
+                                                <br>
+                                                <small class="text-muted">{{ $appointment->created_at->format('g:i A') }}</small>
+                                                @if($appointment->appointment_date)
+                                                    <br>
+                                                    <small class="text-info">
+                                                        Appt Date: {{ $appointment->appointment_date->format('M d, Y') }}
+                                                    </small>
+                                                @endif
+                                                @if($appointment->appointment_time)
+                                                    <br>
+                                                    <small class="text-info">
+                                                        Appt Time: {{ date('g:i A', strtotime($appointment->appointment_time)) }}
+                                                    </small>
+                                                @endif
+                                                @if($appointment->scheduled_datetime)
+                                                    <br>
+                                                    <small class="text-info">
+                                                        Scheduled: {{ $appointment->scheduled_datetime->format('M d, g:i A') }}
+                                                    </small>
+                                                @endif
+                                            </td>
+                                           <td>
+    <div class="btn-group-vertical btn-group-sm" role="group">
+        <a href="{{ route('appointments.show', $appointment) }}" class="btn btn-info btn-sm me-1" title="View Details">
+            <i class="fas fa-eye"></i>
+        </a>
+
+        
+        {{-- Only show Accept/Reject buttons for appointment-type consultations that are pending --}}
+        @if($appointment->status === 'pending' && (!$appointment->vet_id || $appointment->vet_id === auth()->id()) && $appointment->consultation_type === 'appointment')
+            <form action="{{ route('appointments.accept', $appointment) }}" method="POST" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-success btn-sm" 
+                        onclick="return confirm('Are you sure you want to accept this appointment?')">
+                    <i class="fas fa-check me-1"></i>Accept
+                </button>
+            </form>
+            
+            <form action="{{ route('appointments.reject', $appointment) }}" method="POST" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-danger btn-sm" 
+                        onclick="return confirm('Are you sure you want to reject this appointment?')">
+                    <i class="fas fa-times me-1"></i>Reject
+                </button>
+            </form>
+        @endif
+        
+
+        
+        {{-- No actions after acceptance as per user request --}}
+    </div>
+</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $appointments->links() }}
+                </div>
+
+                <!-- No modals needed as per user request -->
+            @else
+                <div class="text-center py-5">
+                    <i class="fas fa-stethoscope fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Appointment Requests</h4>
+                    <p class="text-muted">There are currently no appointment requests to review.</p>
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+
+<style>
+.badge-success { background-color: #28a745; }
+.badge-warning { background-color: #ffc107; color: #212529; }
+.badge-danger { background-color: #dc3545; }
+.badge-dark { background-color: #343a40; }
+.badge-info { background-color: #17a2b8; }
+.badge-secondary { background-color: #6c757d; }
+
+.table-responsive {
+    max-height: 70vh;
+}
+
+.btn-group-vertical .btn {
+    margin-bottom: 2px;
+}
+
+/* Mobile responsiveness improvements */
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-height: none;
+    }
+    
+    .table {
+        min-width: 800px; /* Ensure table has minimum width for scrolling */
+        font-size: 0.9rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 8px 6px;
+        white-space: nowrap;
+    }
+    
+    .btn-group-vertical .btn {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        margin-bottom: 1px;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .table {
+        min-width: 700px;
+        font-size: 0.85rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 6px 4px;
+        font-size: 0.8rem;
+    }
+    
+    .btn-group-vertical .btn {
+        padding: 5px 8px;
+        font-size: 0.8rem;
+    }
+    
+    .text-truncate {
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 400px) {
+    .table {
+        min-width: 600px;
+        font-size: 0.8rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 5px 3px;
+        font-size: 0.75rem;
+    }
+    
+    .btn-group-vertical .btn {
+        padding: 4px 6px;
+        font-size: 0.75rem;
+    }
+    
+    .text-truncate {
+        max-width: 120px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum datetime to current time for scheduling
+    const datetimeInputs = document.querySelectorAll('input[type="datetime-local"]');
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    const minDateTime = now.toISOString().slice(0, 16);
+    
+    datetimeInputs.forEach(input => {
+        input.min = minDateTime;
+    });
+});
+</script>
+@endsection
