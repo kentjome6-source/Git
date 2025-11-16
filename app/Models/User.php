@@ -28,6 +28,7 @@ class User extends Authenticatable
         'profile_picture_path', // Add profile picture path
         'certificate_path',     // Add certificate path for veterinarians
         'is_verified_vet',      // Add verification status for veterinarians
+        'google_id',
     ];
 
     /**
