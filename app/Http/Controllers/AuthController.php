@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -26,17 +27,13 @@ class AuthController extends Controller
                 return redirect()->route('admin.dashboard');
 
             } else if ($user->role === 'vet') {
-                // Check if veterinarian is verified before allowing access
                 if ((bool) $user->is_verified_vet) {
-                    // Redirect verified veterinarians to their dashboard
                     return redirect()->route('vet.records');
                 } else {
-                    // Log out unverified veterinarians and show error
                     Auth::logout();
                     return back()->with('error', 'Your account is pending verification by an administrator.');
                 }
             } else {
-                // Redirect users to the Multi-Pet Dashboard
                 return redirect()->route('pet.multipet.index');
             }
         }
@@ -50,7 +47,6 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
-    // 🔹 Registration
     public function showRegister()
     {
         return view('auth.register');
@@ -68,16 +64,13 @@ class AuthController extends Controller
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role'     => 'user', // default role = pet user
+            'role'     => 'user',
         ]);
 
         Auth::login($user);
-
-        // Redirect new users to the Multi-Pet Dashboard
         return redirect()->route('pet.multipet.index');
     }
 
-    // 🔹 Veterinarian Registration
     public function showVetRegister()
     {
         return view('auth.vet-register');
@@ -91,29 +84,74 @@ class AuthController extends Controller
             'password'    => 'required|string|min:6|confirmed',
             'phone'       => 'required|string|max:20',
             'address'     => 'required|string|max:500',
-            'certificate' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
+            'certificate' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Store the certificate image
         $certificatePath = $request->file('certificate')->store('certificates', 'public');
 
         $user = User::create([
             'name'             => $request->name,
             'email'            => $request->email,
             'password'         => Hash::make($request->password),
-            'role'             => 'vet', // veterinarian role
+            'role'             => 'vet',
             'phone'            => $request->phone,
             'address'          => $request->address,
-            'certificate_path' => $certificatePath, // Store certificate path
-            'is_verified_vet'  => false, // Not verified by default
+            'certificate_path' => $certificatePath,
+            'is_verified_vet'  => false,
         ]);
 
         Auth::login($user);
 
-        // Log out the veterinarian immediately as they need to be verified first
         Auth::logout();
 
-        // Redirect to login with success message
         return redirect()->route('login')->with('success', 'Registration successful! Your account is pending verification by an administrator. You will receive an email when your account is approved.');
+    }
+
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+
+            $user = User::where('google_id', $googleUser->getId())->first();
+            
+            if (!$user) {
+                $user = User::where('email', $googleUser->getEmail())->first();
+                
+                if ($user) {
+                    $user->update(['google_id' => $googleUser->getId()]);
+                } else {
+                    $user = User::create([
+                        'name' => $googleUser->getName(),
+                        'email' => $googleUser->getEmail(),
+                        'google_id' => $googleUser->getId(),
+                        'role' => 'user',
+                        'profile_picture_path' => $googleUser->getAvatar(),
+                    ]);
+                }
+            }
+            
+            Auth::login($user);
+
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } else if ($user->role === 'vet') {
+                if ((bool) $user->is_verified_vet) {
+                    return redirect()->route('vet.records');
+                } else {
+                    Auth::logout();
+                    return redirect()->route('login')->with('error', 'Your account is pending verification by an administrator.');
+                }
+            } else {
+                return redirect()->route('pet.multipet.index');
+            }
+            
+        } catch (\Exception $e) {
+            return redirect()->route('login')->with('error', 'Google authentication failed. Please try again.');
+        }
     }
 }
