@@ -17,7 +17,8 @@ class AdminController extends Controller
     public function dashboard()
     {
         // Get user statistics
-        $totalUsers = User::count();
+        // Use the legitimate scope so dashboard matches admin user management
+        $totalUsers = User::legitimate()->count();
         $totalPets = Pet::count();
         $totalAdoptions = \App\Models\Adoption::count();
         $totalLostFound = LostFound::count();
