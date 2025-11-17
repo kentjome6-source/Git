@@ -479,7 +479,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(data => {
                     if (data.success) {
-                        // Don't add message to UI here since it will be added via WebSocket
+                        // Append the sent message locally so the sender doesn't need to refresh
+                        try {
+                            const messageContainer = document.getElementById('message-container');
+                            if (messageContainer) {
+                                const msg = data.message;
+                                // Prevent duplicate if already added via WebSocket
+                                const existingMessage = document.querySelector(`.message[data-message-id="${msg.id}"]`);
+                                if (!existingMessage) {
+                                    const messageDiv = document.createElement('div');
+                                    messageDiv.className = `mb-3 ${msg.sender_id == {{ Auth::id() }} ? 'text-end' : 'text-start'} message`;
+                                    messageDiv.setAttribute('data-message-id', msg.id);
+
+                                    const messageContent = document.createElement('div');
+                                    messageContent.className = msg.sender_id == {{ Auth::id() }} ?
+                                        'd-inline-block p-3 rounded-3 shadow-sm bg-primary text-white' :
+                                        'd-inline-block p-3 rounded-3 shadow-sm bg-light';
+                                    messageContent.style.maxWidth = '80%';
+                                    messageContent.style.wordWrap = 'break-word';
+
+                                    const timestamp = formatTimestamp(msg.created_at);
+
+                                    messageContent.innerHTML = `
+                                        ${msg.message}
+                                        <div class="small mt-1">
+                                            <em>${timestamp}</em>
+                                        </div>
+                                    `;
+
+                                    messageDiv.appendChild(messageContent);
+                                    messageContainer.appendChild(messageDiv);
+                                    messageContainer.scrollTop = messageContainer.scrollHeight;
+                                }
+                            }
+                        } catch (err) {
+                            console.error('Error appending sent message locally:', err);
+                        }
+
                         // Clear input
                         messageInput.value = '';
                     } else {
