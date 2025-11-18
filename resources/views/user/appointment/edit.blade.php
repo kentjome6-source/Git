@@ -21,20 +21,6 @@
                         <!-- Hidden appointment type field -->
                         <input type="hidden" name="appointment_type" value="appointment">
 
-                        <!-- Urgency Level -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <label for="urgency_level" class="form-label fw-bold">Urgency Level</label>
-                                <select name="urgency_level" id="urgency_level" class="form-select" required>
-                                    <option value="">Select urgency level</option>
-                                    <option value="low" {{ $appointment->urgency_level === 'low' ? 'selected' : '' }}>Low - Routine checkup or general questions</option>
-                                    <option value="medium" {{ $appointment->urgency_level === 'medium' ? 'selected' : '' }}>Medium - Concerning symptoms but not urgent</option>
-                                    <option value="high" {{ $appointment->urgency_level === 'high' ? 'selected' : '' }}>High - Serious symptoms requiring prompt attention</option>
-                                    <option value="emergency" {{ $appointment->urgency_level === 'emergency' ? 'selected' : '' }}>Emergency - Life-threatening condition</option>
-                                </select>
-                            </div>
-                        </div>
-
                         <!-- Veterinarian Selection -->
                         <div class="row mb-3">
                             <div class="col-12">
@@ -112,19 +98,20 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="pet_species" class="form-label">Species *</label>
-                                    <select name="pet_species" id="pet_species" class="form-select" required>
-                                        <option value="">Select species</option>
-                                        <option value="Dog" {{ $appointment->pet_species === 'Dog' ? 'selected' : '' }}>Dog</option>
-                                        <option value="Cat" {{ $appointment->pet_species === 'Cat' ? 'selected' : '' }}>Cat</option>
-                                        <option value="Bird" {{ $appointment->pet_species === 'Bird' ? 'selected' : '' }}>Bird</option>
-                                        <option value="Rabbit" {{ $appointment->pet_species === 'Rabbit' ? 'selected' : '' }}>Rabbit</option>
-                                        <option value="Hamster" {{ $appointment->pet_species === 'Hamster' ? 'selected' : '' }}>Hamster</option>
-                                        <option value="Guinea Pig" {{ $appointment->pet_species === 'Guinea Pig' ? 'selected' : '' }}>Guinea Pig</option>
-                                        <option value="Fish" {{ $appointment->pet_species === 'Fish' ? 'selected' : '' }}>Fish</option>
-                                        <option value="Reptile" {{ $appointment->pet_species === 'Reptile' ? 'selected' : '' }}>Reptile</option>
-                                        <option value="Other" {{ $appointment->pet_species === 'Other' ? 'selected' : '' }}>Other</option>
+                                    <label for="pet_type" class="form-label">Pet Type *</label>
+                                    <select name="pet_type" id="pet_type" class="form-select" required>
+                                        <option value="">Select pet type</option>
+                                        <option value="Dog" {{ $appointment->pet_type === 'Dog' ? 'selected' : '' }}>Dog</option>
+                                        <option value="Cat" {{ $appointment->pet_type === 'Cat' ? 'selected' : '' }}>Cat</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="pet_services_received" class="form-label">Pet Services Received</label>
+                                    <textarea name="pet_services_received" id="pet_services_received" class="form-control" 
+                                              rows="2" placeholder="Enter services your pet has received (e.g., Deworming, Vaccination, Tick and Flea Prevention)">{{ old('pet_services_received', $appointment->pet_services_received) }}</textarea>
+                                    <div class="form-text">List any services your pet has recently received, such as deworming, vaccination, or tick and flea prevention.</div>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -184,16 +171,16 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="appointment_date" class="form-label">Preferred Appointment Date</label>
-                                    <input type="date" name="appointment_date" id="appointment_date" 
-                                           class="form-control" value="{{ old('appointment_date', $appointment->appointment_date ? $appointment->appointment_date->format('Y-m-d') : '') }}">
+                                    <label for="preferred_date" class="form-label">Preferred Appointment Date</label>
+                                    <input type="date" name="preferred_date" id="preferred_date" 
+                                           class="form-control" value="{{ old('preferred_date', $appointment->appointment_date ? $appointment->appointment_date->format('Y-m-d') : '') }}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="appointment_time" class="form-label">Preferred Appointment Time</label>
-                                    <input type="time" name="appointment_time" id="appointment_time" 
-                                           class="form-control" value="{{ old('appointment_time', $appointment->appointment_time ?? '') }}">
+                                    <label for="preferred_time" class="form-label">Preferred Appointment Time</label>
+                                    <input type="time" name="preferred_time" id="preferred_time" 
+                                           class="form-control" value="{{ old('preferred_time', $appointment->appointment_time ?? '') }}">
                                 </div>
                             </div>
                             <div class="col-md-6" id="scheduled_datetime_section" style="{{ $appointment->consultation_type === 'appointment' ? 'display: block;' : 'display: none;' }}">
@@ -350,11 +337,36 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Set minimum datetime to current time
-    const datetimeInput = document.getElementById('scheduled_datetime');
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    datetimeInput.min = now.toISOString().slice(0, 16);
+    // Set minimum date to current date
+    const dateInput = document.getElementById('preferred_date');
+    const timeInput = document.getElementById('preferred_time');
+    
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+    }
+    
+    // Set minimum time based on current date
+    if (dateInput && timeInput) {
+        dateInput.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            selectedDate.setHours(0, 0, 0, 0);
+            
+            // If selected date is today, set minimum time to current time
+            if (selectedDate.getTime() === today.getTime()) {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = Math.ceil(now.getMinutes() / 30) * 30; // Round up to nearest 30 minutes
+                const roundedMinutes = minutes >= 60 ? '00' : String(minutes).padStart(2, '0');
+                const minTime = minutes >= 60 ? String(parseInt(hours) + 1).padStart(2, '0') + ':' + roundedMinutes : hours + ':' + roundedMinutes;
+                timeInput.min = minTime;
+            } else {
+                timeInput.min = '00:00';
+            }
+        });
+    }
 });
 </script>
 @endsection

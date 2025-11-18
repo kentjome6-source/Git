@@ -216,24 +216,9 @@ class SharedMap {
     }
     
     createShelterIcon(location) {
-        // Choose icon based on location type
-        let iconClass = 'fas fa-store';
-        let iconColor = '#667eea';
-        
-        switch(location.type) {
-            case 'pet_shop':
-                iconClass = 'fas fa-store';
-                iconColor = '#667eea';
-                break;
-            case 'veterinarian':
-                iconClass = 'fas fa-user-md';
-                iconColor = '#10b981';
-                break;
-            case 'grooming':
-                iconClass = 'fas fa-cut';
-                iconColor = '#f59e0b';
-                break;
-        }
+        // Use only veterinarian icon for all locations
+        let iconClass = 'fas fa-user-md';
+        let iconColor = '#10b981';
         
         // Create custom icon
         return L.divIcon({
@@ -295,12 +280,12 @@ class SharedMap {
         return `
             <div style="min-width: 250px; max-width: 300px;">
                 <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                    <div style="background: ${this.getIconColor(location.type)}; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                        <i class="${this.getIconClass(location.type)}"></i>
+                    <div style="background: #10b981; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                        <i class="fas fa-user-md"></i>
                     </div>
                     <div>
                         <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">${location.name}</h4>
-                        <span style="background: #e5e7eb; color: #374151; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">${this.getTypeName(location.type)}</span>
+                        <span style="background: #e5e7eb; color: #374151; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Veterinarian</span>
                     </div>
                 </div>
                 <div style="margin-bottom: 8px; color: #4b5563;">
@@ -374,21 +359,13 @@ class SharedMap {
     }
     
     getIconClass(type) {
-        switch(type) {
-            case 'pet_shop': return 'fas fa-store';
-            case 'veterinarian': return 'fas fa-user-md';
-            case 'grooming': return 'fas fa-cut';
-            default: return 'fas fa-home';
-        }
+        // Always return veterinarian icon
+        return 'fas fa-user-md';
     }
-    
+
     getIconColor(type) {
-        switch(type) {
-            case 'pet_shop': return '#667eea';
-            case 'veterinarian': return '#10b981';
-            case 'grooming': return '#f59e0b';
-            default: return '#667eea';
-        }
+        // Always return veterinarian color
+        return '#10b981';
     }
     
     getTypeName(type) {

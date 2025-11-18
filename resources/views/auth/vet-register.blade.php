@@ -151,7 +151,7 @@
 <body>
     <div class="card">
         <h3 class="text-center mb-3">🐾 Register as Veterinarian</h3>
-        <form method="POST" action="{{ route('vet.register.post') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('register.vet') }}" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
                 <label for="name">Full Name</label>

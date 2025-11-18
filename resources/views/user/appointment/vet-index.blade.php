@@ -5,9 +5,9 @@
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="fas fa-stethoscope me-2"></i>Veterinary Appointments</h2>
+                <h2><i class="fas fa-stethoscope me-2"></i>Pending Appointments</h2>
                 <div class="d-flex gap-2">
-                    <span class="badge badge-info">{{ $appointments->total() }} Total Appointments</span>
+                    <span class="badge badge-info">{{ $appointments->total() }} Pending Appointments</span>
                 </div>
             </div>
 
@@ -18,10 +18,11 @@
                             <table class="table table-hover mb-0">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th>Priority</th>
+                                        <th>ID</th>
                                         <th>Pet Owner</th>
                                         <th>Pet Name</th>
-                                        <th>Chief Complaint</th>
+                                        <th>Pet Type</th>
+                                        <th>Services Received</th>
                                         <th>Status</th>
                                         <th>Requested</th>
                                         <th>Actions</th>
@@ -29,39 +30,50 @@
                                 </thead>
                                 <tbody>
                                     @foreach($appointments as $appointment)
-                                        <tr class="{{ $appointment->urgency_level === 'emergency' ? 'table-danger' : ($appointment->urgency_level === 'high' ? 'table-warning' : '') }}">
-                                            <td>
-                                                <span class="badge {{ $appointment->getUrgencyBadgeClass() }}">
-                                                    {{ ucfirst($appointment->urgency_level) }}
-                                                </span>
-                                            </td>
+                                        <tr>
+                                            <td>{{ $appointment->id }}</td>
                                             <td>
                                                 <div>
                                                     <strong>{{ $appointment->owner_name }}</strong>
                                                     <br>
                                                     <small class="text-muted">{{ $appointment->owner_email }}</small>
-                                                    <br>
-                                                    <small class="text-muted">{{ $appointment->owner_phone }}</small>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div>
                                                     <strong>{{ $appointment->pet_name }}</strong>
-                                                    {{-- Removed pet species and breed information as per user request --}}
                                                 </div>
                                             </td>
+                                            <td>{{ $appointment->pet_type }}</td>
+                                            <td>{{ $appointment->pet_services_received }}</td>
                                             <td>
-                                                <div class="text-truncate" style="max-width: 200px;" title="{{ $appointment->chief_complaint }}">
-                                                    {{ Str::limit($appointment->chief_complaint, 80) }}
-                                                </div>
-                                                <small class="text-muted">
-                                                    Reason: {{ ucfirst(str_replace('_', ' ', $appointment->consultation_reason)) }}
-                                                </small>
-                                            </td>
-                                            <td>
-                                                <span class="badge {{ $appointment->getStatusBadgeClass() }}">
-                                                    {{ ucfirst($appointment->status) }}
+                                                @php
+                                                    // Map statuses for veterinarian view to match pet parents view
+                                                    $statusDisplay = match($appointment->status) {
+                                                        'pending' => 'Pending Review',
+                                                        'accepted' => 'Accepted',
+                                                        'rejected' => 'Rejected',
+                                                        'cancelled' => 'Cancelled',
+                                                        default => ucfirst($appointment->status)
+                                                    };
+                                                    
+                                                    // Map background classes for veterinarian view to match pet parents view
+                                                    $statusClass = match($appointment->status) {
+                                                        'pending' => 'warning',
+                                                        'accepted' => 'success',
+                                                        'rejected' => 'dark',
+                                                        'cancelled' => 'danger',
+                                                        default => 'secondary'
+                                                    };
+                                                @endphp
+                                                <span class="badge bg-{{ $statusClass }}">
+                                                    {{ $statusDisplay }}
                                                 </span>
+                                                @if($appointment->status === 'rejected' && $appointment->rejection_reason)
+                                                    <div class="mt-1">
+                                                        <small class="text-muted">Reason: {{ \Illuminate\Support\Str::limit($appointment->rejection_reason, 50) }}</small>
+                                                    </div>
+                                                @endif
                                                 @if($appointment->vet_id === auth()->id())
                                                     <br><small class="text-success">Assigned to you</small>
                                                 @elseif($appointment->vet)
@@ -72,24 +84,6 @@
                                                 <small>{{ $appointment->created_at->format('M d, Y') }}</small>
                                                 <br>
                                                 <small class="text-muted">{{ $appointment->created_at->format('g:i A') }}</small>
-                                                @if($appointment->appointment_date)
-                                                    <br>
-                                                    <small class="text-info">
-                                                        Appt Date: {{ $appointment->appointment_date->format('M d, Y') }}
-                                                    </small>
-                                                @endif
-                                                @if($appointment->appointment_time)
-                                                    <br>
-                                                    <small class="text-info">
-                                                        Appt Time: {{ date('g:i A', strtotime($appointment->appointment_time)) }}
-                                                    </small>
-                                                @endif
-                                                @if($appointment->scheduled_datetime)
-                                                    <br>
-                                                    <small class="text-info">
-                                                        Scheduled: {{ $appointment->scheduled_datetime->format('M d, g:i A') }}
-                                                    </small>
-                                                @endif
                                             </td>
                                            <td>
     <div class="btn-group-vertical btn-group-sm" role="group">
@@ -98,8 +92,8 @@
         </a>
 
         
-        {{-- Only show Accept/Reject buttons for appointment-type consultations that are pending --}}
-        @if($appointment->status === 'pending' && (!$appointment->vet_id || $appointment->vet_id === auth()->id()) && $appointment->consultation_type === 'appointment')
+        {{-- Show Accept/Reject buttons for pending appointments --}}
+        @if($appointment->status === 'pending')
             <form action="{{ route('appointments.accept', $appointment) }}" method="POST" class="d-inline">
                 @csrf
                 <button type="submit" class="btn btn-success btn-sm" 
@@ -108,13 +102,35 @@
                 </button>
             </form>
             
-            <form action="{{ route('appointments.reject', $appointment) }}" method="POST" class="d-inline">
-                @csrf
-                <button type="submit" class="btn btn-danger btn-sm" 
-                        onclick="return confirm('Are you sure you want to reject this appointment?')">
-                    <i class="fas fa-times me-1"></i>Reject
-                </button>
-            </form>
+            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal{{ $appointment->id }}">
+                <i class="fas fa-times me-1"></i>Reject
+            </button>
+            
+            <!-- Rejection Modal -->
+            <div class="modal fade" id="rejectModal{{ $appointment->id }}" tabindex="-1" aria-labelledby="rejectModalLabel{{ $appointment->id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{{ route('appointments.reject', $appointment) }}" method="POST">
+                            @csrf
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="rejectModalLabel{{ $appointment->id }}">Reject Appointment</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="rejection_reason{{ $appointment->id }}" class="form-label">Reason for Rejection</label>
+                                    <textarea class="form-control" id="rejection_reason{{ $appointment->id }}" name="rejection_reason" rows="4" required></textarea>
+                                    <div class="form-text">Please provide a reason for rejecting this appointment (maximum 500 characters).</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger">Reject Appointment</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         @endif
         
 
@@ -139,8 +155,8 @@
             @else
                 <div class="text-center py-5">
                     <i class="fas fa-stethoscope fa-4x text-muted mb-3"></i>
-                    <h4 class="text-muted">No Appointment Requests</h4>
-                    <p class="text-muted">There are currently no appointment requests to review.</p>
+                    <h4 class="text-muted">No Pending Appointments</h4>
+                    <p class="text-muted">There are currently no pending appointment requests to review.</p>
                 </div>
             @endif
         </div>

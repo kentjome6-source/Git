@@ -122,7 +122,7 @@
             Already have an account? <a href="{{ route('login') }}">Login</a>
         </p>
         
-        <a href="{{ route('vet.register') }}" class="vet-register-link">⚕️ Register as Veterinarian</a>
+        <a href="{{ route('register.vet') }}" class="vet-register-link">⚕️ Register as Veterinarian</a>
     </div>
 </body>
 </html>

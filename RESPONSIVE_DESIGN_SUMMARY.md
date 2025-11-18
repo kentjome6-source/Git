@@ -77,10 +77,6 @@ This document summarizes all the changes made to make the PawPortal Laravel webs
 - Created responsive layout for pet listings
 - Added proper filtering and sorting controls for mobile
 
-### 5.4 Pet Health Records
-- Made health record forms and displays mobile-friendly
-- Added proper spacing and sizing for medical information
-
 ### 5.5 Appointments
 - Optimized appointment forms and listings for mobile
 - Made calendar and time selection mobile-friendly
@@ -155,8 +151,6 @@ This document summarizes all the changes made to make the PawPortal Laravel webs
 - `resources/views/user/multi-pet/index.blade.php`
 - `resources/views/user/adoptions/index.blade.php`
 - `resources/views/user/adoptions/create.blade.php`
-- `resources/views/user/pet-health/index.blade.php`
-- `resources/views/user/pet-health/create.blade.php`
 - `resources/views/user/appointment/index.blade.php`
 - `resources/views/user/appointment/create.blade.php`
 - `resources/views/user/lost-found/index.blade.php`

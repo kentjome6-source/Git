@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Location Details - View Map')
+@section('title', 'Location Details - Map')
 
 @section('styles')
 <style>

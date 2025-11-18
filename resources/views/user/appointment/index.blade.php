@@ -359,7 +359,7 @@
             </div>
             
             <!-- Desktop Table View -->
-            <div class="table-container">
+                    <div class="table-container">
                 <table class="table">
                     <thead>
                         <tr>
@@ -367,7 +367,6 @@
                             <th>Status</th>
                             <th>Veterinarian</th>
                             <th>Created</th>
-                            <th>Appointment Date</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -378,8 +377,7 @@
                                     <div class="pet-info">
                                         <div class="pet-details">
                                             <h4>{{ $appointment->pet_name }}</h4>
-                                            {{-- Removed pet species and breed information as per user request --}}
-                                            <p><small>{{ Str::limit($appointment->chief_complaint, 60) }}</small></p>
+                                            {{-- Pet complaint removed per simplified requirements --}}
                                         </div>
                                     </div>
                                 </td>
@@ -413,13 +411,7 @@
                                     @endif
                                 </td>
                                 <td>{{ $appointment->created_at->format('M d, Y') }}</td>
-                                <td>
-                                    @if($appointment->appointment_date)
-                                        {{ $appointment->appointment_date->format('M d, Y') }}
-                                    @else
-                                        Not set
-                                    @endif
-                                </td>
+                                
                                 <td>
                                     <div class="action-buttons">
                                         <a href="{{ route('appointments.show', $appointment) }}" class="btn btn-primary">
@@ -446,7 +438,7 @@
             
             <!-- Mobile Swipeable View -->
             <div class="swipeable-table-container">
-                @foreach($appointments as $appointment)
+                        @foreach($appointments as $appointment)
                     <div class="swipeable-table-row">
                         <div class="swipeable-table-item">
                             <span class="swipeable-table-label">Pet Name:</span>
@@ -497,21 +489,7 @@
                             <span class="swipeable-table-value">{{ $appointment->created_at->format('M d, Y') }}</span>
                         </div>
                         
-                        <div class="swipeable-table-item">
-                            <span class="swipeable-table-label">Appointment Date:</span>
-                            <span class="swipeable-table-value">
-                                @if($appointment->appointment_date)
-                                    {{ $appointment->appointment_date->format('M d, Y') }}
-                                @else
-                                    Not set
-                                @endif
-                            </span>
-                        </div>
                         
-                        <div class="swipeable-table-item">
-                            <span class="swipeable-table-label">Complaint:</span>
-                            <span class="swipeable-table-value">{{ Str::limit($appointment->chief_complaint, 60) }}</span>
-                        </div>
                         
                         <div class="swipeable-action-buttons">
                             <a href="{{ route('appointments.show', $appointment) }}" class="btn btn-primary">

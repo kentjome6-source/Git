@@ -3,6 +3,8 @@
 @section('title', 'Map Management')
 
 @section('styles')
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
@@ -12,7 +14,7 @@
 
     /* Map Styles */
     .map-section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .map-header { display: flex; justify-content: between; align-items: center; margin-bottom: 20px; }
+    .map-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
     .map-container { 
         height: 400px; 
         border-radius: 8px; 
@@ -49,11 +51,11 @@
         display: none; 
     }
     
-    .map-toggle { display: flex; gap: 10px; align-items: center; }
-    .toggle-btn { padding: 8px 16px; border-radius: 6px; border: 2px solid #667eea; background: white; color: #667eea; cursor: pointer; transition: all 0.2s; }
-    .toggle-btn.active { background: #667eea; color: white; }
-    .toggle-btn:hover { background: #667eea; color: white; }
-
+    .map-actions { margin-left: auto; }
+    
+    .btn-primary { background: #667eea; color: white; padding: 8px 16px; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; text-decoration: none; display: inline-block; }
+    .btn-primary:hover { background: #5a6fd8; }
+    
     /* Responsive styles for mobile */
     @media (max-width: 768px) {
         .admin-header {
@@ -80,19 +82,15 @@
             margin-bottom: 15px;
         }
         
-        .map-toggle {
-            width: 100%;
-            justify-content: center;
-        }
-        
         .map-container {
             height: 300px;
             border-radius: 6px;
         }
         
-        .toggle-btn {
-            padding: 6px 12px;
-            font-size: 0.9rem;
+        .map-actions {
+            margin-left: 0;
+            width: 100%;
+            text-align: center;
         }
     }
     
@@ -160,13 +158,10 @@
                 <i class="fas fa-map-marked-alt"></i>
                 Locations Map
             </h2>
-            <div class="map-toggle">
-                <button type="button" class="toggle-btn active" onclick="toggleMapView('all')" id="btn-all">
-                    <i class="fas fa-globe"></i> All Locations
-                </button>
-                <button type="button" class="toggle-btn" onclick="toggleMapView('filtered')" id="btn-filtered">
-                    <i class="fas fa-filter"></i> Filtered Results
-                </button>
+            <div class="map-actions">
+                <a href="{{ route('admin.map.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Shelter
+                </a>
             </div>
         </div>
         <div id="shelterMap" class="map-container">
@@ -187,7 +182,7 @@
         </div>
         <div style="margin-top: 15px; font-size: 0.9rem; color: #6b7280;">
             <i class="fas fa-info-circle"></i> 
-            Click on map markers to view location details. Use the toggle buttons to switch between all locations and current filter results.
+            Click on map markers to view location details.
         </div>
     </div>
 </div>
@@ -201,8 +196,6 @@
 // Location data from backend
 const locations = @json($shelters->items());
 let allLocations = locations;
-let filteredLocations = locations;
-let currentView = 'all';
 let sharedMap = null;
 
 // Initialize map when document is ready
@@ -244,24 +237,9 @@ function initBasicMap() {
             const lat = parseFloat(location.latitude);
             const lng = parseFloat(location.longitude);
             
-            // Choose icon based on location type
-            let iconClass = 'fas fa-store';
-            let iconColor = '#667eea';
-            
-            switch(location.type) {
-                case 'pet_shop':
-                    iconClass = 'fas fa-store';
-                    iconColor = '#667eea';
-                    break;
-                case 'veterinarian':
-                    iconClass = 'fas fa-user-md';
-                    iconColor = '#10b981';
-                    break;
-                case 'grooming':
-                    iconClass = 'fas fa-cut';
-                    iconColor = '#f59e0b';
-                    break;
-            }
+            // Use only veterinarian icon for all locations
+            let iconClass = 'fas fa-user-md';
+            let iconColor = '#10b981';
             
             // Create custom icon
             const customIcon = L.divIcon({
@@ -284,7 +262,7 @@ function initBasicMap() {
                         </div>
                         <div>
                             <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">${location.name}</h4>
-                            <span style="background: #e5e7eb; color: #374151; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">${getTypeName(location.type)}</span>
+                            <span style="background: #e5e7eb; color: #374151; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Veterinarian</span>
                         </div>
                     </div>
                     <div style="margin-bottom: 8px; color: #4b5563;">
@@ -393,24 +371,9 @@ function initFullscreenMap() {
             const lat = parseFloat(location.latitude);
             const lng = parseFloat(location.longitude);
             
-            // Choose icon based on location type
-            let iconClass = 'fas fa-store';
-            let iconColor = '#667eea';
-            
-            switch(location.type) {
-                case 'pet_shop':
-                    iconClass = 'fas fa-store';
-                    iconColor = '#667eea';
-                    break;
-                case 'veterinarian':
-                    iconClass = 'fas fa-user-md';
-                    iconColor = '#10b981';
-                    break;
-                case 'grooming':
-                    iconClass = 'fas fa-cut';
-                    iconColor = '#f59e0b';
-                    break;
-            }
+            // Use only veterinarian icon for all locations
+            let iconClass = 'fas fa-user-md';
+            let iconColor = '#10b981';
             
             // Create custom icon
             const customIcon = L.divIcon({
@@ -433,7 +396,7 @@ function initFullscreenMap() {
                         </div>
                         <div>
                             <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">${location.name}</h4>
-                            <span style="background: #e5e7eb; color: #374151; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">${getTypeName(location.type)}</span>
+                            <span style="background: #e5e7eb; color: #374151; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Veterinarian</span>
                         </div>
                     </div>
                     <div style="margin-bottom: 8px; color: #4b5563;">
@@ -490,77 +453,6 @@ function getTypeName(type) {
         case 'grooming': return 'Grooming Service';
         default: return type;
     }
-}
-
-// Toggle map view
-function toggleMapView(view) {
-    currentView = view;
-    
-    // Update button states
-    document.getElementById('btn-all').classList.toggle('active', view === 'all');
-    document.getElementById('btn-filtered').classList.toggle('active', view === 'filtered');
-    
-    // Load appropriate markers
-    if (view === 'all') {
-        if (sharedMap) {
-            sharedMap.updateMarkers(allLocations);
-        }
-    } else {
-        // Get currently filtered locations from the table
-        updateFilteredLocations();
-        if (sharedMap) {
-            sharedMap.updateMarkers(filteredLocations);
-        }
-    }
-}
-
-// Update filtered locations based on current table results
-function updateFilteredLocations() {
-    // Get the current URL parameters to determine filtering
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchTerm = urlParams.get('search');
-    const typeFilter = urlParams.get('type');
-    const statusFilter = urlParams.get('status');
-    
-    filteredLocations = allLocations.filter(location => {
-        let matches = true;
-        
-        if (searchTerm) {
-            const search = searchTerm.toLowerCase();
-            matches = matches && (
-                location.name.toLowerCase().includes(search) ||
-                location.address.toLowerCase().includes(search) ||
-                location.city.toLowerCase().includes(search)
-            );
-        }
-        
-        if (typeFilter) {
-            matches = matches && location.type === typeFilter;
-        }
-        
-        if (statusFilter) {
-            const isActive = statusFilter === 'active';
-            matches = matches && location.is_active === isActive;
-        }
-        
-        return matches;
-    });
-}
-
-// Update filtered view when filters are applied
-const filterForm = document.querySelector('.filters-card form');
-if (filterForm) {
-    filterForm.addEventListener('submit', function() {
-        // Small delay to let the page update
-        setTimeout(() => {
-            if (currentView === 'filtered') {
-                updateFilteredLocations();
-                if (sharedMap) {
-                    sharedMap.updateMarkers(filteredLocations);
-                }
-            }
-        }, 100);
-    });
 }
 </script>
 @endsection

@@ -35,10 +35,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class, // Add our new UserSeeder
             ShelterSeeder::class,
-            SanFranciscoVetLocationsSeeder::class,
             // PetsTableSeeder::class,  // Commented out to prevent sample pets
             // AdoptionPetsSeeder::class, // Commented out to prevent sample adoption listings
-            GroomingServicesSeeder::class, // Add the GroomingServicesSeeder
             PostSeeder::class, // Add our new PostSeeder
         ]);
     }

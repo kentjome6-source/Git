@@ -272,7 +272,7 @@
                     <i class="fas fa-paw"></i> Report Pet
                 </a>
                 <a href="{{ route('view.map') }}" class="btn btn-secondary">
-                    <i class="fas fa-map-marked-alt"></i> View Map
+                    <i class="fas fa-map-marked-alt"></i> Map
                 </a>
             </div>
         </div>

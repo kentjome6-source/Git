@@ -57,6 +57,15 @@ class PetController extends Controller
     }
 
     /**
+     * Display the specified pet.
+     */
+    public function show(Pet $pet)
+    {
+        $pet->load(['user']);
+        return view('admin.pets.show', compact('pet'));
+    }
+
+    /**
      * Show the form for editing the specified pet.
      */
     public function edit(Pet $pet)

@@ -38,18 +38,39 @@ class PetUserController extends Controller
             'role' => 'pet',
         ]);
 
-        return redirect()->route('pet-users.index')->with('success', 'Pet user created successfully.');
+        return redirect()->route('admin.pet-users.index')->with('success', 'Pet user created successfully.');
+    }
+
+    // Show pet user details
+    public function show(User $petUser)
+    {
+        // Ensure user is a pet user
+        if ($petUser->role !== 'pet') {
+            abort(404, 'User not found.');
+        }
+        
+        return view('admin.pet-users.show', compact('petUser'));
     }
 
     // Show edit form
     public function edit(User $petUser)
     {
+        // Ensure user is a pet user
+        if ($petUser->role !== 'pet') {
+            abort(404, 'User not found.');
+        }
+        
         return view('admin.pet-users.edit', compact('petUser'));
     }
 
     // Update pet user
     public function update(Request $request, User $petUser)
     {
+        // Ensure user is a pet user
+        if ($petUser->role !== 'pet') {
+            abort(404, 'User not found.');
+        }
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$petUser->id,
@@ -64,13 +85,18 @@ class PetUserController extends Controller
         $petUser->role = 'pet'; // ensure role stays pet
         $petUser->save();
 
-        return redirect()->route('pet-users.index')->with('success', 'Pet user updated successfully.');
+        return redirect()->route('admin.pet-users.index')->with('success', 'Pet user updated successfully.');
     }
 
     // Delete pet user
     public function destroy(User $petUser)
     {
+        // Ensure user is a pet user
+        if ($petUser->role !== 'pet') {
+            abort(404, 'User not found.');
+        }
+        
         $petUser->delete();
-        return redirect()->route('pet-users.index')->with('success', 'Pet user deleted successfully.');
+        return redirect()->route('admin.pet-users.index')->with('success', 'Pet user deleted successfully.');
     }
 }

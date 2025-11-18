@@ -55,9 +55,9 @@
                 @if(Auth::user()->role == 'admin')
                     {{ route('admin.dashboard') }}
                 @elseif(Auth::user()->role == 'user')
-                    {{ route('pet.health') }}
+                    {{ route('pet.multipet.index') }}
                 @elseif(Auth::user()->role == 'vet')
-                    {{ route('vet.records') }}
+                    {{ route('vet.appointments') }}
                 @else
                     {{ url('/') }}
                 @endif

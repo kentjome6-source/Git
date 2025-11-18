@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('province');
             $table->string('phone');
             $table->string('email')->nullable();
+            // Ensure `operating_hours` column is properly configured for JSON data
             $table->json('operating_hours')->nullable();
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();

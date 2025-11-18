@@ -96,7 +96,7 @@
         @if(session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
-        <form method="POST" action="{{ route('login.post') }}">
+        <form method="POST" action="{{ route('login') }}">
             @csrf
             <div class="mb-3">
                 <label>Email</label>
@@ -124,7 +124,7 @@
         </div>
         
         <a href="{{ route('register') }}" class="register-link">Register as Pet Owner</a>
-        <a href="{{ route('vet.register') }}" class="vet-register-link">⚕️ Register as Veterinarian</a>
+        <a href="{{ route('register.vet') }}" class="vet-register-link">⚕️ Register as Veterinarian</a>
     </div>
 </body>
 </html>

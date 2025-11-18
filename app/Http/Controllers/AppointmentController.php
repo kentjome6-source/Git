@@ -47,96 +47,43 @@ class AppointmentController extends Controller
     {
         $validated = $request->validate([
             'appointment_type' => 'required|in:appointment',
-            'urgency_level' => 'required|in:low,medium,high,emergency',
-            'vet_id' => 'required|exists:users,id,role,vet,is_verified_vet,1',
-            
-            // Owner Information
+            'vet_id' => 'required|exists:users,id',
+
+            // Owner Information (simplified)
             'owner_name' => 'required|string|max:255',
             'owner_phone' => 'required|string|max:20',
-            'owner_email' => 'required|email|max:255',
+            'email' => 'required|email|max:255',
             'owner_address' => 'nullable|string',
-            
-            // Pet Information
+
+            // Pet Information (simplified)
             'pet_name' => 'required|string|max:255',
-            'pet_species' => 'required|string|max:255',
-            'pet_breed' => 'nullable|string|max:255',
-            'pet_age_years' => 'nullable|numeric|min:0|max:30', // Changed from pet_age to pet_age_years
-            'pet_weight' => 'nullable|numeric|min:0|max:999.99',
-            'pet_gender' => 'nullable|in:male,female,unknown',
+            'pet_type' => 'required|in:Dog,Cat',
+            'pet_services_received' => 'nullable|string',
             
-            // Appointment Details
-            'chief_complaint' => 'required|string',
-            'detailed_symptoms' => 'required|string',
-            'consultation_reason' => 'required|in:routine_checkup,illness,injury,vaccination,behavioral,other',
-            'additional_concerns' => 'nullable|string',
-            
-            // Duration of Symptoms
-            'symptom_duration_days' => 'nullable|integer|min:0',
-            'symptom_onset' => 'required|in:sudden,gradual,intermittent',
-            'symptom_progression' => 'nullable|string',
-            
-            // Previous Medications / Treatments
-            'current_medications' => 'nullable|string',
-            'previous_treatments' => 'nullable|string',
-            'allergies' => 'nullable|string',
-            'vaccination_history' => 'nullable|string',
-            'previous_medical_history' => 'nullable|string',
-            
-            // Scheduling
-            'scheduled_datetime' => 'nullable|date|after:now',
-            'appointment_date' => 'nullable|date',
-            'appointment_time' => 'nullable|date_format:H:i',
+            // Scheduling (optional)
+            'preferred_date' => 'nullable|date',
+            'preferred_time' => 'nullable|date_format:H:i',
         ]);
 
-        // Create appointment without creating a new pet record
-        $validated['user_id'] = Auth::id();
-        $validated['status'] = 'pending';
-
-        // Prepare appointment data
         $appointmentData = [
-            'user_id' => $validated['user_id'],
-            'pet_id' => null, // No pet record created, only store info in appointment
+            'user_id' => Auth::id(),
             'vet_id' => $validated['vet_id'],
-            'urgency_level' => $validated['urgency_level'],
-            'status' => $validated['status'],
-            
-            // Owner Information
+            'status' => 'pending',
+
+            // Owner
             'owner_name' => $validated['owner_name'],
             'owner_phone' => $validated['owner_phone'],
-            'owner_email' => $validated['owner_email'],
-            'owner_address' => $validated['owner_address'],
-            
-            // Pet Information
+            'email' => $validated['email'],
+            'owner_address' => $validated['owner_address'] ?? null,
+
+            // Pet
             'pet_name' => $validated['pet_name'],
-            'pet_species' => $validated['pet_species'],
-            'pet_breed' => $validated['pet_breed'],
-            'pet_age_years' => $validated['pet_age_years'], // Changed from $validated['pet_age'] to $validated['pet_age_years']
-            // Removed pet_age_months as it doesn't exist in the database
-            'pet_weight' => $validated['pet_weight'],
-            'pet_gender' => $validated['pet_gender'] ?? 'unknown',
-            
-            // Appointment Details
-            'chief_complaint' => $validated['chief_complaint'],
-            'detailed_symptoms' => $validated['detailed_symptoms'],
-            'consultation_reason' => $validated['consultation_reason'],
-            'additional_concerns' => $validated['additional_concerns'],
-            
-            // Duration of Symptoms
-            'symptom_duration_days' => $validated['symptom_duration_days'],
-            'symptom_onset' => $validated['symptom_onset'],
-            'symptom_progression' => $validated['symptom_progression'],
-            
-            // Previous Medications / Treatments
-            'current_medications' => $validated['current_medications'],
-            'previous_treatments' => $validated['previous_treatments'],
-            'allergies' => $validated['allergies'],
-            'vaccination_history' => $validated['vaccination_history'],
-            'previous_medical_history' => $validated['previous_medical_history'],
-            
+            'pet_type' => $validated['pet_type'],
+            'pet_services_received' => $validated['pet_services_received'] ?? null,
+
             // Scheduling
-            'scheduled_datetime' => $validated['scheduled_datetime'],
-            'appointment_date' => $validated['appointment_date'],
-            'appointment_time' => $validated['appointment_time'],
+            'scheduled_datetime' => isset($validated['preferred_date']) && isset($validated['preferred_time']) ? 
+                $validated['preferred_date'] . ' ' . $validated['preferred_time'] . ':00' : null,
         ];
 
         $appointment = Appointment::create($appointmentData);
@@ -156,7 +103,6 @@ class AppointmentController extends Controller
         }
 
         $appointment->load(['pet', 'vet', 'user']);
-        
         return view('user.appointment.show', compact('appointment'));
     }
 
@@ -182,89 +128,42 @@ class AppointmentController extends Controller
 
         $validated = $request->validate([
             'appointment_type' => 'required|in:appointment',
-            'urgency_level' => 'required|in:low,medium,high,emergency',
-            'vet_id' => 'required|exists:users,id,role,vet,is_verified_vet,1',
-            
-            // Owner Information
+            'vet_id' => 'required|exists:users,id',
+
+            // Owner Information (simplified)
             'owner_name' => 'required|string|max:255',
             'owner_phone' => 'required|string|max:20',
-            'owner_email' => 'required|email|max:255',
+            'email' => 'required|email|max:255',
             'owner_address' => 'nullable|string',
-            
-            // Pet Information
+
+            // Pet Information (simplified)
             'pet_name' => 'required|string|max:255',
-            'pet_species' => 'required|string|max:255',
-            'pet_breed' => 'nullable|string|max:255',
-            'pet_age_years' => 'nullable|numeric|min:0|max:30', // Changed from pet_age to pet_age_years
-            'pet_weight' => 'nullable|numeric|min:0|max:999.99',
-            'pet_gender' => 'nullable|in:male,female,unknown',
+            'pet_type' => 'required|in:Dog,Cat',
+            'pet_services_received' => 'nullable|string',
             
-            // Appointment Details
-            'chief_complaint' => 'required|string',
-            'detailed_symptoms' => 'required|string',
-            'consultation_reason' => 'required|in:routine_checkup,illness,injury,vaccination,behavioral,other',
-            'additional_concerns' => 'nullable|string',
-            
-            // Duration of Symptoms
-            'symptom_duration_days' => 'nullable|integer|min:0',
-            'symptom_onset' => 'required|in:sudden,gradual,intermittent',
-            'symptom_progression' => 'nullable|string',
-            
-            // Previous Medications / Treatments
-            'current_medications' => 'nullable|string',
-            'previous_treatments' => 'nullable|string',
-            'allergies' => 'nullable|string',
-            'vaccination_history' => 'nullable|string',
-            'previous_medical_history' => 'nullable|string',
-            
-            // Scheduling
-            'scheduled_datetime' => 'nullable|date|after:now',
-            'appointment_date' => 'nullable|date',
-            'appointment_time' => 'nullable|date_format:H:i',
+            // Scheduling (optional)
+            'preferred_date' => 'nullable|date',
+            'preferred_time' => 'nullable|date_format:H:i',
         ]);
 
-        // Prepare appointment data
+        // Prepare appointment data (simplified)
         $appointmentData = [
-            'urgency_level' => $validated['urgency_level'],
             'vet_id' => $validated['vet_id'],
-            
+
             // Owner Information
             'owner_name' => $validated['owner_name'],
             'owner_phone' => $validated['owner_phone'],
-            'owner_email' => $validated['owner_email'],
-            'owner_address' => $validated['owner_address'],
-            
+            'email' => $validated['email'],
+            'owner_address' => $validated['owner_address'] ?? null,
+
             // Pet Information
             'pet_name' => $validated['pet_name'],
-            'pet_species' => $validated['pet_species'],
-            'pet_breed' => $validated['pet_breed'],
-            'pet_age_years' => $validated['pet_age_years'], // Changed from $validated['pet_age'] to $validated['pet_age_years']
-            // Removed pet_age_months as it doesn't exist in the database
-            'pet_weight' => $validated['pet_weight'],
-            'pet_gender' => $validated['pet_gender'] ?? 'unknown',
-            
-            // Appointment Details
-            'chief_complaint' => $validated['chief_complaint'],
-            'detailed_symptoms' => $validated['detailed_symptoms'],
-            'consultation_reason' => $validated['consultation_reason'],
-            'additional_concerns' => $validated['additional_concerns'],
-            
-            // Duration of Symptoms
-            'symptom_duration_days' => $validated['symptom_duration_days'],
-            'symptom_onset' => $validated['symptom_onset'],
-            'symptom_progression' => $validated['symptom_progression'],
-            
-            // Previous Medications / Treatments
-            'current_medications' => $validated['current_medications'],
-            'previous_treatments' => $validated['previous_treatments'],
-            'allergies' => $validated['allergies'],
-            'vaccination_history' => $validated['vaccination_history'],
-            'previous_medical_history' => $validated['previous_medical_history'],
-            
+            'pet_type' => $validated['pet_type'],
+            'pet_services_received' => $validated['pet_services_received'] ?? null,
+
             // Scheduling
-            'scheduled_datetime' => $validated['scheduled_datetime'],
-            'appointment_date' => $validated['appointment_date'],
-            'appointment_time' => $validated['appointment_time'],
+            'scheduled_datetime' => isset($validated['preferred_date']) && isset($validated['preferred_time']) ? 
+                $validated['preferred_date'] . ' ' . $validated['preferred_time'] . ':00' : null,
         ];
 
         $appointment->update($appointmentData);
@@ -299,12 +198,28 @@ class AppointmentController extends Controller
             abort(403, 'Access denied. Veterinarian role required.');
         }
 
-        $appointments = Appointment::with(['user', 'pet'])
-            ->orderBy('urgency_level', 'desc')
+        // Only show pending appointments to vets
+        $appointments = Appointment::where('status', 'pending')
+            ->with(['user', 'pet'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
         return view('user.appointment.vet-index', compact('appointments'));
+    }
+
+    /**
+     * Display appointment history for the authenticated user
+     */
+    public function history(Request $request)
+    {
+        // Only show accepted or rejected appointments for this specific user
+        $appointments = Appointment::where('user_id', Auth::id())
+            ->whereIn('status', ['accepted', 'rejected'])
+            ->with(['vet'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return view('user.appointment.history', compact('appointments'));
     }
 
     /**
@@ -340,16 +255,22 @@ class AppointmentController extends Controller
             abort(403, 'Access denied.');
         }
 
+        // Validate the request to include rejection reason
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|max:500',
+        ]);
+
         // Check if appointment is already accepted or assigned to another vet
         if ($appointment->status !== 'pending' || ($appointment->vet_id && $appointment->vet_id !== Auth::id())) {
             return redirect()->back()->with('error', 'This appointment cannot be rejected.');
         }
 
-        // Reject the appointment
+        // Reject the appointment with reason
         $appointment->update([
             'status' => 'rejected',
             'rejected_at' => now(),
             'rejected_by' => Auth::id(),
+            'rejection_reason' => $validated['rejection_reason'],
         ]);
 
         return redirect()->back()->with('success', 'Appointment rejected successfully!');

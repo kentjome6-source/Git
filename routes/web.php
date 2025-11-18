@@ -1,209 +1,202 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PetHealthController;
-use App\Http\Controllers\AppointmentController;
-use App\Http\Controllers\LostFoundController;
-use App\Http\Controllers\PetController;
-use App\Http\Controllers\AdoptionController;
-use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Admin\AdoptionController;
 use App\Http\Controllers\Admin\LostFoundController as AdminLostFoundController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Admin\MapController as AdminMapController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\VetController;
-use App\Http\Controllers\ViewMapController;
+use App\Http\Controllers\Admin\MapController;
+use App\Http\Controllers\Admin\PetController as AdminPetController;
+use App\Http\Controllers\Admin\PetUserController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AdoptionController as UserAdoptionController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PetController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\VetController;
+use App\Http\Controllers\ViewMapController;
+use App\Http\Controllers\LostFoundController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn() => view('welcome'));
+// Public Routes
+Route::get('/', function () {
+    return view('welcome');
+});
 
-// Auth
+// Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
-
-// Google OAuth
+Route::post('/login', [AuthController::class, 'login']);
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
-
-// Registration (Pet User only)
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+Route::get('/register/vet', [AuthController::class, 'showVetRegister'])->name('register.vet');
+Route::post('/register/vet', [AuthController::class, 'vetRegister']);
 
-// Veterinarian Registration
-Route::get('/vet/register', [AuthController::class, 'showVetRegister'])->name('vet.register');
-Route::post('/vet/register', [AuthController::class, 'vetRegister'])->name('vet.register.post');
+// Logout Route
+Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
-
-// Dashboards
-Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard')->middleware(['auth', 'admin']);
-
-// Profile and Pet Routes
-Route::middleware('auth')->group(function () {
-    // Generic profile route (kept for backward compatibility)
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+// Vet Routes
+Route::prefix('vet')->name('vet.')->middleware(['can:isVet', 'vet.verified'])->group(function () {
+    Route::get('records', [VetController::class, 'records'])->name('records');
+    Route::get('records/{id}', [VetController::class, 'show'])->name('records.show');
+    Route::get('records/{id}/view', [VetController::class, 'viewRecord'])->name('records.view');
+    Route::get('/appointments', [VetController::class, 'appointments'])->name('appointments');
+    Route::get('/appointment-records', [VetController::class, 'appointmentRecords'])->name('appointment.records');
     
-    // Role-specific profile routes
-    Route::get('/user/profile', [ProfileController::class, 'edit'])->name('user.profile.edit');
-    Route::post('/user/profile', [ProfileController::class, 'update'])->name('user.profile.update');
-    
-    Route::get('/admin/profile', [ProfileController::class, 'edit'])->name('admin.profile.edit');
-    Route::post('/admin/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
-    
-    Route::get('/vet/profile', [ProfileController::class, 'edit'])->name('vet.profile.edit');
-    Route::post('/vet/profile', [ProfileController::class, 'update'])->name('vet.profile.update');
-
-    // Adoption Routes
-    Route::get('/adoptions', [AdoptionController::class, 'index'])->name('adoptions.index');
-    Route::get('/adoptions/history', [AdoptionController::class, 'history'])->name('adoptions.history');
-    Route::get('/adoptions/create', [AdoptionController::class, 'create'])->name('adoptions.create');
-    Route::post('/adoptions', [AdoptionController::class, 'store'])->name('adoptions.store');
-    Route::get('/adoptions/{adoption}', [AdoptionController::class, 'show'])->name('adoptions.show');
-    Route::post('/adoptions/{adoption}/adopt', [AdoptionController::class, 'adopt'])->name('adoptions.adopt');
-    Route::post('/adoptions/{adoption}/approve', [AdoptionController::class, 'approveAdoption'])->name('adoptions.approve');
-    Route::post('/adoptions/{adoption}/reject', [AdoptionController::class, 'rejectAdoption'])->name('adoptions.reject');
-    Route::post('/adoptions/{adoption}/complete', [AdoptionController::class, 'completeAdoption'])->name('adoptions.complete');
-    Route::delete('/adoptions/{adoption}', [AdoptionController::class, 'destroy'])->name('adoptions.destroy');
-
-    // Pet Health Routes (converted from RESTful resource)
-    Route::get('/pet-health', [PetHealthController::class, 'index'])->name('pet.health');
-    Route::get('/pet-health/create', [PetHealthController::class, 'create'])->name('pet.health.create');
-    Route::post('/pet-health', [PetHealthController::class, 'store'])->name('pet.health.store');
-    Route::get('/pet-health/{petHealth}', [PetHealthController::class, 'show'])->name('pet.health.show');
-    Route::get('/pet-health/{petHealth}/edit', [PetHealthController::class, 'edit'])->name('pet.health.edit');
-    Route::put('/pet-health/{petHealth}', [PetHealthController::class, 'update'])->name('pet.health.update');
-    Route::delete('/pet-health/{petHealth}', [PetHealthController::class, 'destroy'])->name('pet.health.destroy');
-
-    Route::get('/view-map', [ViewMapController::class, 'index'])->name('view.map');
-    Route::get('/view-map/shelter/{shelter}', [ViewMapController::class, 'showShelter'])->name('view.map.shelter.show');
-    
-    // Multi-Pet Dashboard Routes
-    Route::get('/multi-pet', [PetController::class, 'index'])->name('pet.multipet.index');
-    Route::get('/multi-pet/create', [PetController::class, 'create'])->name('pet.multipet.create');
-    Route::post('/multi-pet', [PetController::class, 'store'])->name('pet.multipet.store');
-    Route::get('/multi-pet/{pet}', [PetController::class, 'show'])->name('pet.multipet.show');
-    Route::get('/multi-pet/{pet}/edit', [PetController::class, 'edit'])->name('pet.multipet.edit');
-    Route::put('/multi-pet/{pet}', [PetController::class, 'update'])->name('pet.multipet.update');
-    Route::delete('/multi-pet/{pet}', [PetController::class, 'destroy'])->name('pet.multipet.destroy');
-    
-    // Appointment Routes (converted from RESTful resource)
-    Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
-    Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create');
-    Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+    // Vet Appointment Management Routes
     Route::get('/appointments/{appointment}', [AppointmentController::class, 'show'])->name('appointments.show');
-    Route::get('/appointments/{appointment}/edit', [AppointmentController::class, 'edit'])->name('appointments.edit');
-    Route::put('/appointments/{appointment}', [AppointmentController::class, 'update'])->name('appointments.update');
-    Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
-    Route::get('/appointments/vet/dashboard', [AppointmentController::class, 'vetIndex'])->name('appointments.vet.index');
     Route::post('/appointments/{appointment}/accept', [AppointmentController::class, 'accept'])->name('appointments.accept');
     Route::post('/appointments/{appointment}/reject', [AppointmentController::class, 'reject'])->name('appointments.reject');
-    Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.update-status');
+    Route::put('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.status.update');
     
-    // Chat Routes for Users
-    Route::get('/messages', [ChatController::class, 'index'])->name('user.messages.index');
-    Route::post('/messages/send', [ChatController::class, 'send'])->name('user.messages.send');
-    Route::get('/messages/fetch', [ChatController::class, 'fetchMessages'])->name('user.messages.fetch');
-    Route::get('/messages/unread-count', [ChatController::class, 'getUnreadCount'])->name('user.messages.unread-count');
-    Route::post('/messages/mark-as-read', [ChatController::class, 'markAsRead'])->name('user.messages.mark-as-read');
-    Route::get('/messages/contact-unread-count', [ChatController::class, 'getContactUnreadCount'])->name('user.messages.contact-unread-count');
-
-    // Lost & Found Routes
-    Route::get('/lost-found', [LostFoundController::class, 'index'])->name('pet.lostfound');
-    Route::get('/lost-found/map', [LostFoundController::class, 'map'])->name('lost-found.map');
-    Route::get('/lost-found/create', [LostFoundController::class, 'create'])->name('lost-found.create');
-    Route::post('/lost-found', [LostFoundController::class, 'store'])->name('lost-found.store');
-    Route::get('/lost-found/{lostFound}', [LostFoundController::class, 'show'])->name('lost-found.show');
-    Route::get('/lost-found/{lostFound}/edit', [LostFoundController::class, 'edit'])->name('lost-found.edit');
-    Route::put('/lost-found/{lostFound}', [LostFoundController::class, 'update'])->name('lost-found.update');
-    Route::delete('/lost-found/{lostFound}', [LostFoundController::class, 'destroy'])->name('lost-found.destroy');
-    Route::patch('/lost-found/{lostFound}/resolve', [LostFoundController::class, 'markResolved'])->name('lost-found.resolve');
-    Route::get('/my-listings', [LostFoundController::class, 'myListings'])->name('lost-found.my-listings');
-
-    // Furparent Social Media Routes
-    Route::get('/social-media', [PostController::class, 'index'])->name('social-media.index');
-    Route::get('/social-media/create', [PostController::class, 'create'])->name('social-media.create');
-    Route::post('/social-media', [PostController::class, 'store'])->name('social-media.store');
-    Route::get('/social-media/my-posts', [PostController::class, 'myPosts'])->name('social-media.my-posts');
-    Route::delete('/social-media/{post}', [PostController::class, 'destroy'])->name('social-media.destroy');
-    Route::post('/social-media/{post}/toggle-like', [PostController::class, 'toggleLike'])->name('social-media.toggle-like');
-    Route::get('/social-media/{post}', [PostController::class, 'show'])->name('social-media.show');
-
-    // Comments Routes
-    Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
-    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
-
-    // Vet Routes
-    Route::prefix('vet')->name('vet.')->middleware(['can:isVet', 'vet.verified'])->group(function () {
-        Route::get('adoptions', [App\Http\Controllers\Vet\AdoptionController::class, 'index'])->name('adoptions.index');
-        Route::get('adoptions/management', [App\Http\Controllers\Vet\AdoptionManagementController::class, 'index'])->name('adoptions.management.index');
-        Route::get('adoptions/management/create', [App\Http\Controllers\Vet\AdoptionManagementController::class, 'create'])->name('adoptions.management.create');
-        Route::post('adoptions/management', [App\Http\Controllers\Vet\AdoptionManagementController::class, 'store'])->name('adoptions.management.store');
-        Route::get('adoptions/management/{adoption}', [App\Http\Controllers\Vet\AdoptionManagementController::class, 'show'])->name('adoptions.management.show');
-        Route::delete('adoptions/management/{adoption}', [App\Http\Controllers\Vet\AdoptionManagementController::class, 'destroy'])->name('adoptions.management.destroy');
-        
-        // Add adoption request routes for vets
-        Route::post('adoptions/management/{adoption}/adopt', [App\Http\Controllers\Vet\AdoptionManagementController::class, 'adopt'])->name('adoptions.management.adopt');
-        Route::post('adoptions/management/{adoption}/approve', [App\Http\Controllers\Vet\AdoptionManagementController::class, 'approveAdoption'])->name('adoptions.management.approve');
-        Route::post('adoptions/management/{adoption}/reject', [App\Http\Controllers\Vet\AdoptionManagementController::class, 'rejectAdoption'])->name('adoptions.management.reject');
-        Route::post('adoptions/management/{adoption}/complete', [App\Http\Controllers\Vet\AdoptionManagementController::class, 'completeAdoption'])->name('adoptions.management.complete');
-        
-        Route::get('records', [VetController::class, 'records'])->name('records');
-        Route::get('records/{id}', [VetController::class, 'show'])->name('records.show');
-        Route::get('records/{id}/view', [VetController::class, 'viewRecord'])->name('records.view');
-        Route::get('records/{id}/treatment/create', [VetController::class, 'createTreatment'])->name('records.treatment.create');
-        Route::post('records/{id}/treatments', [VetController::class, 'addTreatment'])->name('records.treatments.add');
-        Route::get('treatments/{treatment}/edit', [VetController::class, 'editTreatment'])->name('records.treatments.edit');
-        Route::put('treatments/{treatment}', [VetController::class, 'updateTreatment'])->name('records.treatments.update');
-        Route::get('/appointments', [VetController::class, 'appointments'])->name('appointments');
-        
-        // Chat Routes for Vets
-        Route::get('messages', [ChatController::class, 'vetIndex'])->name('messages.index');
-        Route::post('/messages/send', [ChatController::class, 'send'])->name('messages.send');
-        Route::get('/messages/fetch', [ChatController::class, 'fetchMessages'])->name('messages.fetch');
-        Route::get('/messages/unread-count', [ChatController::class, 'getUnreadCount'])->name('messages.unread-count');
-        Route::post('/messages/mark-as-read', [ChatController::class, 'markAsRead'])->name('messages.mark-as-read');
-        Route::get('/messages/contact-unread-count', [ChatController::class, 'getContactUnreadCount'])->name('messages.contact-unread-count');
-    });
+    // Chat Routes for Vets
+    Route::get('messages', [ChatController::class, 'vetIndex'])->name('messages.index');
+    Route::post('/messages/send', [ChatController::class, 'send'])->name('messages.send');
+    Route::get('/messages/fetch', [ChatController::class, 'fetchMessages'])->name('messages.fetch');
+    Route::get('/messages/unread-count', [ChatController::class, 'getUnreadCount'])->name('messages.unread-count');
+    Route::post('/messages/mark-as-read', [ChatController::class, 'markAsRead'])->name('messages.mark-as-read');
+    Route::get('/messages/contact-unread-count', [ChatController::class, 'getContactUnreadCount'])->name('messages.contact-unread-count');
+    
+    // Vet Profile Routes
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');    
 });
 
 // Admin Routes
-Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
-    // User Management (converted from RESTful resource)
-    Route::get('/users', [AdminUserController::class, 'index'])->name('admin.users.index');
-    Route::get('/users/create', [AdminUserController::class, 'create'])->name('admin.users.create');
-    Route::post('/users', [AdminUserController::class, 'store'])->name('admin.users.store');
-    Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('admin.users.show');
-    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
-    Route::post('/users/bulk-action', [AdminUserController::class, 'bulkAction'])->name('admin.users.bulk-action');
+Route::middleware(['auth', 'can:isAdmin'])->group(function () {
+    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     
-    // Veterinarian Verification Routes
-    Route::post('/users/{id}/verify-vet', [AdminUserController::class, 'verifyVet'])->name('admin.users.verify-vet');
-    Route::post('/users/{id}/reject-vet', [AdminUserController::class, 'rejectVet'])->name('admin.users.reject-vet');
+    // Admin Profile Routes
+    Route::get('/admin/profile', [ProfileController::class, 'edit'])->name('admin.profile.edit');
+    Route::patch('/admin/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
+    Route::delete('/admin/profile', [ProfileController::class, 'destroy'])->name('admin.profile.destroy');
     
-    // Adoption Management
-    Route::get('/adoptions', [App\Http\Controllers\Admin\AdoptionController::class, 'index'])->name('admin.adoptions.index');
+    // Admin Pet Management
+    Route::resource('admin/pets', AdminPetController::class)->names([
+        'index' => 'admin.pets.index',
+        'create' => 'admin.pets.create',
+        'store' => 'admin.pets.store',
+        'show' => 'admin.pets.show',
+        'edit' => 'admin.pets.edit',
+        'update' => 'admin.pets.update',
+        'destroy' => 'admin.pets.destroy',
+    ]);
     
-    // Lost & Found Management
-    Route::get('/lost-found', [AdminLostFoundController::class, 'index'])->name('admin.lost-found.index');
-    Route::get('/lost-found/{lostFound}', [AdminLostFoundController::class, 'show'])->name('admin.lost-found.show');
+    // Admin User Management
+    Route::resource('admin/users', UserController::class)->names([
+        'index' => 'admin.users.index',
+        'create' => 'admin.users.create',
+        'store' => 'admin.users.store',
+        'show' => 'admin.users.show',
+        'edit' => 'admin.users.edit',
+        'update' => 'admin.users.update',
+        'destroy' => 'admin.users.destroy',
+    ]);
+    Route::post('admin/users/bulk-action', [UserController::class, 'bulkAction'])->name('admin.users.bulk-action');
+    Route::post('admin/users/{user}/verify-vet', [UserController::class, 'verifyVet'])->name('admin.users.verify-vet');
+    Route::post('admin/users/{user}/reject-vet', [UserController::class, 'rejectVet'])->name('admin.users.reject-vet');
     
-    // Map Management
-    Route::get('/map', [AdminMapController::class, 'index'])->name('admin.map.index');
-    Route::get('/map/location/{shelter}', [AdminMapController::class, 'show'])->name('admin.map.show');
-    Route::delete('/map/location/{shelter}', [AdminMapController::class, 'destroy'])->name('admin.map.destroy');
-    Route::patch('/map/location/{shelter}/toggle-status', [AdminMapController::class, 'toggleStatus'])->name('admin.map.toggle-status');
+    // Admin Adoption Management
+    Route::resource('admin/adoptions', AdoptionController::class)->names([
+        'index' => 'admin.adoptions.index',
+        'create' => 'admin.adoptions.create',
+        'store' => 'admin.adoptions.store',
+        'show' => 'admin.adoptions.show',
+        'edit' => 'admin.adoptions.edit',
+        'update' => 'admin.adoptions.update',
+        'destroy' => 'admin.adoptions.destroy',
+    ]);
     
-    // Pet Management (converted from RESTful resource)
-    Route::get('/pets', [App\Http\Controllers\Admin\PetController::class, 'index'])->name('admin.pets.index');
-    Route::get('/pets/create', [App\Http\Controllers\Admin\PetController::class, 'create'])->name('admin.pets.create');
-    Route::post('/pets', [App\Http\Controllers\Admin\PetController::class, 'store'])->name('admin.pets.store');
-    Route::get('/pets/{pet}/edit', [App\Http\Controllers\Admin\PetController::class, 'edit'])->name('admin.pets.edit');
-    Route::put('/pets/{pet}', [App\Http\Controllers\Admin\PetController::class, 'update'])->name('admin.pets.update');
-    Route::delete('/pets/{pet}', [App\Http\Controllers\Admin\PetController::class, 'destroy'])->name('admin.pets.destroy');
+    // Admin Lost & Found Management
+    Route::resource('admin/lost-found', AdminLostFoundController::class)->names([
+        'index' => 'admin.lost-found.index',
+        'create' => 'admin.lost-found.create',
+        'store' => 'admin.lost-found.store',
+        'show' => 'admin.lost-found.show',
+        'edit' => 'admin.lost-found.edit',
+        'update' => 'admin.lost-found.update',
+        'destroy' => 'admin.lost-found.destroy',
+    ]);
     
+    // Admin Map Management
+    Route::resource('admin/map', MapController::class)->names([
+        'index' => 'admin.map.index',
+        'create' => 'admin.map.create',
+        'store' => 'admin.map.store',
+        'show' => 'admin.map.show',
+        'edit' => 'admin.map.edit',
+        'update' => 'admin.map.update',
+        'destroy' => 'admin.map.destroy',
+    ]);
+    
+    // Admin Pet User Management
+    Route::resource('admin/pet-users', PetUserController::class);
 });
+
+// Authenticated User Routes
+Route::middleware(['auth'])->group(function () {
+    // Profile Routes
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/user/profile', [ProfileController::class, 'edit'])->name('user.profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Pet Routes
+    Route::resource('pets', PetController::class)->names([
+        'index' => 'pet.multipet.index',
+        'create' => 'pet.multipet.create',
+        'store' => 'pet.multipet.store',
+        'show' => 'pet.multipet.show',
+        'edit' => 'pet.multipet.edit',
+        'update' => 'pet.multipet.update',
+        'destroy' => 'pet.multipet.destroy',
+    ]);
+    
+    // Appointment Routes
+    Route::get('/appointments/history', [AppointmentController::class, 'history'])->name('appointments.history');
+    Route::resource('appointments', AppointmentController::class);
+    
+    // Adoption Routes
+    Route::resource('adoptions', UserAdoptionController::class);
+    Route::get('/adoptions/history', [UserAdoptionController::class, 'history'])->name('adoptions.history');
+    
+    // Lost & Found Routes
+    Route::get('pet/lostfound', [LostFoundController::class, 'index'])->name('pet.lostfound');
+    Route::resource('lost-found', LostFoundController::class);
+    
+    // Social Media Routes
+    Route::resource('social-media', PostController::class)->names([
+        'index' => 'social-media.index',
+        'create' => 'social-media.create',
+        'store' => 'social-media.store',
+        'show' => 'social-media.show',
+        'edit' => 'social-media.edit',
+        'update' => 'social-media.update',
+        'destroy' => 'social-media.destroy',
+    ]);
+    Route::post('social-media/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+    
+    // Chat Routes
+    Route::get('/messages', [ChatController::class, 'index'])->name('messages.index');
+    // User Messages Routes
+    Route::get('/user/messages', [ChatController::class, 'index'])->name('user.messages.index');
+    Route::post('/user/messages/send', [ChatController::class, 'send'])->name('user.messages.send');
+    Route::get('/user/messages/unread-count', [ChatController::class, 'getUnreadCount'])->name('user.messages.unread-count');
+    Route::post('/user/messages/mark-as-read', [ChatController::class, 'markAsRead'])->name('user.messages.mark-as-read');
+    
+    // Map Routes
+    Route::get('/view-map', [ViewMapController::class, 'index'])->name('view-map.index');
+    Route::get('/view-map/{id}', [ViewMapController::class, 'show'])->name('view-map.show');
+    Route::get('/view-map', [ViewMapController::class, 'index'])->name('view.map');
+});
+
+// Password Reset Routes
+Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');

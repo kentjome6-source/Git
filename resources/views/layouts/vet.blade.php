@@ -283,22 +283,15 @@
 
         <div class="menu">
             <div class="menu-item">
-                <a href="{{ route('vet.records') }}" class="menu-link {{ request()->routeIs('vet.records*') ? 'active' : '' }}">
-                    <i class="fas fa-heart-pulse menu-icon"></i>
-                    <span class="menu-text">Access To Pet Health & Records</span>
-                </a>
-            </div>
-
-            <div class="menu-item">
                 <a href="{{ route('vet.appointments') }}" class="menu-link {{ request()->routeIs('vet.appointments') ? 'active' : '' }}">
                     <i class="fas fa-stethoscope menu-icon"></i>
                     <span class="menu-text">Appointment Management</span>
                 </a>
             </div>
             <div class="menu-item">
-                <a href="{{ route('vet.adoptions.management.index') }}" class="menu-link {{ request()->routeIs('vet.adoptions.management.*') ? 'active' : '' }}">
-                    <i class="fas fa-paw menu-icon"></i>
-                    <span class="menu-text">Adoption Center</span>
+                <a href="{{ route('vet.appointment.records') }}" class="menu-link {{ request()->routeIs('vet.appointment.records') ? 'active' : '' }}">
+                    <i class="fas fa-file-medical menu-icon"></i>
+                    <span class="menu-text">Appointment Records</span>
                 </a>
             </div>
             <div class="menu-item">

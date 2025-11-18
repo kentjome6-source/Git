@@ -525,38 +525,6 @@
         @endif
     </div>
     
-    <!-- Health Records Tab -->
-    <div id="health-tab" class="tab-content">
-        @if(isset($stats['recent_activity']['health_records']) && count($stats['recent_activity']['health_records']) > 0)
-            <div class="activity-list">
-                @foreach($stats['recent_activity']['health_records'] as $record)
-                <div class="pet-card">
-                    <h4>❤️ {{ $record->name }}</h4>
-                    <div class="pet-details">
-                        @if($record->species)
-                        <span>🏷️ {{ ucfirst($record->species) }}</span>
-                        @endif
-                        @if($record->breed)
-                        <span>📋 {{ $record->breed }}</span>
-                        @endif
-                        @if($record->age)
-                        <span>🎂 {{ $record->age }} years old</span>
-                        @endif
-                    </div>
-                    <div class="activity-date">
-                        Record created {{ $record->created_at->diffForHumans() }}
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        @else
-            <div class="no-activity">
-                <h3>No Health Records</h3>
-                <p>This user hasn't created any pet health records yet.</p>
-            </div>
-        @endif
-    </div>
-    
     <!-- Appointments Tab -->
     <div id="appointments-tab" class="tab-content">
         @if(isset($stats['recent_activity']['appointments']) && count($stats['recent_activity']['appointments']) > 0)
@@ -565,12 +533,11 @@
                 <div class="pet-card">
                     <h4>📅 {{ $appointment->pet_name }}</h4>
                     <div class="pet-details">
-                        <span>🩺 {{ $appointment->chief_complaint ?? 'No complaint specified' }}</span>
                         @if($appointment->pet_species)
                         <span>🏷️ {{ ucfirst($appointment->pet_species) }}</span>
                         @endif
-                        @if($appointment->appointment_date)
-                        <span>🗓️ {{ $appointment->appointment_date->format('M d, Y') }}</span>
+                        @if($appointment->pet_services_received)
+                        <span>🛠️ {{ $appointment->pet_services_received }}</span>
                         @endif
                     </div>
                     <div class="activity-date">

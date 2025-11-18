@@ -324,8 +324,8 @@
                 </button>
             </form>
 
-            <a href="{{ route('vet.records') }}" class="btn btn-outline-secondary w-100 py-2">
-                <i class="fa-solid fa-arrow-left me-1"></i> Back to Records
+            <a href="{{ route('vet.appointments') }}" class="btn btn-outline-secondary w-100 py-2">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
             </a>
         </div>
     </div>

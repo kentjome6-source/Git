@@ -53,72 +53,45 @@
                             <span class="badge bg-{{ $statusClass }}">
                                 {{ $statusDisplay }}
                             </span>
-                        </div>
-                        <div class="col-md-4 mb-3 mb-md-0">
-                            <strong>Priority:</strong> {{ ucfirst($appointment->urgency_level) }}
+                            @if($appointment->status === 'rejected' && $appointment->rejection_reason)
+                                <div class="mt-2">
+                                    <strong>Rejection Reason:</strong>
+                                    <div class="alert alert-dark mt-1 mb-0">{{ $appointment->rejection_reason }}</div>
+                                </div>
+                            @endif
                         </div>
                         <div class="col-md-4">
                             <strong>Date:</strong> {{ $appointment->created_at->format('M d, Y') }}
                         </div>
                     </div>
 
-                    <!-- Owner & Pet Information -->
+                    <!-- Pet Information -->
+                    <h6><i class="fas fa-paw me-2"></i>Pet Information</h6>
                     <div class="row mb-4">
                         <div class="col-md-6 mb-4 mb-md-0">
-                            <h6><i class="fas fa-user me-2"></i>Owner Information</h6>
-                            <p><strong>Name:</strong> {{ $appointment->owner_name }}</p>
-                            <p><strong>Email:</strong> {{ $appointment->owner_email }}</p>
-                            <p><strong>Phone:</strong> {{ $appointment->owner_phone }}</p>
-                            @if($appointment->owner_address)
-                                <p><strong>Address:</strong> {{ $appointment->owner_address }}</p>
-                            @endif
-                        </div>
-                        <div class="col-md-6">
-                            <h6><i class="fas fa-paw me-2"></i>Pet Information</h6>
-                            <p><strong>Name:</strong> {{ $appointment->pet_name }}</p>
-                            <p><strong>Species:</strong> {{ $appointment->pet_species }}</p>
-                            @if($appointment->pet_breed)
-                                <p><strong>Breed:</strong> {{ $appointment->pet_breed }}</p>
-                            @endif
-                            @if($appointment->pet_weight)
-                                <p><strong>Weight:</strong> {{ $appointment->pet_weight }} kg</p>
-                            @endif
-                            @if($appointment->pet_gender)
-                                <p><strong>Gender:</strong> {{ ucfirst($appointment->pet_gender) }}</p>
-                            @endif
+                            <p><strong>Pet Name:</strong> {{ $appointment->pet_name }}</p>
+                            <p><strong>Pet Type:</strong> {{ $appointment->pet_type }}</p>
+                            <p><strong>Pet Services Received:</strong> {{ $appointment->pet_services_received }}</p>
                         </div>
                     </div>
 
-                    <hr>
-
-                    <!-- Appointment Details -->
-                    <h6><i class="fas fa-notes-medical me-2"></i>Appointment Details</h6>
-                    <p><strong>Chief Complaint:</strong> {{ $appointment->chief_complaint }}</p>
-                    <p><strong>Symptoms:</strong> {{ $appointment->detailed_symptoms }}</p>
-                    
-                    @if($appointment->appointment_date)
-                        <p><strong>Preferred Appointment Date:</strong> {{ $appointment->appointment_date->format('M d, Y') }}</p>
-                    @endif
-                    
-                    @if($appointment->appointment_time)
-                        <p><strong>Preferred Appointment Time:</strong> {{ date('g:i A', strtotime($appointment->appointment_time)) }}</p>
-                    @endif
-                    
-                    @if($appointment->scheduled_datetime)
-                        <p><strong>Scheduled Date & Time:</strong> {{ $appointment->scheduled_datetime->format('M d, Y g:i A') }}</p>
-                    @endif
-                    
-                    @if($appointment->additional_concerns)
-                        <p><strong>Additional Concerns:</strong> {{ $appointment->additional_concerns }}</p>
-                    @endif
-
-                    @if($appointment->current_medications)
-                        <p><strong>Current Medications:</strong> {{ $appointment->current_medications }}</p>
-                    @endif
-                    
-                    @if($appointment->allergies)
-                        <p><strong>Allergies:</strong> <span class="text-danger">{{ $appointment->allergies }}</span></p>
-                    @endif
+                    <!-- Scheduling -->
+                    <h6><i class="fas fa-calendar-alt me-2"></i>Scheduling</h6>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-4 mb-md-0">
+                            @if($appointment->appointment_date)
+                                <p><strong>Preferred Appointment Date:</strong> {{ $appointment->appointment_date->format('M d, Y') }}</p>
+                            @endif
+                            
+                            @if($appointment->appointment_time)
+                                <p><strong>Preferred Appointment Time:</strong> {{ date('g:i A', strtotime($appointment->appointment_time)) }}</p>
+                            @endif
+                            
+                            @if($appointment->scheduled_datetime)
+                                <p><strong>Scheduled Date & Time:</strong> {{ $appointment->scheduled_datetime->format('M d, Y g:i A') }}</p>
+                            @endif
+                        </div>
+                    </div>
 
                     <!-- Action Buttons -->
                     @if(auth()->user()->role !== 'vet')
@@ -169,12 +142,10 @@
                         <h6 class="mb-0"><i class="fas fa-user me-2"></i>Pet Owner Information</h6>
                     </div>
                     <div class="card-body">
-                        <p><strong>Owner Name:</strong> {{ $appointment->owner_name }}</p>
-                        <p><strong>Email:</strong> {{ $appointment->owner_email }}</p>
+                        <p><strong>Full Name:</strong> {{ $appointment->owner_name }}</p>
                         <p><strong>Phone:</strong> {{ $appointment->owner_phone }}</p>
-                        @if($appointment->owner_address)
-                            <p><strong>Address:</strong> {{ $appointment->owner_address }}</p>
-                        @endif
+                        <p><strong>Email:</strong> {{ $appointment->email }}</p>
+                        <p><strong>Address:</strong> {{ $appointment->owner_address ?? '' }}</p>
                     </div>
                 </div>
             @endif
@@ -230,76 +201,6 @@
     
     hr {
         margin: 1rem 0;
-    }
-}
-
-@media (max-width: 576px) {
-    .container-fluid {
-        padding: 0.5rem;
-    }
-    
-    .card {
-        margin-bottom: 1rem;
-    }
-    
-    .card-header {
-        padding: 0.75rem 1rem;
-    }
-    
-    .card-body {
-        padding: 0.75rem;
-    }
-    
-    h2 {
-        font-size: 1.25rem;
-        text-align: center;
-    }
-    
-    h6 {
-        font-size: 0.95rem;
-    }
-    
-    p {
-        font-size: 0.85rem;
-    }
-    
-    .btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.85rem;
-    }
-    
-    .alert {
-        padding: 0.75rem;
-        font-size: 0.85rem;
-    }
-}
-
-/* Extra small devices */
-@media (max-width: 400px) {
-    .card-body {
-        padding: 0.5rem;
-    }
-    
-    h2 {
-        font-size: 1.1rem;
-    }
-    
-    h6 {
-        font-size: 0.9rem;
-    }
-    
-    p {
-        font-size: 0.8rem;
-    }
-    
-    .btn {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.8rem;
-    }
-    
-    .badge {
-        font-size: 0.7rem;
-        padding: 0.3em 0.5em;
     }
 }
 </style>

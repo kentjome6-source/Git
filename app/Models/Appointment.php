@@ -19,56 +19,25 @@ class Appointment extends Model
         'user_id',
         'pet_id',
         'vet_id',
-        'consultation_type',
-        'urgency_level',
-        'status',
-        
-        // Owner Information
         'owner_name',
         'owner_phone',
-        'owner_email',
+        'email',
         'owner_address',
-        
-        // Pet Information
+        'status',
         'pet_name',
-        'pet_species',
-        'pet_breed',
-        'pet_age_years',
-        // Removed pet_age_months as it doesn't exist in the database
-        'pet_weight',
-        'pet_gender',
-        
-        // Appointment Details
-        'chief_complaint',
-        'detailed_symptoms',
-        'consultation_reason',
-        'appointment_date',
-        'appointment_time',
+        'pet_type',
+        'pet_services_received',
         'scheduled_datetime',
-        'additional_concerns',
-        
-        // Duration of Symptoms
-        'symptom_duration_days',
-        'symptom_onset',
-        'symptom_progression',
-        
-        // Previous Medications / Treatments
-        'current_medications',
-        'previous_treatments',
-        'allergies',
-        'vaccination_history',
-        'previous_medical_history',
-        
-        // Rejection fields
         'rejected_at',
         'rejected_by',
+        'rejection_reason',
+        'approved_at',
+        'approved_by',
     ];
 
     protected $casts = [
-        'pet_weight' => 'decimal:2',
         'rejected_at' => 'datetime',
-        'appointment_date' => 'date',
-        'appointment_time' => 'string', // Keep as string since it's stored as TIME in database
+        'approved_at' => 'datetime',
         'scheduled_datetime' => 'datetime',
     ];
 
@@ -93,17 +62,12 @@ class Appointment extends Model
         return $this->belongsTo(User::class, 'rejected_by');
     }
 
-    // Helper methods
-    public function getUrgencyBadgeClass(): string
+    public function approver(): BelongsTo
     {
-        return match($this->urgency_level) {
-            'low' => 'badge-success',
-            'medium' => 'badge-warning',
-            'high' => 'badge-danger',
-            'emergency' => 'badge-dark',
-            default => 'badge-secondary'
-        };
+        return $this->belongsTo(User::class, 'approved_by');
     }
+
+    // Helper methods
 
     public function getStatusBadgeClass(): string
     {
@@ -120,11 +84,30 @@ class Appointment extends Model
 
     public function getPetAgeString(): string
     {
-        $age = '';
-        if ($this->pet_age_years) {
-            $age .= $this->pet_age_years . ' year' . ($this->pet_age_years > 1 ? 's' : '');
-        }
-        // Removed pet_age_months reference as it doesn't exist in the database
-        return $age ?: 'Age not specified';
+        return $this->pet_name ? $this->pet_name : 'Pet not specified';
+    }
+
+    /**
+     * Get the valid pet types
+     *
+     * @return array
+     */
+    public static function getValidPetTypes(): array
+    {
+        return ['Dog', 'Cat'];
+    }
+
+    /**
+     * Get the predefined pet services
+     *
+     * @return array
+     */
+    public static function getPredefinedServices(): array
+    {
+        return [
+            'Deworming',
+            'Vaccination',
+            'Tick and Flea Prevention'
+        ];
     }
 }

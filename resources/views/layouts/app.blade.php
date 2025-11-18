@@ -320,13 +320,7 @@
             <div class="menu-item">
                 <a href="{{ route('view.map') }}" class="menu-link {{ request()->routeIs('view.map*') ? 'active' : '' }}">
                     <i class="fas fa-paw menu-icon" aria-hidden="true"></i>
-                    <span class="menu-text">View Map</span>
-                </a>
-            </div>
-            <div class="menu-item">
-                <a href="{{ route('pet.health') }}" class="menu-link {{ request()->routeIs('pet.health') ? 'active' : '' }}">
-                    <i class="fas fa-heart-pulse menu-icon" aria-hidden="true"></i>
-                    <span class="menu-text">Pet Health & Records</span>
+                    <span class="menu-text">Map</span>
                 </a>
             </div>
             <div class="menu-item">
@@ -336,13 +330,19 @@
                 </a>
             </div>
             <div class="menu-item">
-                <a href="{{ route('appointments.index') }}" class="menu-link {{ request()->routeIs('appointments.*') ? 'active' : '' }}">
+                <a href="{{ route('appointments.index') }}" class="menu-link {{ request()->routeIs('appointments.*') && !request()->routeIs('appointments.history') ? 'active' : '' }}">
                     <i class="fas fa-stethoscope menu-icon" aria-hidden="true"></i>
                     <span class="menu-text">Appointment</span>
                 </a>
             </div>
             <div class="menu-item">
-                <a href="{{ route('pet.lostfound') }}" class="menu-link {{ request()->routeIs('pet.lostfound') || request()->routeIs('lost-found.*') ? 'active' : '' }}">
+                <a href="{{ route('appointments.history') }}" class="menu-link {{ request()->routeIs('appointments.history') ? 'active' : '' }}">
+                    <i class="fas fa-history menu-icon" aria-hidden="true"></i>
+                    <span class="menu-text">Appointment History</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="{{ route('pet.lostfound') }}" class="menu-link {{ request()->routeIs('pet.lostfound') ? 'active' : '' }}">
                     <i class="fas fa-search-location menu-icon" aria-hidden="true"></i>
                     <span class="menu-text">Lost & Found Board</span>
                 </a>

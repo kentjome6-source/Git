@@ -20,20 +20,6 @@
                         <!-- Hidden appointment type field -->
                         <input type="hidden" name="appointment_type" value="appointment">
 
-                        <!-- Urgency Level -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <label for="urgency_level" class="form-label fw-bold">Urgency Level</label>
-                                <select name="urgency_level" id="urgency_level" class="form-select" required>
-                                    <option value="">Select urgency level</option>
-                                    <option value="low">Low - Routine checkup or general questions</option>
-                                    <option value="medium">Medium - Concerning symptoms but not urgent</option>
-                                    <option value="high">High - Serious symptoms requiring prompt attention</option>
-                                    <option value="emergency">Emergency - Life-threatening condition</option>
-                                </select>
-                            </div>
-                        </div>
-
                         <!-- Veterinarian Selection -->
                         <div class="row mb-3">
                             <div class="col-12">
@@ -75,19 +61,19 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-2">
-                                    <label for="owner_email" class="form-label">Email *</label>
-                                    <input type="email" name="owner_email" id="owner_email" class="form-control form-control-sm" 
-                                           value="{{ old('owner_email', auth()->user()->email) }}" required>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-2">
                                     <label for="owner_phone" class="form-label">Phone *</label>
                                     <input type="tel" name="owner_phone" id="owner_phone" class="form-control form-control-sm" 
                                            value="{{ old('owner_phone') }}" required>
                                 </div>
                             </div>
-                            <div class="col-12">
+                            <div class="col-md-4">
+                                <div class="mb-2">
+                                    <label for="email" class="form-label">Email *</label>
+                                    <input type="email" name="email" id="email" class="form-control form-control-sm" 
+                                           value="{{ old('email', auth()->user()->email) }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="mb-2">
                                     <label for="owner_address" class="form-label">Address</label>
                                     <input type="text" name="owner_address" id="owner_address" class="form-control form-control-sm" 
@@ -96,7 +82,7 @@
                             </div>
                         </div>
 
-                        <!-- Pet Selection and Information Section -->
+                        <!-- Pet Information Section -->
                         <div class="row mb-3">
                             <div class="col-12">
                                 <h6 class="text-dark border-bottom pb-1 mb-2">
@@ -112,185 +98,43 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label for="pet_species" class="form-label">Species *</label>
-                                    <input type="text" name="pet_species" id="pet_species" class="form-control form-control-sm" 
-                                           value="{{ old('pet_species') }}" placeholder="e.g., Dog, Cat, Bird" required>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-2">
-                                    <label for="pet_breed" class="form-label">Breed</label>
-                                    <input type="text" name="pet_breed" id="pet_breed" class="form-control form-control-sm" 
-                                           value="{{ old('pet_breed') }}" placeholder="e.g., Golden Retriever">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-2">
-                                    <label for="pet_age_years" class="form-label">Age (years)</label>
-                                    <input type="number" name="pet_age_years" id="pet_age_years" class="form-control form-control-sm" 
-                                           value="{{ old('pet_age_years') }}" min="0" step="0.1" placeholder="e.g., 2.5">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-2">
-                                    <label for="pet_weight" class="form-label">Weight (kg)</label>
-                                    <input type="number" name="pet_weight" id="pet_weight" class="form-control form-control-sm" 
-                                           value="{{ old('pet_weight') }}" min="0" step="0.1" placeholder="e.g., 15.5">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-2">
-                                    <label for="pet_gender" class="form-label">Gender</label>
-                                    <select name="pet_gender" id="pet_gender" class="form-select form-select-sm">
-                                        <option value="">Select gender</option>
-                                        <option value="male" {{ old('pet_gender') == 'male' ? 'selected' : '' }}>Male</option>
-                                        <option value="female" {{ old('pet_gender') == 'female' ? 'selected' : '' }}>Female</option>
-                                        <option value="unknown" {{ old('pet_gender') == 'unknown' || old('pet_gender') == '' ? 'selected' : '' }}>Unknown</option>
+                                    <label for="pet_type" class="form-label">Pet Type *</label>
+                                    <select name="pet_type" id="pet_type" class="form-select form-select-sm" required>
+                                        <option value="">Select pet type</option>
+                                        <option value="Dog" {{ old('pet_type') == 'Dog' ? 'selected' : '' }}>Dog</option>
+                                        <option value="Cat" {{ old('pet_type') == 'Cat' ? 'selected' : '' }}>Cat</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-2">
+                                    <label for="pet_services_received" class="form-label">Pet Services Received</label>
+                                    <textarea name="pet_services_received" id="pet_services_received" class="form-control form-control-sm" 
+                                              rows="2" placeholder="Enter services your pet has received (e.g., Deworming, Vaccination, Tick and Flea Prevention)">{{ old('pet_services_received') }}</textarea>
+                                    <div class="form-text">List any services your pet has recently received, such as deworming, vaccination, or tick and flea prevention.</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Appointment Details Section -->
+                        <!-- Scheduling Section -->
                         <div class="row mb-3">
                             <div class="col-12">
                                 <h6 class="text-dark border-bottom pb-1 mb-2">
-                                    <i class="fas fa-stethoscope me-2 text-primary"></i>Appointment Details
+                                    <i class="fas fa-calendar me-2 text-primary"></i>Scheduling
                                 </h6>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label for="consultation_reason" class="form-label">Reason *</label>
-                                    <select name="consultation_reason" id="consultation_reason" class="form-select form-select-sm" required>
-                                        <option value="">Select reason</option>
-                                        <option value="routine_checkup">Routine Checkup</option>
-                                        <option value="illness">Illness/Sickness</option>
-                                        <option value="injury">Injury</option>
-                                        <option value="vaccination">Vaccination</option>
-                                        <option value="behavioral">Behavioral Issues</option>
-                                        <option value="other">Other</option>
-                                    </select>
+                                    <label for="preferred_date" class="form-label">Preferred Date</label>
+                                    <input type="date" name="preferred_date" id="preferred_date" 
+                                           class="form-control form-control-sm" value="{{ old('preferred_date') }}" placeholder="Select a date">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label for="appointment_date" class="form-label">Preferred Appointment Date</label>
-                                    <input type="date" name="appointment_date" id="appointment_date" 
-                                           class="form-control form-control-sm" value="{{ old('appointment_date') }}">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-2">
-                                    <label for="appointment_time" class="form-label">Preferred Appointment Time</label>
-                                    <input type="time" name="appointment_time" id="appointment_time" 
-                                           class="form-control form-control-sm" value="{{ old('appointment_time') }}">
-                                </div>
-                            </div>
-                            <div class="col-md-6" id="scheduled_datetime_section" style="display: none;">
-                                <div class="mb-2">
-                                    <label for="scheduled_datetime" class="form-label">Scheduled Date & Time</label>
-                                    <input type="datetime-local" name="scheduled_datetime" id="scheduled_datetime" 
-                                           class="form-control form-control-sm" value="{{ old('scheduled_datetime') }}">
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="mb-2">
-                                    <label for="chief_complaint" class="form-label">Chief Complaint *</label>
-                                    <textarea name="chief_complaint" id="chief_complaint" class="form-control form-control-sm" rows="2" 
-                                              placeholder="Briefly describe the main concern" required>{{ old('chief_complaint') }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="mb-2">
-                                    <label for="detailed_symptoms" class="form-label">Detailed Symptoms</label>
-                                    <textarea name="detailed_symptoms" id="detailed_symptoms" class="form-control form-control-sm" rows="2" 
-                                              placeholder="Detailed description of symptoms">{{ old('detailed_symptoms') }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label for="additional_concerns" class="form-label">Additional Concerns</label>
-                                    <textarea name="additional_concerns" id="additional_concerns" class="form-control" 
-                                              rows="3" placeholder="Any other concerns or questions you have">{{ old('additional_concerns') }}</textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Duration of Symptoms Section -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="text-primary border-bottom pb-2 mb-3">
-                                    <i class="fas fa-clock me-2"></i>Duration of Symptoms
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="symptom_duration_days" class="form-label">Duration (Days)</label>
-                                    <input type="number" name="symptom_duration_days" id="symptom_duration_days" 
-                                           class="form-control" min="0" value="{{ old('symptom_duration_days') }}"
-                                           placeholder="How many days have symptoms been present?">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="symptom_onset" class="form-label">Symptom Onset *</label>
-                                    <select name="symptom_onset" id="symptom_onset" class="form-select" required>
-                                        <option value="">Select onset type</option>
-                                        <option value="sudden">Sudden - Symptoms appeared quickly</option>
-                                        <option value="gradual">Gradual - Symptoms developed slowly over time</option>
-                                        <option value="intermittent">Intermittent - Symptoms come and go</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="symptom_progression" class="form-label">Symptom Progression</label>
-                                    <textarea name="symptom_progression" id="symptom_progression" class="form-control" 
-                                              rows="3" placeholder="How have the symptoms changed over time?">{{ old('symptom_progression') }}</textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Previous Medications / Treatments Section -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="text-primary border-bottom pb-2 mb-3">
-                                    <i class="fas fa-pills me-2"></i>Previous Medications / Treatments
-                                </h5>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="current_medications" class="form-label">Current Medications</label>
-                                    <textarea name="current_medications" id="current_medications" class="form-control" 
-                                              rows="3" placeholder="List any medications your pet is currently taking">{{ old('current_medications') }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="previous_treatments" class="form-label">Previous Treatments</label>
-                                    <textarea name="previous_treatments" id="previous_treatments" class="form-control" 
-                                              rows="3" placeholder="Describe any previous treatments for this condition">{{ old('previous_treatments') }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="allergies" class="form-label">Known Allergies</label>
-                                    <textarea name="allergies" id="allergies" class="form-control" 
-                                              rows="3" placeholder="List any known allergies or adverse reactions">{{ old('allergies') }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="vaccination_history" class="form-label">Vaccination History</label>
-                                    <textarea name="vaccination_history" id="vaccination_history" class="form-control" 
-                                              rows="3" placeholder="Recent vaccinations and dates">{{ old('vaccination_history') }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label for="previous_medical_history" class="form-label">Previous Medical History</label>
-                                    <textarea name="previous_medical_history" id="previous_medical_history" class="form-control" 
-                                              rows="3" placeholder="Any relevant past medical conditions or surgeries">{{ old('previous_medical_history') }}</textarea>
+                                    <label for="preferred_time" class="form-label">Preferred Time</label>
+                                    <input type="time" name="preferred_time" id="preferred_time" 
+                                           class="form-control form-control-sm" value="{{ old('preferred_time') }}">
                                 </div>
                             </div>
                         </div>
@@ -316,28 +160,6 @@
 </div>
 
 <style>
-.consultation-type-card {
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: 1px solid #dee2e6;
-    min-height: 180px;
-    max-width: 100%;
-}
-
-.consultation-type-card:hover {
-    border-color: #6c757d;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.consultation-type-card.selected {
-    border-color: #495057;
-    background-color: #f8f9fa;
-}
-
-.consultation-type-card input[type="radio"] {
-    transform: scale(1.2);
-}
-
 .form-control:focus, .form-select:focus {
     border-color: #6c757d;
     box-shadow: 0 0 0 0.1rem rgba(108,117,125,.15);
@@ -538,12 +360,35 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Set minimum datetime to current time
-    const datetimeInput = document.getElementById('scheduled_datetime');
-    if (datetimeInput) {
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        datetimeInput.min = now.toISOString().slice(0, 16);
+    // Set minimum date to current date
+    const dateInput = document.getElementById('preferred_date');
+    const timeInput = document.getElementById('preferred_time');
+    
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+    }
+    
+    // Set minimum time based on current date
+    if (dateInput && timeInput) {
+        dateInput.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            selectedDate.setHours(0, 0, 0, 0);
+            
+            // If selected date is today, set minimum time to current time
+            if (selectedDate.getTime() === today.getTime()) {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = Math.ceil(now.getMinutes() / 30) * 30; // Round up to nearest 30 minutes
+                const roundedMinutes = minutes >= 60 ? '00' : String(minutes).padStart(2, '0');
+                const minTime = minutes >= 60 ? String(parseInt(hours) + 1).padStart(2, '0') + ':' + roundedMinutes : hours + ':' + roundedMinutes;
+                timeInput.min = minTime;
+            } else {
+                timeInput.min = '00:00';
+            }
+        });
     }
 });
 </script>

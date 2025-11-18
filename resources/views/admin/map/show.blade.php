@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Location Details - View Map')
+@section('title', 'Location Details - Map')
 
 @section('styles')
 <style>
@@ -359,6 +359,52 @@
                             <strong>Operating Hours:</strong>
                             @php
                                 $hours = is_string($shelter->operating_hours) ? json_decode($shelter->operating_hours, true) : $shelter->operating_hours;
+                                // Define default hours
+                                $defaultHours = [
+                                    'monday' => '8 AM - 5 PM',
+                                    'tuesday' => '8 AM - 5 PM',
+                                    'wednesday' => '8 AM - 5 PM',
+                                    'thursday' => '8 AM - 5 PM',
+                                    'friday' => '8 AM - 5 PM',
+                                    'saturday' => '8 AM - 5 PM',
+                                    'sunday' => '9 AM - 4 PM'
+                                ];
+                                
+                                // Ensure proper ordering for display
+                                if (is_array($hours)) {
+                                    // Filter out any entries that look like address data instead of time data
+                                    foreach ($hours as $day => $time) {
+                                        // If the time looks like an address (contains common address words), skip it
+                                        if (is_string($time) && 
+                                            (stripos($time, 'purok') !== false || 
+                                             stripos($time, 'poblacion') !== false || 
+                                             stripos($time, 'san francisco') !== false || 
+                                             stripos($time, 'agusan') !== false || 
+                                             stripos($time, 'caraga') !== false || 
+                                             preg_match('/\d{4}/', $time))) {
+                                            // This looks like address data, not time data - remove it
+                                            unset($hours[$day]);
+                                        }
+                                    }
+                                    
+                                    $hourOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                                    $orderedHours = [];
+                                    
+                                    // Add hours in the correct order, use defaults for missing days
+                                    foreach ($hourOrder as $day) {
+                                        if (isset($hours[$day]) && !empty($hours[$day])) {
+                                            $orderedHours[$day] = $hours[$day];
+                                        } else {
+                                            // Use default value for missing or empty days
+                                            $orderedHours[$day] = $defaultHours[$day];
+                                        }
+                                    }
+                                    
+                                    $hours = $orderedHours;
+                                } else {
+                                    // If no hours data, use default entries for all days
+                                    $hours = $defaultHours;
+                                }
                             @endphp
                             @if($hours)
                                 <ul class="hours-list">

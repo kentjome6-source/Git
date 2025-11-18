@@ -16,54 +16,32 @@ return new class extends Migration
         if (!Schema::hasTable('appointments')) {
             Schema::create('appointments', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('pet_id')->nullable()->constrained()->onDelete('cascade');
-                $table->foreignId('vet_id')->nullable()->constrained('users')->onDelete('cascade');
+                // We store pet info directly on the appointment (no pet_id for request records)
+                $table->foreignId('vet_id')->constrained('users')->onDelete('cascade');
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
                 
                 // Basic appointment info
-                $table->string('consultation_type')->default('appointment'); // 'chat' or 'appointment'
-                $table->string('urgency_level')->default('medium'); // low, medium, high, emergency
+                $table->string('email')->nullable(); // Email field for appointment contact
                 $table->string('status')->default('pending'); // pending, accepted, in_progress, completed, cancelled, rejected
                 
-                // Owner Information
+                // Owner Information (simplified)
                 $table->string('owner_name')->nullable();
                 $table->string('owner_phone')->nullable();
-                $table->string('owner_email')->nullable();
                 $table->text('owner_address')->nullable();
-                
-                // Pet Information
+
+                // Pet Information (simplified)
                 $table->string('pet_name')->nullable();
-                $table->string('pet_species')->nullable();
-                $table->string('pet_breed')->nullable();
-                $table->integer('pet_age_years')->nullable();
-                $table->decimal('pet_weight', 8, 2)->nullable();
-                $table->string('pet_gender')->nullable();
+                // pet_species will store Pet Type (e.g., Dog, Cat)
+                $table->string('pet_type')->nullable();
+                $table->text('pet_services_received')->nullable();
                 
-                // Appointment Details
-                $table->text('chief_complaint'); // Main reason for appointment
-                $table->text('detailed_symptoms')->nullable();
-                $table->string('consultation_reason'); // 'routine_checkup', 'illness', 'injury', 'vaccination', 'other'
                 // Appointment scheduling fields
-                $table->date('appointment_date')->nullable();
-                $table->time('appointment_time')->nullable();
                 $table->dateTime('scheduled_datetime')->nullable();
-                $table->text('additional_concerns')->nullable();
-                
-                // Duration of Symptoms
-                $table->integer('symptom_duration_days')->nullable();
-                $table->string('symptom_onset')->nullable();
-                $table->text('symptom_progression')->nullable();
-                
-                // Medical History
-                $table->text('allergies')->nullable();
-                $table->text('vaccination_history')->nullable();
-                $table->text('previous_medical_history')->nullable();
-                $table->text('current_medications')->nullable();
-                $table->text('previous_treatments')->nullable();
                 
                 // Rejection fields
                 $table->timestamp('rejected_at')->nullable();
                 $table->foreignId('rejected_by')->nullable()->constrained('users')->onDelete('set null');
+                $table->text('rejection_reason')->nullable();
                 
                 $table->timestamps();
             });

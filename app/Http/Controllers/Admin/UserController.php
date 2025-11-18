@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Models\Appointment;
 use App\Models\LostFound;
 use App\Models\Pet;
-use App\Models\PetHealthRecord;
 use App\Models\Adoption;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -128,7 +127,6 @@ class UserController extends Controller
             'pets_count' => 0,
             'adoptions_count' => 0,
             'appointments_count' => 0,
-            'health_records_count' => 0,
             'lost_found_count' => 0,
             'adoption_listings_count' => 0,
             'adopted_pets_count' => 0,
@@ -136,7 +134,6 @@ class UserController extends Controller
                 'pets' => [],
                 'adoptions' => [],
                 'appointments' => [],
-                'health_records' => [],
                 'lost_found' => [],
             ]
         ];
@@ -158,14 +155,12 @@ class UserController extends Controller
                                               ->latest()
                                               ->take(5)
                                               ->get(),
-                'health_records' => [], // Vets don't create health records
                 'lost_found' => [], // Vets don't create lost/found listings
             ];
         } else {
             // For regular users, show pet registration stats and appointments they created
             $stats['pets_count'] = $user->pets()->count();
             $stats['appointments_count'] = Appointment::where('user_id', $user->id)->count();
-            $stats['health_records_count'] = PetHealthRecord::where('user_id', $user->id)->count();
             $stats['lost_found_count'] = LostFound::where('user_id', $user->id)->count();
             $stats['adoption_listings_count'] = Adoption::where('user_id', $user->id)
                                                 ->where('uploader_type', 'user')
@@ -190,10 +185,6 @@ class UserController extends Controller
                                               ->latest()
                                               ->take(5)
                                               ->get(),
-                'health_records' => PetHealthRecord::where('user_id', $user->id)
-                                                  ->latest()
-                                                  ->take(5)
-                                                  ->get(),
                 'lost_found' => LostFound::where('user_id', $user->id)
                                           ->latest()
                                           ->take(5)

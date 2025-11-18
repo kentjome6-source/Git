@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'View Map')
+@section('title', 'Map')
 
 @section('styles')
 <!-- Leaflet CSS -->
@@ -222,11 +222,10 @@
 <div class="content-section">
     <div class="container">
         <!-- Map Section -->
-        @if($shelters->count() > 0 || $lostFoundItems->count() > 0)
             <div class="map-section">
                 <div class="map-header-content">
                     <h2 class="map-header-title">
-                        <i class="fas fa-map-marked-alt"></i> Find Shelters & Pets Near You
+                        <i class="fas fa-map-marked-alt"></i> Find Shelters & Pets on the Map
                     </h2>
                     <p class="map-header-subtitle">Click on the map markers to view details</p>
                 </div>
@@ -247,7 +246,6 @@
                     </div>
                 </div>
             </div>
-        @endif
 
         <h2 class="section-title">Available Shelters & Services</h2>
         
@@ -331,12 +329,12 @@
             document.querySelector('.notification').style.display = 'none';
         }, 5000);
     </script>
+
 @endif
 
 <!-- Leaflet JavaScript -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-@if($shelters->count() > 0 || $lostFoundItems->count() > 0)
 <script>
 // Function to get human-readable name for shelter type
 function getShelterTypeName(type) {
@@ -816,5 +814,4 @@ function exitFullscreen() {
     }
 }
 </script>
-@endif
 @endsection
