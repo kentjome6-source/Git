@@ -51,7 +51,7 @@
     /* Map Styles */
     .map-section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
     .map-container { 
-        height: 300px; 
+        height: 450px; 
         border-radius: 10px; 
         overflow: hidden; 
         border: 2px solid #e5e7eb; 
@@ -121,7 +121,7 @@
         }
         
         .map-container { 
-            height: 250px; 
+            height: 350px; 
             border-radius: 8px; 
         }
         
@@ -190,7 +190,7 @@
         }
         
         .map-container { 
-            height: 200px; 
+            height: 280px; 
             border-radius: 6px; 
         }
         
