@@ -30,8 +30,5 @@ class DatabaseSeeder extends Seeder
                 'role' => 'vet',
             ]);
         }
-
-        // Seed vet shops
-        $this->call(VetShopSeeder::class);
     }
 }

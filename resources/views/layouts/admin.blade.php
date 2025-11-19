@@ -331,7 +331,7 @@
                     </a>
                 </div>
                 <div class="menu-item">
-                    <a href="{{ route('adoptions.index') }}" class="menu-link {{ request()->routeIs('adoptions.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.adoptions.index') }}" class="menu-link {{ request()->routeIs('admin.adoptions.*') ? 'active' : '' }}">
                         <i class="fas fa-history menu-icon" aria-hidden="true"></i>
                         <span class="menu-text">Adoption History</span>
                     </a>

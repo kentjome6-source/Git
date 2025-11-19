@@ -17,8 +17,8 @@
                         <!-- Desktop Table View -->
                         <div class="table-responsive desktop-table">
                             <table class="table table-hover mb-0">
-                                <thead class="table-dark">
-                                    <tr>
+                                <thead>
+                                    <tr class="table-success">
                                         <th>ID</th>
                                         <th>Pet Owner</th>
                                         <th>Pet Name</th>
@@ -78,13 +78,13 @@
                                             </td>
                                            <td>
     <div class="btn-group-vertical btn-group-sm" role="group">
-        <a href="{{ route('appointments.show', $appointment) }}" class="btn btn-info btn-sm me-1" title="View Details">
+        <a href="{{ route('vet.appointments.show', $appointment) }}" class="btn btn-info btn-sm me-1" title="View Details">
             <i class="fas fa-eye"></i>
         </a>
         
         {{-- Show Accept/Reject buttons for pending appointments --}}
         @if($appointment->status === 'pending')
-            <form action="{{ route('appointments.accept', $appointment) }}" method="POST" class="d-inline">
+            <form action="{{ route('vet.appointments.accept', $appointment) }}" method="POST" class="d-inline">
                 @csrf
                 <button type="submit" class="btn btn-success btn-sm" 
                         onclick="return confirm('Are you sure you want to accept this appointment?')">
@@ -100,7 +100,7 @@
             <div class="modal fade" id="rejectModal{{ $appointment->id }}" tabindex="-1" aria-labelledby="rejectModalLabel{{ $appointment->id }}" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <form action="{{ route('appointments.reject', $appointment) }}" method="POST">
+                        <form action="{{ route('vet.appointments.reject', $appointment) }}" method="POST">
                             @csrf
                             <div class="modal-header">
                                 <h5 class="modal-title" id="rejectModalLabel{{ $appointment->id }}">Reject Appointment</h5>
@@ -206,13 +206,13 @@
                                     </div>
                                     
                                     <div class="swipeable-actions">
-                                        <a href="{{ route('appointments.show', $appointment) }}" class="btn btn-info btn-sm" title="View Details">
+                                        <a href="{{ route('vet.appointments.show', $appointment) }}" class="btn btn-info btn-sm" title="View Details">
                                             <i class="fas fa-eye"></i> View
                                         </a>
                                         
                                         {{-- Show Accept/Reject buttons for pending appointments --}}
                                         @if($appointment->status === 'pending')
-                                            <form action="{{ route('appointments.accept', $appointment) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('vet.appointments.accept', $appointment) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 <button type="submit" class="btn btn-success btn-sm" 
                                                         onclick="return confirm('Are you sure you want to accept this appointment?')">
@@ -228,7 +228,7 @@
                                             <div class="modal fade" id="rejectModal{{ $appointment->id }}" tabindex="-1" aria-labelledby="rejectModalLabel{{ $appointment->id }}" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
-                                                        <form action="{{ route('appointments.reject', $appointment) }}" method="POST">
+                                                        <form action="{{ route('vet.appointments.reject', $appointment) }}" method="POST">
                                                             @csrf
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title" id="rejectModalLabel{{ $appointment->id }}">Reject Appointment</h5>
@@ -284,6 +284,19 @@
 
 .table-responsive {
     max-height: 70vh;
+}
+
+/* Vet green theme for table header */
+.table-success {
+    --bs-table-bg: #27ae60;
+    --bs-table-color: #fff;
+    --bs-table-border-color: #219653;
+}
+
+.table-success th {
+    color: #fff !important;
+    background-color: #27ae60 !important;
+    border-color: #219653 !important;
 }
 
 .btn-group-vertical .btn {

@@ -196,10 +196,10 @@
 
 @section('content')
         <div class="page-header">
-            <h1 class="page-title">Report Pet</h1>
+            <h1 class="page-title">Report Lost/Found Pet</h1>
             <p class="page-subtitle">Help reunite pets with their families</p>
-            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #2196f3;">
-                <i class="fas fa-info-circle" style="color: #2196f3; margin-right: 8px;"></i>
+            <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #c3e6cb;">
+                <i class="fas fa-info-circle"></i>
                 <strong>Note:</strong> Your listing will be reviewed by our admin team before being published. This helps ensure quality and accuracy of all listings.
             </div>
         </div>

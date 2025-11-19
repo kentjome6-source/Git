@@ -48,7 +48,7 @@
         .btn-primary:hover { background: #4a3d7a; }
         .btn-secondary { background: #6c757d; color: #fff; }
         .btn-secondary:hover { background: #5a6268; }
-
+        
         .listings-grid {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 30px; margin-bottom: 40px;
@@ -122,7 +122,13 @@
             padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
             font-weight: 500;
         }
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-success { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb;
+            font-size: 1.1rem;
+            text-align: center;
+        }
 
         /* Responsive styles */
         @media (max-width: 768px) {
@@ -272,7 +278,7 @@
                     <i class="fas fa-paw"></i> Report Pet
                 </a>
                 <a href="{{ route('view.map') }}" class="btn btn-secondary">
-                    <i class="fas fa-map-marked-alt"></i> Map
+                    <i class="fas fa-map-marked-alt"></i> View Map
                 </a>
             </div>
         </div>

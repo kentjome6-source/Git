@@ -30,51 +30,88 @@
                             <small class="text-muted">Click "Add New Pet" to create your first pet listing.</small>
                         </div>
                     @else
-                        <!-- Responsive Table View -->
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Animal Type</th>
-                                        <th>Owner</th>
-                                        <th>Description</th>
-                                        <th>Image</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($pets as $pet)
-                                        <tr>
-                                            <td>{{ $pet->name }}</td>
-                                            <td>{{ $pet->user->name }}</td>
-                                            <td>{{ Str::limit($pet->description, 50) }}</td>
-                                            <td>
-                                                @if($pet->image_path)
-                                                    <img src="{{ asset('storage/' . $pet->image_path) }}" alt="{{ $pet->name }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
-                                                @else
-                                                    <div class="bg-light d-flex align-items-center justify-content-center rounded" style="width: 50px; height: 50px;">
-                                                        <i class="fas fa-paw text-muted"></i>
-                                                    </div>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <div class="btn-group" role="group">
-                                                    <a href="{{ route('admin.pets.edit', $pet) }}" class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-edit"></i> <span class="d-none d-lg-inline">Edit</span>
-                                                    </a>
-                                                    <form action="{{ route('admin.pets.destroy', $pet) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this pet?')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                            <i class="fas fa-trash"></i> <span class="d-none d-lg-inline">Delete</span>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                        <!-- Card-based layout for desktop -->
+                        <div class="pets-grid">
+                            @foreach($pets as $pet)
+                                <div class="pet-card">
+                                    <div class="pet-image">
+                                        @if($pet->image_path)
+                                            <img src="{{ asset('storage/' . $pet->image_path) }}" alt="{{ $pet->name }}">
+                                        @else
+                                            <div class="no-image">
+                                                <i class="fas fa-paw"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="pet-content">
+                                        <h3 class="pet-title">{{ $pet->name }}</h3>
+                                        <div class="pet-meta">
+                                            <div class="meta-item">
+                                                <i class="fas fa-user"></i>
+                                                {{ $pet->user->name }}
+                                            </div>
+                                            <div class="meta-item">
+                                                <i class="fas fa-info-circle"></i>
+                                                {{ Str::limit($pet->description, 50) }}
+                                            </div>
+                                        </div>
+                                        <div class="pet-actions">
+                                            <a href="{{ route('admin.pets.edit', $pet) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            <form action="{{ route('admin.pets.destroy', $pet) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this pet?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        
+                        <!-- Swipeable table for mobile - consistent with other admin views -->
+                        <div class="swipeable-table-container">
+                            @foreach($pets as $pet)
+                                <div class="swipeable-table-row">
+                                    <div class="swipeable-table-item">
+                                        <span class="swipeable-table-label">Name</span>
+                                        <span class="swipeable-table-value">{{ $pet->name }}</span>
+                                    </div>
+                                    <div class="swipeable-table-item">
+                                        <span class="swipeable-table-label">Owner</span>
+                                        <span class="swipeable-table-value">{{ $pet->user->name }}</span>
+                                    </div>
+                                    <div class="swipeable-table-item">
+                                        <span class="swipeable-table-label">Description</span>
+                                        <span class="swipeable-table-value">{{ Str::limit($pet->description, 50) }}</span>
+                                    </div>
+                                    <div class="swipeable-table-item">
+                                        <span class="swipeable-table-label">Image</span>
+                                        <span class="swipeable-table-value">
+                                            @if($pet->image_path)
+                                                <img src="{{ asset('storage/' . $pet->image_path) }}" alt="{{ $pet->name }}" class="swipeable-pet-image">
+                                            @else
+                                                <i class="fas fa-paw"></i>
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div class="swipeable-action-buttons">
+                                        <a href="{{ route('admin.pets.edit', $pet) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <form action="{{ route('admin.pets.destroy', $pet) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this pet?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     @endif
                 </div>
@@ -86,6 +123,149 @@
 
 @section('styles')
 <style>
+    /* Card-based layout for desktop */
+    .pets-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+    
+    .pet-card {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #eee;
+    }
+    
+    .pet-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    
+    .pet-image {
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+        background: #f8f9fa;
+    }
+    
+    .pet-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .pet-image .no-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        background: linear-gradient(135deg, #e74c3c 0%, #ff6b6b 100%);
+        color: white;
+        font-size: 3rem;
+    }
+    
+    .pet-content {
+        padding: 20px;
+    }
+    
+    .pet-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 12px;
+    }
+    
+    .pet-meta {
+        margin-bottom: 20px;
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 8px;
+    }
+    
+    .meta-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .pet-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .pet-actions .btn {
+        flex: 1;
+        justify-content: center;
+    }
+    
+    /* Swipeable table for mobile - consistent with other admin views */
+    .swipeable-table-container {
+        display: none;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px 0;
+    }
+    
+    .swipeable-table-row {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #eee;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        background: #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .swipeable-table-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .swipeable-table-item:last-child {
+        border-bottom: none;
+    }
+    
+    .swipeable-table-label {
+        font-weight: 600;
+        color: #e74c3c;
+        min-width: 100px;
+    }
+    
+    .swipeable-table-value {
+        text-align: right;
+        flex: 1;
+    }
+    
+    .swipeable-pet-image {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+    
+    .swipeable-action-buttons {
+        display: flex;
+        gap: 8px;
+        padding: 10px 15px;
+    }
+    
+    .swipeable-action-buttons .btn {
+        flex: 1;
+        justify-content: center;
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+    
     /* Responsive Improvements for All Devices */
     .table-responsive {
         border: none;
@@ -102,23 +282,25 @@
             font-size: 0.875rem;
         }
         
-        .table th,
-        .table td {
-            padding: 0.75rem !important;
+        .pets-grid {
+            display: grid !important;
+        }
+        
+        .swipeable-table-container {
+            display: none !important;
         }
     }
     
     /* Tablet Improvements */
     @media (max-width: 991px) {
-        .table th,
-        .table td {
-            padding: 0.6rem !important;
-            font-size: 0.85rem;
-        }
-        
         .btn {
             padding: 0.3rem 0.6rem;
             font-size: 0.8rem;
+        }
+        
+        .pets-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
     }
 
@@ -142,22 +324,22 @@
             white-space: nowrap;
         }
         
-        .table th,
-        .table td {
-            font-size: 0.8rem;
-            padding: 0.5rem !important;
-        }
-        
-        /* Hide text on smaller buttons for mobile */
-        .btn span {
+        /* Hide card grid on mobile */
+        .pets-grid {
             display: none;
         }
         
-        /* Adjust image sizes for mobile */
-        .table img,
-        .table .bg-light {
-            width: 40px !important;
-            height: 40px !important;
+        /* Show swipeable table on mobile */
+        .swipeable-table-container {
+            display: block;
+        }
+        
+        .swipeable-table-label {
+            font-size: 0.9rem;
+        }
+        
+        .swipeable-table-value {
+            font-size: 0.9rem;
         }
     }
 
@@ -179,32 +361,24 @@
             font-size: 0.75rem;
         }
         
-        .table th,
-        .table td {
-            font-size: 0.75rem;
-            padding: 0.4rem !important;
+        .swipeable-table-item {
+            padding: 10px 12px;
         }
         
-        /* Further reduce image sizes on very small screens */
-        .table img,
-        .table .bg-light {
-            width: 35px !important;
-            height: 35px !important;
+        .swipeable-table-label {
+            font-size: 0.85rem;
         }
         
-        /* Stack action buttons on very small screens */
-        .btn-group {
+        .swipeable-table-value {
+            font-size: 0.85rem;
+        }
+        
+        .swipeable-action-buttons {
             flex-direction: column;
-            width: 100%;
         }
         
-        .btn-group .btn {
-            margin-bottom: 0.25rem;
+        .swipeable-action-buttons .btn {
             width: 100%;
-        }
-        
-        .btn-group .btn:last-child {
-            margin-bottom: 0;
         }
     }
     

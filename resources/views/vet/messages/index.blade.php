@@ -8,7 +8,7 @@
         <!-- Contacts Panel -->
         <div class="col-lg-4 col-md-5 mb-4 mb-md-0">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-users me-2"></i>Contacts</h5>
                     <span class="badge bg-light text-dark">{{ $users->count() }}</span>
                 </div>
@@ -28,7 +28,7 @@
                                         @if($user->profile_picture_path)
                                             <img src="{{ asset('storage/' . $user->profile_picture_path) }}" alt="{{ $user->name }} Profile Picture" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
                                         @else
-                                            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <div class="avatar bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                                 {{ substr($user->name, 0, 1) }}
                                             </div>
                                         @endif
@@ -39,7 +39,7 @@
                                     </div>
                                     <div class="d-flex align-items-center">
                                         @if($user->role !== 'vet')
-                                            <span class="badge bg-info me-2">User</span>
+                                            <span class="badge bg-success me-2">User</span>
                                         @endif
                                         @if($user->unread_count > 0)
                                             <span class="badge bg-danger rounded-pill unread-count-badge" data-contact-id="{{ $user->id }}">{{ $user->unread_count }}</span>
@@ -56,7 +56,7 @@
         <!-- Messages Panel -->
         <div class="col-lg-8 col-md-7">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                <div class="card-header bg-success text-white border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Messages</h5>
                     @if($selectedUserId)
                         @php
@@ -88,7 +88,7 @@
                                 @foreach($messages as $message)
                                     <div class="mb-3 {{ $message->sender_id == Auth::id() ? 'text-end' : 'text-start' }}">
                                         <div class="d-inline-block p-3 rounded-3 shadow-sm 
-                                            {{ $message->sender_id == Auth::id() ? 'bg-primary text-white' : 'bg-light' }}" 
+                                            {{ $message->sender_id == Auth::id() ? 'bg-success text-white' : 'bg-light' }}" 
                                             style="max-width: 80%; word-wrap: break-word;">
                                             {{ $message->message }}
                                             <div class="small mt-1">
@@ -104,7 +104,7 @@
                             <input type="hidden" id="receiver-id" value="{{ $selectedUserId }}">
                             <div class="input-group">
                                 <input type="text" id="message-input" class="form-control" placeholder="Type your message..." required>
-                                <button class="btn btn-primary" type="submit">
+                                <button class="btn btn-success" type="submit">
                                     <i class="fas fa-paper-plane"></i>
                                     <span class="d-none d-sm-inline ms-1">Send</span>
                                 </button>
@@ -140,6 +140,25 @@
 }
 #message-container::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+}
+
+/* Vet green theme for message headers, buttons, and bubbles */
+.bg-success {
+    background-color: #27ae60 !important;
+}
+
+.btn-success {
+    background-color: #27ae60 !important;
+    border-color: #27ae60 !important;
+}
+
+.btn-success:hover {
+    background-color: #219653 !important;
+    border-color: #219653 !important;
+}
+
+.badge.bg-success {
+    background-color: #27ae60 !important;
 }
 </style>
 

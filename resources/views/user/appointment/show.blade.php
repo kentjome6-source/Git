@@ -23,7 +23,7 @@
 
             <!-- Main Card -->
             <div class="card">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-success text-white">
                     <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Appointment Details</h5>
                 </div>
                 <div class="card-body">
@@ -138,7 +138,7 @@
             <!-- Show veterinarian information for the assigned vet -->
             @if(auth()->user()->role === 'vet' && auth()->id() === $appointment->vet_id)
                 <div class="card mt-4">
-                    <div class="card-header bg-info text-white">
+                    <div class="card-header bg-success text-white">
                         <h6 class="mb-0"><i class="fas fa-user me-2"></i>Pet Owner Information</h6>
                     </div>
                     <div class="card-body">
@@ -154,6 +154,11 @@
 </div>
 
 <style>
+/* Vet green theme for appointment headers */
+.card-header.bg-success {
+    background-color: #27ae60 !important;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
     .container-fluid {

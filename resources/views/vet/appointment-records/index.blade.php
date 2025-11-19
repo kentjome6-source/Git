@@ -47,8 +47,8 @@ use Illuminate\Support\Str;
                         <!-- Desktop Table View -->
                         <div class="table-responsive desktop-table">
                             <table class="table table-hover mb-0">
-                                <thead class="table-dark">
-                                    <tr>
+                                <thead>
+                                    <tr class="table-success">
                                         <th>ID</th>
                                         <th>Pet Owner</th>
                                         <th>Pet Name</th>
@@ -243,6 +243,19 @@ use Illuminate\Support\Str;
 
 .table-responsive {
     max-height: 70vh;
+}
+
+/* Vet green theme for table header */
+.table-success {
+    --bs-table-bg: #27ae60;
+    --bs-table-color: #fff;
+    --bs-table-border-color: #219653;
+}
+
+.table-success th {
+    color: #fff !important;
+    background-color: #27ae60 !important;
+    border-color: #219653 !important;
 }
 
 .btn-group-vertical .btn {

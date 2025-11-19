@@ -342,9 +342,9 @@
                 </a>
             </div>
             <div class="menu-item">
-                <a href="{{ route('pet.lostfound') }}" class="menu-link {{ request()->routeIs('pet.lostfound') ? 'active' : '' }}">
+                <a href="{{ route('pet.lostfound') }}" class="menu-link {{ request()->routeIs('pet.lostfound') || request()->routeIs('lost-found.*') ? 'active' : '' }}">
                     <i class="fas fa-search-location menu-icon" aria-hidden="true"></i>
-                    <span class="menu-text">Lost & Found Board</span>
+                    <span class="menu-text">Lost & Found</span>
                 </a>
             </div>
             <div class="menu-item">

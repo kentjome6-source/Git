@@ -7,8 +7,8 @@
     .profile-card {
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         border: none;
-        background-color: #2c2c2c;
-        color: #f1f1f1;
+        background-color: #ffffff;
+        color: #333333;
     }
     .profile-header {
         background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%) !important;
@@ -27,7 +27,7 @@
     }
     .form-label {
         font-weight: 600;
-        color: #f1f1f1;
+        color: #333333;
         margin-bottom: 8px;
     }
     .alert-success {
@@ -36,39 +36,39 @@
         color: #d4edda;
     }
     .form-control {
-        background-color: #1e1e1e;
-        color: #f1f1f1;
-        border: 1px solid #444;
+        background-color: #ffffff;
+        color: #333333;
+        border: 1px solid #ced4da;
         border-radius: 8px;
         padding: 12px 15px;
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
     .form-control:focus {
-        background-color: #1e1e1e;
-        color: #f1f1f1;
+        background-color: #ffffff;
+        color: #333333;
         border-color: #27ae60;
         box-shadow: 0 0 0 0.25rem rgba(39, 174, 96, 0.25);
     }
     .form-control:disabled {
-        background-color: #333;
-        color: #bbb;
+        background-color: #e9ecef;
+        color: #6c757d;
     }
     .btn-outline-secondary {
-        color: #f1f1f1;
-        border: 2px solid #666;
+        color: #333333;
+        border: 2px solid #6c757d;
         border-radius: 8px;
         padding: 10px 15px;
         font-weight: 600;
         transition: all 0.3s ease;
     }
     .btn-outline-secondary:hover {
-        background-color: #444;
-        color: #f1f1f1;
-        border-color: #777;
+        background-color: #e9ecef;
+        color: #333333;
+        border-color: #495057;
         transform: translateY(-2px);
     }
     .btn-close {
-        filter: invert(1) grayscale(100%) brightness(200%);
+        filter: invert(0) grayscale(0) brightness(100%);
     }
     .profile-picture-container {
         text-align: center;
@@ -130,7 +130,7 @@
         color: #27ae60;
         margin-bottom: 20px;
         padding-bottom: 10px;
-        border-bottom: 2px solid #444;
+        border-bottom: 2px solid #dee2e6;
     }
     
     /* Mobile Responsive Styles */

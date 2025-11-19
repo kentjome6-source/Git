@@ -56,7 +56,7 @@
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">Adoption History</h5>
                             <p class="card-text">View complete adoption history and manage requests.</p>
-                            <a href="{{ route('adoptions.index') }}" class="btn btn-primary mt-auto">View History</a>
+                            <a href="{{ route('admin.adoptions.index') }}" class="btn btn-primary mt-auto">View History</a>
                         </div>
                     </div>
                 </div>
