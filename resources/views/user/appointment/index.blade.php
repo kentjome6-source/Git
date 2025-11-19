@@ -331,16 +331,8 @@
     @if($appointments->count() > 0)
         <div class="stats-grid">
             <div class="stat-card pending">
-                <div class="stat-number">{{ $appointments->where('status', 'pending')->count() }}</div>
-                <div class="stat-label">Pending</div>
-            </div>
-            <div class="stat-card confirmed">
-                <div class="stat-number">{{ $appointments->where('status', 'accepted')->count() }}</div>
-                <div class="stat-label">Accepted</div>
-            </div>
-            <div class="stat-card completed">
-                <div class="stat-number">{{ $appointments->where('status', 'rejected')->count() }}</div>
-                <div class="stat-label">Rejected</div>
+                <div class="stat-number">{{ $appointments->count() }}</div>
+                <div class="stat-label">Pending Review</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">{{ $appointments->count() }}</div>

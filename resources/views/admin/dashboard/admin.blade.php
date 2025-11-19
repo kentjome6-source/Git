@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin Dashboard')
+@section('title', 'Dashboard')
 
 @section('content')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <h1>Admin Dashboard</h1>
+            <h1>Dashboard</h1>
             <p>Welcome to the PawPortal Admin Dashboard. Manage the platform efficiently using the options below.</p>
             
             <!-- Statistics Cards -->

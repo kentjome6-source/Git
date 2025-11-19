@@ -18,10 +18,12 @@ class AppointmentController extends Controller
 
     /**
      * Display a listing of appointments for the authenticated user
+     * Only shows pending and accepted appointments
      */
     public function index()
     {
         $appointments = Appointment::where('user_id', Auth::id())
+            ->where('status', 'pending')
             ->with(['pet', 'vet'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -209,6 +211,7 @@ class AppointmentController extends Controller
 
     /**
      * Display appointment history for the authenticated user
+     * Shows accepted and rejected appointments
      */
     public function history(Request $request)
     {
@@ -219,7 +222,21 @@ class AppointmentController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
-        return view('user.appointment.history', compact('appointments'));
+        return view('user.appointment-history.index', compact('appointments'));
+    }
+
+    /**
+     * Display the specified appointment in history context
+     */
+    public function showHistory(Appointment $appointment)
+    {
+        // Ensure user can only view their own appointments
+        if ($appointment->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized access to appointment.');
+        }
+
+        $appointment->load(['pet', 'vet', 'user']);
+        return view('user.appointment-history.show', compact('appointment'));
     }
 
     /**

@@ -1,6 +1,6 @@
-@extends(auth()->user()->role === 'vet' ? 'layouts.vet' : 'layouts.app')
+@extends('layouts.app')
 
-@section('title', 'Appointment')
+@section('title', 'Appointment Details')
 
 @section('content')
 <div class="container-fluid py-4">
@@ -8,23 +8,18 @@
         <div class="col-lg-10">
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row gap-3">
-                <h2><i class="fas fa-stethoscope me-2"></i>Appointment</h2>
+                <h2><i class="fas fa-stethoscope me-2"></i>Appointment Details</h2>
                 <div class="d-flex gap-2 flex-wrap">
-                    @if($appointment->status === 'pending' && $appointment->user_id === auth()->id())
-                        <a href="{{ route('appointments.edit', $appointment) }}" class="btn btn-warning">
-                            <i class="fas fa-edit me-2"></i>Edit Request
-                        </a>
-                    @endif
-                    <a href="{{ auth()->user()->role === 'vet' ? route('vet.appointments') : route('appointments.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Back
+                    <a href="{{ route('appointments.history') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to History
                     </a>
                 </div>
             </div>
 
             <!-- Main Card -->
             <div class="card">
-                <div class="card-header @if(auth()->user()->role !== 'vet') bg-primary @else bg-success @endif text-white">
-                    <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Appointment Details</h5>
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Appointment Information</h5>
                 </div>
                 <div class="card-body">
                     <!-- Status Info -->
@@ -45,8 +40,8 @@
                                 $statusClass = match($appointment->status) {
                                     'pending' => 'warning',
                                     'accepted' => 'success',
-                                    'rejected' => 'dark',
-                                    'cancelled' => 'danger',
+                                    'rejected' => 'danger',
+                                    'cancelled' => 'secondary',
                                     default => 'secondary'
                                 };
                             @endphp
@@ -92,73 +87,43 @@
                             @endif
                         </div>
                     </div>
-
-                    <!-- Action Buttons -->
-                    @if(auth()->user()->role !== 'vet')
-                        <div class="mt-4">
-                            @if($appointment->status === 'pending' && $appointment->user_id === auth()->id())
-                                <form action="{{ route('appointments.destroy', $appointment) }}" method="POST" class="d-inline"
-                                      onsubmit="return confirm('Are you sure you want to delete this appointment request?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="fas fa-trash me-2"></i>Cancel Request
-                                    </button>
-                                </form>
-                            @endif
-                        </div>
-                    @endif
                 </div>
             </div>
 
             <!-- Veterinary Information -->
-            @if(auth()->user()->role !== 'vet' && ($appointment->vet || $appointment->vet_notes || $appointment->diagnosis || $appointment->treatment_plan))
-                <div class="card mt-4">
-                    <div class="card-header @if(auth()->user()->role !== 'vet') bg-primary @else bg-success @endif text-white">
-                        <h6 class="mb-0"><i class="fas fa-user-md me-2"></i>Veterinary Information</h6>
-                    </div>
-                    <div class="card-body">
-                        @if($appointment->vet)
-                            <p><strong>Veterinarian:</strong> Dr. {{ $appointment->vet->name }}</p>
-                            <p><strong>Email:</strong> {{ $appointment->vet->email }}</p>
-                            
-                            @if($appointment->vet_notes)
-                                <p><strong>Vet Notes:</strong> {{ $appointment->vet_notes }}</p>
-                            @endif
-                        @else
-                            <div class="alert alert-warning">
-                                <i class="fas fa-hourglass-half me-2"></i>
-                                Your appointment request is pending review. A veterinarian will be assigned soon.
-                            </div>
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-user-md me-2"></i>Veterinary Information</h6>
+                </div>
+                <div class="card-body">
+                    @if($appointment->vet)
+                        <p><strong>Veterinarian:</strong> Dr. {{ $appointment->vet->name }}</p>
+                        <p><strong>Email:</strong> {{ $appointment->vet->email }}</p>
+                        
+                        @if($appointment->vet_notes)
+                            <p><strong>Vet Notes:</strong> {{ $appointment->vet_notes }}</p>
                         @endif
-                    </div>
+                        
+                        @if($appointment->diagnosis)
+                            <p><strong>Diagnosis:</strong> {{ $appointment->diagnosis }}</p>
+                        @endif
+                        
+                        @if($appointment->treatment_plan)
+                            <p><strong>Treatment Plan:</strong> {{ $appointment->treatment_plan }}</p>
+                        @endif
+                    @else
+                        <div class="alert alert-warning">
+                            <i class="fas fa-hourglass-half me-2"></i>
+                            Your appointment request is pending review. A veterinarian will be assigned soon.
+                        </div>
+                    @endif
                 </div>
-            @endif
-            
-            <!-- Show veterinarian information for the assigned vet -->
-            @if(auth()->user()->role === 'vet' && auth()->id() === $appointment->vet_id)
-                <div class="card mt-4">
-                    <div class="card-header bg-success text-white">
-                        <h6 class="mb-0"><i class="fas fa-user me-2"></i>Pet Owner Information</h6>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Full Name:</strong> {{ $appointment->owner_name }}</p>
-                        <p><strong>Phone:</strong> {{ $appointment->owner_phone }}</p>
-                        <p><strong>Email:</strong> {{ $appointment->email }}</p>
-                        <p><strong>Address:</strong> {{ $appointment->owner_address ?? '' }}</p>
-                    </div>
-                </div>
-            @endif
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-/* Vet green theme for appointment headers */
-.card-header.bg-success {
-    background-color: #27ae60 !important;
-}
-
 /* Pet parent purple theme for appointment headers */
 .card-header.bg-primary {
     background-color: #5b4b9b !important;

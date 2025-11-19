@@ -64,7 +64,7 @@ class VetController extends Controller
         }
         
         $appointment->load(['user', 'pet']);
-        return view('user.appointment.show', compact('appointment'));
+        return view('vet.appointment-records.show', compact('appointment'));
     }
     
     /**
@@ -80,7 +80,7 @@ class VetController extends Controller
         }
         
         $appointment->load(['user', 'pet']);
-        return view('user.appointment.show', compact('appointment'));
+        return view('vet.appointment-records.show', compact('appointment'));
     }
     
     /**

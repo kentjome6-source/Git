@@ -20,7 +20,7 @@ use Illuminate\Support\Str;
                         <!-- Desktop Table View -->
                         <div class="table-responsive desktop-table">
                             <table class="table table-hover mb-0">
-                                <thead class="table-dark">
+                                <thead class="table-primary">
                                     <tr>
                                         <th>ID</th>
                                         <th>Pet Name</th>
@@ -81,7 +81,7 @@ use Illuminate\Support\Str;
                                             </td>
                                            <td>
                                                 <div class="btn-group-vertical btn-group-sm" role="group">
-                                                    <a href="{{ route('appointments.show', $appointment) }}" class="btn btn-info btn-sm me-1" title="View Details">
+                                                    <a href="{{ route('appointments.history.show', $appointment) }}" class="btn btn-info btn-sm me-1" title="View Details">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                 </div>
@@ -169,7 +169,7 @@ use Illuminate\Support\Str;
                                     </div>
                                     
                                     <div class="swipeable-actions">
-                                        <a href="{{ route('appointments.show', $appointment) }}" class="btn btn-info btn-sm" title="View Details">
+                                        <a href="{{ route('appointments.history.show', $appointment) }}" class="btn btn-info btn-sm" title="View Details">
                                             <i class="fas fa-eye"></i> View
                                         </a>
                                     </div>
@@ -204,6 +204,19 @@ use Illuminate\Support\Str;
 
 .table-responsive {
     max-height: 70vh;
+}
+
+/* Pet parent purple theme for table header */
+.table-primary {
+    --bs-table-bg: #5b4b9b;
+    --bs-table-color: #fff;
+    --bs-table-border-color: #4a3d82;
+}
+
+.table-primary th {
+    color: #fff !important;
+    background-color: #5b4b9b !important;
+    border-color: #4a3d82 !important;
 }
 
 .btn-group-vertical .btn {

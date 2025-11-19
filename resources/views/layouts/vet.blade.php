@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Veterinarian - PawPortal')</title>
+    <title>@yield('title', 'Appointment')</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @auth
         <meta name="current-user-id" content="{{ Auth::id() }}">
@@ -289,7 +289,7 @@
                 </a>
             </div>
             <div class="menu-item">
-                <a href="{{ route('vet.appointment.records') }}" class="menu-link {{ request()->routeIs('vet.appointment.records') ? 'active' : '' }}">
+                <a href="{{ route('vet.appointment.records') }}" class="menu-link {{ request()->routeIs('vet.appointment.records') || request()->routeIs('vet.appointment.records.show') ? 'active' : '' }}">
                     <i class="fas fa-file-medical menu-icon"></i>
                     <span class="menu-text">Appointment Records</span>
                 </a>

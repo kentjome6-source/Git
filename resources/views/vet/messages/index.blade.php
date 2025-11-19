@@ -1,6 +1,6 @@
 @extends('layouts.vet')
 
-@section('title', 'Vet Messages')
+@section('title', 'Messages')
 
 @section('content')
 <div class="container-fluid">
@@ -8,7 +8,7 @@
         <!-- Contacts Panel -->
         <div class="col-lg-4 col-md-5 mb-4 mb-md-0">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-vet-green text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-users me-2"></i>Contacts</h5>
                     <span class="badge bg-light text-dark">{{ $users->count() }}</span>
                 </div>
@@ -39,7 +39,7 @@
                                     </div>
                                     <div class="d-flex align-items-center">
                                         @if($user->role !== 'vet')
-                                            <span class="badge bg-success me-2">User</span>
+                                            <span class="badge bg-vet-green me-2">User</span>
                                         @endif
                                         @if($user->unread_count > 0)
                                             <span class="badge bg-danger rounded-pill unread-count-badge" data-contact-id="{{ $user->id }}">{{ $user->unread_count }}</span>
@@ -56,7 +56,7 @@
         <!-- Messages Panel -->
         <div class="col-lg-8 col-md-7">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-success text-white border-bottom d-flex justify-content-between align-items-center">
+                <div class="card-header bg-vet-green text-white border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Messages</h5>
                     @if($selectedUserId)
                         @php
@@ -67,7 +67,7 @@
                                 @if($selectedUser->profile_picture_path)
                                     <img src="{{ asset('storage/' . $selectedUser->profile_picture_path) }}" alt="{{ $selectedUser->name }} Profile Picture" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
                                 @else
-                                    <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                    <div class="avatar bg-vet-green text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
                                         {{ substr($selectedUser->name, 0, 1) }}
                                     </div>
                                 @endif
@@ -104,7 +104,7 @@
                             <input type="hidden" id="receiver-id" value="{{ $selectedUserId }}">
                             <div class="input-group">
                                 <input type="text" id="message-input" class="form-control" placeholder="Type your message..." required>
-                                <button class="btn btn-success" type="submit">
+                                <button class="btn btn-vet-green" type="submit">
                                     <i class="fas fa-paper-plane"></i>
                                     <span class="d-none d-sm-inline ms-1">Send</span>
                                 </button>
@@ -143,16 +143,17 @@
 }
 
 /* Vet green theme for message headers, buttons, and bubbles */
-.bg-success {
+.bg-vet-green {
     background-color: #27ae60 !important;
 }
 
-.btn-success {
+.btn-vet-green {
     background-color: #27ae60 !important;
     border-color: #27ae60 !important;
+    color: #fff !important;
 }
 
-.btn-success:hover {
+.btn-vet-green:hover {
     background-color: #219653 !important;
     border-color: #219653 !important;
 }

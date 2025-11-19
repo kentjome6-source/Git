@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Manage Pets')
+@section('title', 'Pet Management')
 
 @section('content')
 <div class="container-fluid py-4">
@@ -9,7 +9,7 @@
             <div class="card shadow-lg border-0 rounded-4">
                 <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">
-                        <i class="fas fa-paw me-2"></i>Manage Pets
+                        <i class="fas fa-paw me-2"></i>Pet Management
                     </h4>
                     <a href="{{ route('admin.pets.create') }}" class="btn btn-light btn-sm">
                         <i class="fas fa-plus-circle me-1"></i> Add New Pet

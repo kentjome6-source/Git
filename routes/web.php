@@ -46,6 +46,7 @@ Route::prefix('vet')->name('vet.')->middleware(['can:isVet', 'vet.verified'])->g
     Route::get('records/{id}/view', [VetController::class, 'viewRecord'])->name('records.view');
     Route::get('/appointments', [VetController::class, 'appointments'])->name('appointments');
     Route::get('/appointment-records', [VetController::class, 'appointmentRecords'])->name('appointment.records');
+    Route::get('/appointment-records/{appointment}', [VetController::class, 'show'])->name('appointment.records.show');
     
     // Vet Appointment Management Routes
     Route::get('/appointments/{appointment}', [AppointmentController::class, 'show'])->name('appointments.show');
@@ -160,6 +161,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Appointment Routes
     Route::get('/appointments/history', [AppointmentController::class, 'history'])->name('appointments.history');
+    Route::get('/appointments/history/{appointment}', [AppointmentController::class, 'showHistory'])->name('appointments.history.show');
     Route::resource('appointments', AppointmentController::class);
     
     // Adoption Routes

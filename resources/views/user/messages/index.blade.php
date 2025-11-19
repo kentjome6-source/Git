@@ -8,7 +8,7 @@
         <!-- Contacts Panel -->
         <div class="col-lg-4 col-md-5 mb-4 mb-md-0" id="contacts-panel">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-purple text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-users me-2"></i>Contacts</h5>
                     <span class="badge bg-light text-dark">{{ $users->count() }}</span>
                 </div>
@@ -28,7 +28,7 @@
                                         @if($user->profile_picture_path)
                                             <img src="{{ asset('storage/' . $user->profile_picture_path) }}" alt="{{ $user->name }} Profile Picture" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
                                         @else
-                                            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <div class="avatar bg-purple text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                                 {{ substr($user->name, 0, 1) }}
                                             </div>
                                         @endif
@@ -55,7 +55,7 @@
         <!-- Messages Panel -->
         <div class="col-lg-8 col-md-7" id="messages-panel">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                <div class="card-header bg-purple text-white border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Messages</h5>
                     @if($selectedUserId)
                         @php
@@ -66,7 +66,7 @@
                                 @if($selectedUser->profile_picture_path)
                                     <img src="{{ asset('storage/' . $selectedUser->profile_picture_path) }}" alt="{{ $selectedUser->name }} Profile Picture" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
                                 @else
-                                    <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                    <div class="avatar bg-purple text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
                                         {{ substr($selectedUser->name, 0, 1) }}
                                     </div>
                                 @endif
@@ -87,7 +87,7 @@
                                 @foreach($messages as $message)
                                     <div class="mb-3 {{ $message->sender_id == Auth::id() ? 'text-end' : 'text-start' }}">
                                         <div class="d-inline-block p-3 rounded-3 shadow-sm 
-                                            {{ $message->sender_id == Auth::id() ? 'bg-primary text-white' : 'bg-light' }}" 
+                                            {{ $message->sender_id == Auth::id() ? 'bg-purple text-white' : 'bg-light' }}" 
                                             style="max-width: 80%; word-wrap: break-word;">
                                             {{ $message->message }}
                                             <div class="small mt-1">
@@ -103,7 +103,7 @@
                             <input type="hidden" id="receiver-id" value="{{ $selectedUserId }}">
                             <div class="input-group">
                                 <input type="text" id="message-input" class="form-control" placeholder="Type your message..." required>
-                                <button class="btn btn-primary" type="submit">
+                                <button class="btn btn-purple" type="submit">
                                     <i class="fas fa-paper-plane"></i>
                                     <span class="d-none d-sm-inline ms-1">Send</span>
                                 </button>
@@ -141,6 +141,22 @@
 }
 #message-container::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+}
+
+/* Pet parent purple theme for message headers and buttons */
+.bg-purple {
+    background-color: #5b4b9b !important;
+}
+
+.btn-purple {
+    background-color: #5b4b9b !important;
+    border-color: #5b4b9b !important;
+    color: #fff !important;
+}
+
+.btn-purple:hover {
+    background-color: #4a3d82 !important;
+    border-color: #4a3d82 !important;
 }
 </style>
 

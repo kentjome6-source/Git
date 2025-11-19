@@ -330,13 +330,13 @@
                 </a>
             </div>
             <div class="menu-item">
-                <a href="{{ route('appointments.index') }}" class="menu-link {{ request()->routeIs('appointments.*') && !request()->routeIs('appointments.history') ? 'active' : '' }}">
+                <a href="{{ route('appointments.index') }}" class="menu-link {{ request()->routeIs('appointments.*') && !request()->routeIs('appointments.history') && !request()->routeIs('appointments.history.show') ? 'active' : '' }}">
                     <i class="fas fa-stethoscope menu-icon" aria-hidden="true"></i>
                     <span class="menu-text">Appointment</span>
                 </a>
             </div>
             <div class="menu-item">
-                <a href="{{ route('appointments.history') }}" class="menu-link {{ request()->routeIs('appointments.history') ? 'active' : '' }}">
+                <a href="{{ route('appointments.history') }}" class="menu-link {{ request()->routeIs('appointments.history') || request()->routeIs('appointments.history.show') ? 'active' : '' }}">
                     <i class="fas fa-history menu-icon" aria-hidden="true"></i>
                     <span class="menu-text">Appointment History</span>
                 </a>

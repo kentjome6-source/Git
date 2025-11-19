@@ -113,7 +113,7 @@ use Illuminate\Support\Str;
                                             </td>
                                            <td>
                                                 <div class="btn-group-vertical btn-group-sm" role="group">
-                                                    <a href="{{ route('appointments.show', $appointment) }}" class="btn btn-info btn-sm me-1" title="View Details">
+                                                    <a href="{{ route('vet.appointment.records.show', $appointment) }}" class="btn btn-info btn-sm me-1" title="View Details">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                 </div>
@@ -204,7 +204,7 @@ use Illuminate\Support\Str;
                                     </div>
                                     
                                     <div class="swipeable-actions">
-                                        <a href="{{ route('appointments.show', $appointment) }}" class="btn btn-info btn-sm" title="View Details">
+                                        <a href="{{ route('vet.appointment.records.show', $appointment) }}" class="btn btn-info btn-sm" title="View Details">
                                             <i class="fas fa-eye"></i> View
                                         </a>
                                     </div>

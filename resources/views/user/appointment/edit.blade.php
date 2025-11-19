@@ -53,31 +53,31 @@
                                     <i class="fas fa-user me-2"></i>Owner Information
                                 </h5>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="owner_name" class="form-label">Full Name *</label>
                                     <input type="text" name="owner_name" id="owner_name" class="form-control" 
                                            value="{{ old('owner_name', $appointment->owner_name) }}" required>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="owner_email" class="form-label">Email Address *</label>
-                                    <input type="email" name="owner_email" id="owner_email" class="form-control" 
-                                           value="{{ old('owner_email', $appointment->owner_email) }}" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="owner_phone" class="form-label">Phone Number *</label>
+                                    <label for="owner_phone" class="form-label">Phone *</label>
                                     <input type="tel" name="owner_phone" id="owner_phone" class="form-control" 
                                            value="{{ old('owner_phone', $appointment->owner_phone) }}" required>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="owner_email" class="form-label">Email *</label>
+                                    <input type="email" name="owner_email" id="owner_email" class="form-control" 
+                                           value="{{ old('owner_email', $appointment->owner_email) }}" required>
+                                </div>
+                            </div>
+                            <div class="col-12">
                                 <div class="mb-3">
                                     <label for="owner_address" class="form-label">Address</label>
-                                    <textarea name="owner_address" id="owner_address" class="form-control" rows="3">{{ old('owner_address', $appointment->owner_address) }}</textarea>
+                                    <textarea name="owner_address" id="owner_address" class="form-control" rows="2">{{ old('owner_address', $appointment->owner_address) }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -89,14 +89,14 @@
                                     <i class="fas fa-paw me-2"></i>Pet Information
                                 </h5>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="pet_name" class="form-label">Pet Name *</label>
                                     <input type="text" name="pet_name" id="pet_name" class="form-control" 
                                            value="{{ old('pet_name', $appointment->pet_name) }}" required>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="pet_type" class="form-label">Pet Type *</label>
                                     <select name="pet_type" id="pet_type" class="form-select" required>
@@ -110,184 +110,30 @@
                                 <div class="mb-3">
                                     <label for="pet_services_received" class="form-label">Pet Services Received</label>
                                     <textarea name="pet_services_received" id="pet_services_received" class="form-control" 
-                                              rows="2" placeholder="Enter services your pet has received (e.g., Deworming, Vaccination, Tick and Flea Prevention)">{{ old('pet_services_received', $appointment->pet_services_received) }}</textarea>
-                                    <div class="form-text">List any services your pet has recently received, such as deworming, vaccination, or tick and flea prevention.</div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="pet_breed" class="form-label">Breed</label>
-                                    <input type="text" name="pet_breed" id="pet_breed" class="form-control" 
-                                           value="{{ old('pet_breed', $appointment->pet_breed) }}">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="pet_gender" class="form-label">Gender</label>
-                                    <select name="pet_gender" id="pet_gender" class="form-select">
-                                        <option value="">Select gender</option>
-                                        <option value="male" {{ $appointment->pet_gender === 'male' ? 'selected' : '' }}>Male</option>
-                                        <option value="female" {{ $appointment->pet_gender === 'female' ? 'selected' : '' }}>Female</option>
-                                        <option value="unknown" {{ $appointment->pet_gender === 'unknown' ? 'selected' : '' }}>Unknown</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="pet_age_years" class="form-label">Age (Years)</label>
-                                    <input type="number" name="pet_age_years" id="pet_age_years" class="form-control" 
-                                           min="0" max="30" value="{{ old('pet_age_years', $appointment->pet_age_years) }}">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="pet_weight" class="form-label">Weight (kg)</label>
-                                    <input type="number" name="pet_weight" id="pet_weight" class="form-control" 
-                                           step="0.1" min="0" max="999.99" value="{{ old('pet_weight', $appointment->pet_weight) }}">
+                                              rows="2" placeholder="List any services your pet has recently received, such as deworming, vaccination, or tick and flea prevention.">{{ old('pet_services_received', $appointment->pet_services_received) }}</textarea>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Appointment Details Section -->
+                        <!-- Scheduling Section -->
                         <div class="row mb-4">
                             <div class="col-12">
                                 <h5 class="text-primary border-bottom pb-2 mb-3">
-                                    <i class="fas fa-notes-medical me-2"></i>Appointment Details
+                                    <i class="fas fa-calendar-alt me-2"></i>Scheduling
                                 </h5>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="consultation_reason" class="form-label">Reason for Appointment *</label>
-                                    <select name="consultation_reason" id="consultation_reason" class="form-select" required>
-                                        <option value="">Select reason</option>
-                                        <option value="routine_checkup" {{ $appointment->consultation_reason === 'routine_checkup' ? 'selected' : '' }}>Routine Checkup</option>
-                                        <option value="illness" {{ $appointment->consultation_reason === 'illness' ? 'selected' : '' }}>Illness/Sickness</option>
-                                        <option value="injury" {{ $appointment->consultation_reason === 'injury' ? 'selected' : '' }}>Injury</option>
-                                        <option value="vaccination" {{ $appointment->consultation_reason === 'vaccination' ? 'selected' : '' }}>Vaccination</option>
-                                        <option value="behavioral" {{ $appointment->consultation_reason === 'behavioral' ? 'selected' : '' }}>Behavioral Issues</option>
-                                        <option value="other" {{ $appointment->consultation_reason === 'other' ? 'selected' : '' }}>Other</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="preferred_date" class="form-label">Preferred Appointment Date</label>
+                                    <label for="preferred_date" class="form-label">Preferred Date</label>
                                     <input type="date" name="preferred_date" id="preferred_date" 
                                            class="form-control" value="{{ old('preferred_date', $appointment->appointment_date ? $appointment->appointment_date->format('Y-m-d') : '') }}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="preferred_time" class="form-label">Preferred Appointment Time</label>
+                                    <label for="preferred_time" class="form-label">Preferred Time</label>
                                     <input type="time" name="preferred_time" id="preferred_time" 
                                            class="form-control" value="{{ old('preferred_time', $appointment->appointment_time ?? '') }}">
-                                </div>
-                            </div>
-                            <div class="col-md-6" id="scheduled_datetime_section" style="{{ $appointment->consultation_type === 'appointment' ? 'display: block;' : 'display: none;' }}">
-                                <div class="mb-3">
-                                    <label for="scheduled_datetime" class="form-label">Scheduled Date & Time</label>
-                                    <input type="datetime-local" name="scheduled_datetime" id="scheduled_datetime" 
-                                           class="form-control" value="{{ old('scheduled_datetime', $appointment->scheduled_datetime ? $appointment->scheduled_datetime->format('Y-m-d\TH:i') : '') }}">
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label for="chief_complaint" class="form-label">Chief Complaint *</label>
-                                    <textarea name="chief_complaint" id="chief_complaint" class="form-control" 
-                                              rows="3" required placeholder="Briefly describe the main concern or reason for this consultation">{{ old('chief_complaint', $appointment->chief_complaint) }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label for="detailed_symptoms" class="form-label">Detailed Symptoms *</label>
-                                    <textarea name="detailed_symptoms" id="detailed_symptoms" class="form-control" 
-                                              rows="4" required placeholder="Provide detailed description of all symptoms observed">{{ old('detailed_symptoms', $appointment->detailed_symptoms) }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label for="additional_concerns" class="form-label">Additional Concerns</label>
-                                    <textarea name="additional_concerns" id="additional_concerns" class="form-control" 
-                                              rows="3" placeholder="Any other concerns or questions you have">{{ old('additional_concerns', $appointment->additional_concerns) }}</textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Duration of Symptoms Section -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="text-primary border-bottom pb-2 mb-3">
-                                    <i class="fas fa-clock me-2"></i>Duration of Symptoms
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="symptom_duration_days" class="form-label">Duration (Days)</label>
-                                    <input type="number" name="symptom_duration_days" id="symptom_duration_days" 
-                                           class="form-control" min="0" value="{{ old('symptom_duration_days', $appointment->symptom_duration_days) }}"
-                                           placeholder="How many days have symptoms been present?">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="symptom_onset" class="form-label">Symptom Onset *</label>
-                                    <select name="symptom_onset" id="symptom_onset" class="form-select" required>
-                                        <option value="">Select onset type</option>
-                                        <option value="sudden" {{ $appointment->symptom_onset === 'sudden' ? 'selected' : '' }}>Sudden - Symptoms appeared quickly</option>
-                                        <option value="gradual" {{ $appointment->symptom_onset === 'gradual' ? 'selected' : '' }}>Gradual - Symptoms developed slowly over time</option>
-                                        <option value="intermittent" {{ $appointment->symptom_onset === 'intermittent' ? 'selected' : '' }}>Intermittent - Symptoms come and go</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="symptom_progression" class="form-label">Symptom Progression</label>
-                                    <textarea name="symptom_progression" id="symptom_progression" class="form-control" 
-                                              rows="3" placeholder="How have the symptoms changed over time?">{{ old('symptom_progression', $appointment->symptom_progression) }}</textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Previous Medications / Treatments Section -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="text-primary border-bottom pb-2 mb-3">
-                                    <i class="fas fa-pills me-2"></i>Previous Medications / Treatments
-                                </h5>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="current_medications" class="form-label">Current Medications</label>
-                                    <textarea name="current_medications" id="current_medications" class="form-control" 
-                                              rows="3" placeholder="List any medications your pet is currently taking">{{ old('current_medications', $appointment->current_medications) }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="previous_treatments" class="form-label">Previous Treatments</label>
-                                    <textarea name="previous_treatments" id="previous_treatments" class="form-control" 
-                                              rows="3" placeholder="Describe any previous treatments for this condition">{{ old('previous_treatments', $appointment->previous_treatments) }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="allergies" class="form-label">Known Allergies</label>
-                                    <textarea name="allergies" id="allergies" class="form-control" 
-                                              rows="3" placeholder="List any known allergies or adverse reactions">{{ old('allergies', $appointment->allergies) }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="vaccination_history" class="form-label">Vaccination History</label>
-                                    <textarea name="vaccination_history" id="vaccination_history" class="form-control" 
-                                              rows="3" placeholder="Recent vaccinations and dates">{{ old('vaccination_history', $appointment->vaccination_history) }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label for="previous_medical_history" class="form-label">Previous Medical History</label>
-                                    <textarea name="previous_medical_history" id="previous_medical_history" class="form-control" 
-                                              rows="3" placeholder="Any relevant past medical conditions or surgeries">{{ old('previous_medical_history', $appointment->previous_medical_history) }}</textarea>
                                 </div>
                             </div>
                         </div>
