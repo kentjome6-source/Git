@@ -3,6 +3,8 @@
 @section('title', 'Location Details - Map')
 
 @section('styles')
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
     .shelter-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 0; color: white; text-align: center; }
     .shelter-title { font-size: 2rem; font-weight: 700; margin-bottom: 10px; }
@@ -269,22 +271,14 @@
         <div class="shelter-overview">
             <div class="shelter-info">
                 <div class="shelter-header-info">
-                    <div class="shelter-icon icon-{{ $shelter->type }}">
-                        @if($shelter->type === 'pet_shop')
-                            <i class="fas fa-store"></i>
-                        @elseif($shelter->type === 'veterinarian')
-                            <i class="fas fa-user-md"></i>
-                        @elseif($shelter->type === 'grooming')
-                            <i class="fas fa-cut"></i>
-                        @else
-                            <i class="fas fa-home"></i>
-                        @endif
+                    <div class="shelter-icon icon-veterinarian">
+                        <i class="fas fa-user-md"></i>
                     </div>
                     <div class="shelter-details">
                         <h2>{{ $shelter->name }}</h2>
                         <div>
-                            <span class="badge badge-{{ $shelter->type === 'pet_shop' ? 'primary' : ($shelter->type === 'veterinarian' ? 'success' : ($shelter->type === 'grooming' ? 'warning' : 'info')) }}">
-                                {{ $shelter->type_name }}
+                            <span class="badge badge-success">
+                                Veterinarian
                             </span>
                             <span class="badge badge-{{ $shelter->is_active ? 'active' : 'inactive' }}">
                                 {{ $shelter->is_active ? 'Active' : 'Inactive' }}
@@ -460,135 +454,261 @@
 @endsection
 
 @section('scripts')
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
 @if($shelter->latitude && $shelter->longitude)
 <script>
-    // Simple and robust map initialization
-    let mapInitialized = false;
-    
-    function initMap() {
-        // Prevent multiple initializations
-        if (mapInitialized) return;
-        
-        const mapContainer = document.getElementById('shelter-map');
-        if (!mapContainer) return;
-        
-        try {
-            // Ensure container is visible and properly sized
-            mapContainer.style.display = 'block';
-            mapContainer.style.width = '100%';
-            mapContainer.style.height = window.innerWidth <= 576 ? '250px' : '400px';
-            
-            // Clear any existing content
-            mapContainer.innerHTML = '';
-            
-            // Load Leaflet dynamically if not available
-            if (typeof L === 'undefined') {
-                // Load CSS
-                const css = document.createElement('link');
-                css.rel = 'stylesheet';
-                css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-                document.head.appendChild(css);
+    // Initialize map when document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Wait a bit for the assets to load
+        setTimeout(function() {
+            if (typeof SharedMap !== 'undefined') {
+                // Create a single-item array for the shelter
+                const shelterData = [{
+                    id: {{ $shelter->id }},
+                    name: "{{ $shelter->name }}",
+                    address: "{{ $shelter->address }}",
+                    city: "{{ $shelter->city }}",
+                    province: "{{ $shelter->province }}",
+                    phone: "{{ $shelter->phone }}",
+                    email: "{{ $shelter->email }}",
+                    latitude: "{{ $shelter->latitude }}",
+                    longitude: "{{ $shelter->longitude }}",
+                    type: "veterinarian"
+                }];
                 
-                // Load JS
-                const script = document.createElement('script');
-                script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-                script.onload = function() {
-                    createMap();
-                };
-                document.head.appendChild(script);
+                // Initialize the shared map component
+                const sharedMap = new SharedMap('shelter-map', shelterData, {
+                    fullscreenEnabled: true,
+                    showViewDetails: false,
+                    zoom: 16 // Focus more closely on single location
+                });
+                
+                // Store reference to map for potential future use
+                window.shelterMap = sharedMap;
             } else {
-                createMap();
+                console.error('SharedMap is not available');
+                // Fallback to basic map initialization
+                initBasicMap();
             }
-        } catch (error) {
-            console.error('Map initialization error:', error);
-            showError(mapContainer, 'Failed to initialize map: ' + error.message);
-        }
-    }
-    
-    function createMap() {
-        try {
-            const mapContainer = document.getElementById('shelter-map');
-            if (!mapContainer) return;
-            
-            // Parse coordinates
-            const lat = parseFloat({{ $shelter->latitude }});
-            const lng = parseFloat({{ $shelter->longitude }});
-            
-            if (isNaN(lat) || isNaN(lng)) {
-                throw new Error('Invalid coordinates');
-            }
-            
-            // Remove any existing map
-            if (mapContainer._leaflet_id) {
-                mapContainer._leaflet_id = null;
-            }
-            
-            // Create map with explicit options
-            const map = L.map('shelter-map', {
-                center: [lat, lng],
-                zoom: 15,
-                zoomControl: false,
-                attributionControl: true
-            });
-            
-            // Add tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                maxZoom: 18
-            }).addTo(map);
-            
-            // Add marker
-            const marker = L.marker([lat, lng]).addTo(map);
-            
-            // Add popup
-            marker.bindPopup(`
-                <b>{{ $shelter->name }}</b><br>
-                {{ $shelter->address }}
-                @if($shelter->phone)
-                <br>Phone: {{ $shelter->phone }}
-                @endif
-            `);
-            
-            // Force resize
-            setTimeout(() => {
-                map.invalidateSize();
-            }, 100);
-            
-            mapInitialized = true;
-            console.log('Map initialized successfully');
-            
-        } catch (error) {
-            console.error('Map creation error:', error);
-            const mapContainer = document.getElementById('shelter-map');
-            if (mapContainer) {
-                showError(mapContainer, 'Failed to create map: ' + error.message);
-            }
-        }
-    }
-    
-    function showError(container, message) {
-        container.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; flex-direction: column; padding: 20px; text-align: center; color: #666;">
-                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 15px; color: #e74c3c;"></i>
-                <p style="margin: 0; font-size: 1.1rem;">${message}</p>
-                <button onclick="initMap()" style="margin-top: 15px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    <i class="fas fa-redo"></i> Retry
-                </button>
-            </div>
-        `;
-    }
-    
-    // Initialize map when page is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initMap);
-    } else {
-        initMap();
-    }
-    
-    // Also initialize on window load for extra reliability
-    window.addEventListener('load', function() {
-        setTimeout(initMap, 500);
+        }, 100);
     });
+    
+    // Fallback function for basic map initialization
+    function initBasicMap() {
+        // Parse coordinates
+        const lat = parseFloat({{ $shelter->latitude }});
+        const lng = parseFloat({{ $shelter->longitude }});
+        
+        if (isNaN(lat) || isNaN(lng)) {
+            console.error('Invalid coordinates');
+            return;
+        }
+        
+        // Create map with explicit options
+        const map = L.map('shelter-map', {
+            center: [lat, lng],
+            zoom: 16,
+            zoomControl: false,
+            attributionControl: true
+        });
+        
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 18
+        }).addTo(map);
+        
+        // Create custom icon
+        const customIcon = L.divIcon({
+            html: `<div style="background: #10b981; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="fas fa-user-md" style="font-size: 12px;"></i></div>`,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -18],
+            className: 'custom-marker'
+        });
+        
+        // Add marker
+        const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+        
+        // Add popup
+        marker.bindPopup(`
+            <div style="min-width: 200px;">
+                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                    <div style="background: #10b981; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">{{ $shelter->name }}</h4>
+                        <span style="background: #e5e7eb; color: #374151; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Veterinarian</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 8px; color: #4b5563;">
+                    <i class="fas fa-map-marker-alt" style="color: #667eea; margin-right: 6px;"></i>
+                    {{ $shelter->address }}<br>
+                    {{ $shelter->city }}, {{ $shelter->province }}
+                </div>
+                @if($shelter->phone)
+                <div style="margin-bottom: 8px; color: #4b5563;">
+                    <i class="fas fa-phone" style="color: #667eea; margin-right: 6px;"></i>
+                    {{ $shelter->phone }}
+                </div>
+                @endif
+                @if($shelter->email)
+                <div style="margin-bottom: 12px; color: #4b5563;">
+                    <i class="fas fa-envelope" style="color: #667eea; margin-right: 6px;"></i>
+                    {{ $shelter->email }}
+                </div>
+                @endif
+            </div>
+        `);
+        
+        // Force resize
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 100);
+        
+        // Store reference to map
+        window.shelterMap = map;
+        
+        // Initialize fullscreen functionality
+        initFullscreenFunctionality();
+    }
+    
+    function initFullscreenFunctionality() {
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const exitFullscreenBtn = document.getElementById('exit-fullscreen-btn');
+        const fullscreenOverlay = document.getElementById('fullscreen-overlay');
+        
+        if (fullscreenBtn) {
+            // Add both click and touch events for better mobile support
+            fullscreenBtn.addEventListener('click', handleFullscreenToggle);
+            fullscreenBtn.addEventListener('touchstart', handleFullscreenToggle);
+        }
+        
+        if (exitFullscreenBtn) {
+            // Add both click and touch events for better mobile support
+            exitFullscreenBtn.addEventListener('click', exitFullscreen);
+            exitFullscreenBtn.addEventListener('touchstart', exitFullscreen);
+        }
+        
+        if (fullscreenOverlay) {
+            // Add both click and touch events for better mobile support
+            fullscreenOverlay.addEventListener('click', handleOverlayClick);
+            fullscreenOverlay.addEventListener('touchstart', handleOverlayClick);
+        }
+        
+        // Exit fullscreen on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && fullscreenOverlay && fullscreenOverlay.style.display === 'block') {
+                exitFullscreen();
+            }
+        });
+    }
+    
+    function handleFullscreenToggle(e) {
+        e.preventDefault();
+        const fullscreenOverlay = document.getElementById('fullscreen-overlay');
+        if (fullscreenOverlay) {
+            fullscreenOverlay.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            if (!window.fullscreenMap) {
+                initFullscreenMap();
+            } else {
+                setTimeout(() => {
+                    window.fullscreenMap.invalidateSize();
+                }, 100);
+            }
+        }
+    }
+    
+    function handleOverlayClick(e) {
+        if (e.target.id === 'fullscreen-overlay') {
+            exitFullscreen();
+        }
+    }
+    
+    function initFullscreenMap() {
+        // Parse coordinates
+        const lat = parseFloat({{ $shelter->latitude }});
+        const lng = parseFloat({{ $shelter->longitude }});
+        
+        if (isNaN(lat) || isNaN(lng)) {
+            console.error('Invalid coordinates');
+            return;
+        }
+        
+        window.fullscreenMap = L.map('fullscreen-map', {
+            center: [lat, lng],
+            zoom: 16,
+            zoomControl: false,
+            attributionControl: true
+        });
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 18
+        }).addTo(window.fullscreenMap);
+        
+        // Create custom icon
+        const customIcon = L.divIcon({
+            html: `<div style="background: #10b981; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="fas fa-user-md" style="font-size: 12px;"></i></div>`,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -18],
+            className: 'custom-marker'
+        });
+        
+        // Add marker
+        const marker = L.marker([lat, lng], { icon: customIcon }).addTo(window.fullscreenMap);
+        
+        // Add popup
+        marker.bindPopup(`
+            <div style="min-width: 200px;">
+                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                    <div style="background: #10b981; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">{{ $shelter->name }}</h4>
+                        <span style="background: #e5e7eb; color: #374151; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Veterinarian</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 8px; color: #4b5563;">
+                    <i class="fas fa-map-marker-alt" style="color: #667eea; margin-right: 6px;"></i>
+                    {{ $shelter->address }}<br>
+                    {{ $shelter->city }}, {{ $shelter->province }}
+                </div>
+                @if($shelter->phone)
+                <div style="margin-bottom: 8px; color: #4b5563;">
+                    <i class="fas fa-phone" style="color: #667eea; margin-right: 6px;"></i>
+                    {{ $shelter->phone }}
+                </div>
+                @endif
+                @if($shelter->email)
+                <div style="margin-bottom: 12px; color: #4b5563;">
+                    <i class="fas fa-envelope" style="color: #667eea; margin-right: 6px;"></i>
+                    {{ $shelter->email }}
+                </div>
+                @endif
+            </div>
+        `);
+        
+        // Add click handler to exit fullscreen when clicking on the map
+        window.fullscreenMap.on('click', function() {
+            exitFullscreen();
+        });
+    }
+    
+    function exitFullscreen() {
+        const fullscreenOverlay = document.getElementById('fullscreen-overlay');
+        if (fullscreenOverlay) {
+            fullscreenOverlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    }
 </script>
 @endif
 @endsection

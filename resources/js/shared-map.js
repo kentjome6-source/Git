@@ -8,12 +8,12 @@ class SharedMap {
         this.mapElementId = mapElementId;
         this.locations = locations;
         this.options = {
-            center: [8.507, 125.977], // Updated to correct coordinates for San Francisco, Agusan del Sur
+            center: [8.3450, 125.9800], // San Francisco, Agusan del Sur
             zoom: 15, // Changed from 13 to 15 to focus more closely on San Francisco, Agusan del Sur
             fullscreenEnabled: false,
             showToggleButtons: false,
             showViewDetails: false,
-            viewDetailsRoute: '/admin/map/location/', // Default route
+            viewDetailsRoute: '/view-map/', // Default route for user map
             ...options
         };
         
@@ -197,14 +197,8 @@ class SharedMap {
             }
         });
         
-        // Fit map to markers if we have any
-        if (bounds.length > 0) {
-            if (bounds.length === 1) {
-                targetMap.setView(bounds[0], 14);
-            } else {
-                targetMap.fitBounds(bounds, { padding: [20, 20] });
-            }
-        }
+        // NOTE: We're removing the automatic fitting to bounds to maintain the intended center focus
+        // on San Francisco, Agusan del Sur. The map will stay centered on the predefined coordinates.
         
         // Add additional event listeners for clean desktop design
         targetMap.on('popupopen', (e) => {
@@ -370,7 +364,7 @@ class SharedMap {
     
     getTypeName(type) {
         switch(type) {
-            case 'pet_shop': return 'Pet Shop';
+            case 'pet_shop': return 'Vet Shop';
             case 'veterinarian': return 'Veterinarian';
             case 'grooming': return 'Grooming Service';
             default: return type;

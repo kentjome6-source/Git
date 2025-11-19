@@ -31,13 +31,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // Seed shelters and users
-        $this->call([
-            UserSeeder::class, // Add our new UserSeeder
-            ShelterSeeder::class,
-            // PetsTableSeeder::class,  // Commented out to prevent sample pets
-            // AdoptionPetsSeeder::class, // Commented out to prevent sample adoption listings
-            PostSeeder::class, // Add our new PostSeeder
-        ]);
+        // Seed vet shops
+        $this->call(VetShopSeeder::class);
     }
 }

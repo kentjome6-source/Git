@@ -266,7 +266,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize map centered on San Francisco, Agusan del Sur
-    const map = L.map('shelterMap').setView([8.3333, 125.9833], 13);
+    const map = L.map('shelterMap').setView([8.3450, 125.9800], 15);
     
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

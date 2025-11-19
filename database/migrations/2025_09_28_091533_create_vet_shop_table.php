@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('shelters', function (Blueprint $table) {
+        Schema::create('vet_shop', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->enum('type', ['pet_shop', 'veterinarian', 'grooming']);
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('shelters');
+        Schema::dropIfExists('vet_shop');
     }
 };

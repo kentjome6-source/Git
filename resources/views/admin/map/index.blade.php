@@ -3,216 +3,309 @@
 @section('title', 'Map Management')
 
 @section('styles')
-<!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
-    .admin-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 0; color: white; }
-    .admin-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
-    .admin-subtitle { font-size: 1.1rem; opacity: 0.9; }
+    .page-header { margin-bottom: 25px; }
+    .page-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 8px; }
+    .page-subtitle { font-size: 1rem; color: #6b7280; }
 
+    /* Stats Cards */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; }
+    .stat-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 1.5rem; color: white; }
+    .stat-info h3 { font-size: 1.75rem; font-weight: 700; margin-bottom: 5px; color: #1f2937; }
+    .stat-info p { margin: 0; color: #6b7280; font-size: 0.9rem; }
+    
+    .bg-blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .bg-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+    .bg-purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+    .bg-yellow { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+
+    /* Section Header */
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+    .section-title { font-size: 1.5rem; font-weight: 700; color: #1f2937; margin: 0; }
+    
+    /* Search and Filter */
+    .search-filter-container { display: flex; gap: 10px; flex-wrap: wrap; }
+    .search-form { display: flex; }
+    .search-input { padding: 10px 15px; border: 1px solid #d1d5db; border-radius: 6px 0 0 6px; width: 250px; font-size: 0.9rem; }
+    .search-btn { background: #667eea; color: white; border: none; border-radius: 0 6px 6px 0; padding: 0 15px; cursor: pointer; }
+    .filter-dropdown select { padding: 10px 15px; border: 1px solid #d1d5db; border-radius: 6px; background: white; font-size: 0.9rem; }
+    
     /* Map Styles */
-    .map-section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .map-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+    .map-section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
     .map-container { 
-        height: 400px; 
-        border-radius: 8px; 
+        height: 450px; 
+        border-radius: 10px; 
         overflow: hidden; 
         border: 2px solid #e5e7eb; 
         position: relative; 
+        width: 100%;
     }
     
-    .map-fullscreen { 
-        position: fixed; 
-        top: 0; 
-        left: 0; 
-        width: 100vw; 
-        height: 100vh; 
-        z-index: 10001; /* Increased z-index to ensure it's above all other elements */
-        border-radius: 0; 
-        border: none; 
-        background: white; /* Explicit background color for fullscreen */
-    }
-    
+    /* Map Controls */
     .map-controls { position: absolute; top: 10px; right: 10px; z-index: 1000; display: flex; gap: 5px; }
     .map-btn { background: white; border: 1px solid #ccc; border-radius: 4px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s; }
     .map-btn:hover { background: #f5f5f5; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
     .map-btn i { font-size: 14px; color: #333; }
     
-    .fullscreen-overlay { 
-        position: fixed; 
-        top: 0; 
-        left: 0; 
-        width: 100vw; 
-        height: 100vh; 
-        background: rgba(0,0,0,0.9); /* Darker background for better contrast */
-        z-index: 10000; /* Increased z-index to ensure it's above all other elements */
-        display: none; 
-    }
+    .fullscreen-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; display: none; }
     
-    .map-actions { margin-left: auto; }
+    /* Table Styles */
+    .table-responsive { overflow-x: auto; }
+    .data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .data-table thead { background: #f3f4f6; }
+    .data-table th { padding: 15px; text-align: left; font-weight: 600; color: #374151; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
+    .data-table td { padding: 15px; border-top: 1px solid #e5e7eb; }
+    .data-table tbody tr:hover { background: #f9fafb; }
     
-    .btn-primary { background: #667eea; color: white; padding: 8px 16px; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; text-decoration: none; display: inline-block; }
-    .btn-primary:hover { background: #5a6fd8; }
+    .table-cell-content strong { display: block; margin-bottom: 3px; }
+    .table-cell-content small { color: #6b7280; }
     
-    /* Responsive styles for mobile */
+    .contact-info div { margin-bottom: 3px; }
+    .contact-info div:last-child { margin-bottom: 0; }
+    
+    .badge { padding: 5px 10px; border-radius: 16px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+    .badge-info { background: #ddd6fe; color: #5b21b6; }
+    .badge-success { background: #dcfce7; color: #166534; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    
+    .status-badge { padding: 5px 10px; border-radius: 16px; font-size: 0.8rem; font-weight: 600; }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-inactive { background: #fee2e2; color: #991b1b; }
+    
+    .action-buttons { display: flex; gap: 5px; }
+    .btn { padding: 8px 12px; border-radius: 6px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; text-align: center; display: inline-block; font-size: 0.85rem; }
+    .btn-sm { padding: 6px 10px; font-size: 0.8rem; }
+    .btn-info { background: #93c5fd; color: #1e40af; }
+    .btn-warning { background: #fcd34d; color: #92400e; }
+    .btn-secondary { background: #d1d5db; color: #374151; }
+    .btn-success { background: #86efac; color: #166534; }
+    .btn-danger { background: #fca5a5; color: #991b1b; }
+    
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    
+    /* Pagination */
+    .pagination-container { margin-top: 25px; display: flex; justify-content: center; }
+    
+    /* Empty State */
+    .empty-state { text-align: center; padding: 60px 20px; color: #6b7280; }
+    .empty-state i { font-size: 3rem; margin-bottom: 20px; opacity: 0.3; }
+    .empty-state h3 { margin-bottom: 10px; color: #374151; font-size: 1.5rem; }
+    
+    /* Responsive styles */
     @media (max-width: 768px) {
-        .admin-header {
-            padding: 20px 0;
-        }
+        .page-title { font-size: 1.75rem; }
+        .page-subtitle { font-size: 0.9rem; }
         
-        .admin-title {
-            font-size: 2rem;
-        }
+        .stats-grid { grid-template-columns: 1fr; gap: 15px; margin-bottom: 25px; }
+        .stat-card { padding: 15px; }
+        .stat-icon { width: 50px; height: 50px; font-size: 1.25rem; margin-right: 12px; }
+        .stat-info h3 { font-size: 1.5rem; }
         
-        .admin-subtitle {
-            font-size: 1rem;
-        }
+        .section-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+        .section-title { font-size: 1.35rem; }
         
-        .map-section {
-            padding: 15px;
-            margin-bottom: 15px;
-        }
+        .search-filter-container { width: 100%; }
+        .search-input { width: 100%; }
         
-        .map-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
+        .map-section { padding: 20px; margin-bottom: 25px; }
+        .map-container { height: 350px; border-radius: 8px; }
         
-        .map-container {
-            height: 300px;
-            border-radius: 6px;
-        }
+        .map-btn { width: 28px; height: 28px; }
+        .map-btn i { font-size: 12px; }
         
-        .map-actions {
-            margin-left: 0;
-            width: 100%;
-            text-align: center;
-        }
+        .data-table th, .data-table td { padding: 12px 10px; }
+        
+        .action-buttons { flex-wrap: wrap; justify-content: flex-end; }
+        
+        .empty-state { padding: 40px 15px; }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 15px; }
+        .empty-state h3 { font-size: 1.25rem; }
     }
     
     @media (max-width: 576px) {
-        .admin-header {
-            padding: 15px 0;
-        }
+        .page-title { font-size: 1.5rem; }
         
-        .admin-title {
-            font-size: 1.75rem;
-        }
+        .stat-card { padding: 12px; }
+        .stat-icon { width: 45px; height: 45px; font-size: 1rem; margin-right: 10px; }
+        .stat-info h3 { font-size: 1.25rem; }
+        .stat-info p { font-size: 0.8rem; }
         
-        .map-section {
-            padding: 12px;
-        }
+        .section-title { font-size: 1.25rem; }
         
-        .map-container {
-            height: 250px;
-        }
+        .search-input { padding: 8px 12px; font-size: 0.85rem; }
+        .search-btn { padding: 0 12px; }
+        .filter-dropdown select { padding: 8px 12px; font-size: 0.85rem; }
         
-        .map-btn {
-            width: 25px;
-            height: 25px;
-        }
+        .map-section { padding: 15px; margin-bottom: 20px; }
+        .map-container { height: 300px; border-radius: 6px; }
         
-        .map-btn i {
-            font-size: 12px;
-        }
-    }
-    
-    /* Ensure fullscreen map covers entire viewport on mobile */
-    @media (max-width: 768px) {
-        .map-fullscreen {
-            width: 100vw !important;
-            height: 100vh !important;
-            top: 0 !important;
-            left: 0 !important;
-            border-radius: 0 !important;
-        }
+        .map-btn { width: 24px; height: 24px; }
+        .map-btn i { font-size: 10px; }
         
-        /* Ensure no other elements interfere with fullscreen map */
-        .fullscreen-overlay {
-            width: 100vw !important;
-            height: 100vh !important;
-            top: 0 !important;
-            left: 0 !important;
-        }
+        .data-table th, .data-table td { padding: 10px 8px; font-size: 0.85rem; }
+        
+        .btn { padding: 6px 10px; font-size: 0.8rem; }
+        .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+        
+        .empty-state { padding: 30px 10px; }
+        .empty-state i { font-size: 2rem; margin-bottom: 12px; }
+        .empty-state h3 { font-size: 1.1rem; }
     }
 </style>
 @endsection
 
 @section('content')
-<div class="admin-header">
-    <div class="container">
-        <h1 class="admin-title">Map Management</h1>
-        <p class="admin-subtitle">View locations on the map</p>
+<div class="content-section">
+    <div class="page-header">
+        <h1 class="page-title">Vet Shop Locations</h1>
+        <p class="page-subtitle">Manage veterinarian locations and services</p>
     </div>
-</div>
 
-<div class="container" style="padding: 30px 20px;">
     <!-- Map Section -->
     <div class="map-section">
-        <div class="map-header">
-            <h2 class="section-title" style="margin: 0;">
-                <i class="fas fa-map-marked-alt"></i>
-                Locations Map
-            </h2>
-            <div class="map-actions">
-                <a href="{{ route('admin.map.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Add Shelter
-                </a>
-            </div>
+        <div class="section-header">
+            <h2 class="section-title">Location Map</h2>
+            <a href="{{ route('admin.map.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Location
+            </a>
         </div>
-        <div id="shelterMap" class="map-container">
+        
+        <div class="map-container">
+            <div id="shelterMap" style="height: 100%; width: 100%;"></div>
             <div class="map-controls">
-                <div class="map-btn" id="fullscreen-btn" title="View Fullscreen">
+                <button id="fullscreen-btn" class="map-btn" title="Fullscreen">
                     <i class="fas fa-expand"></i>
-                </div>
+                </button>
             </div>
         </div>
-        <div class="fullscreen-overlay" id="fullscreen-overlay">
-            <div id="fullscreen-map" class="map-container map-fullscreen">
-                <div class="map-controls">
-                    <div class="map-btn" id="exit-fullscreen-btn" title="Exit Fullscreen">
-                        <i class="fas fa-compress"></i>
-                    </div>
-                </div>
+    </div>
+
+    <!-- Vet Shops List -->
+    <div class="content-section">
+        @if($shelters->count() > 0)
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Address</th>
+                            <th>Contact</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($shelters as $shelter)
+                            <tr>
+                                <td>
+                                    <div class="table-cell-content">
+                                        <strong>{{ $shelter->name }}</strong>
+                                        <small class="text-muted">{{ $shelter->city }}, {{ $shelter->province }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-{{ $shelter->type === 'pet_shop' ? 'info' : ($shelter->type === 'veterinarian' ? 'success' : 'warning') }}">
+                                        {{ $shelter->getTypeNameAttribute() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="table-cell-content">
+                                        <small>{{ $shelter->address }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="contact-info">
+                                        @if($shelter->phone)
+                                            <div><i class="fas fa-phone"></i> {{ $shelter->phone }}</div>
+                                        @endif
+                                        @if($shelter->email)
+                                            <div><i class="fas fa-envelope"></i> {{ $shelter->email }}</div>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge {{ $shelter->is_active ? 'status-active' : 'status-inactive' }}">
+                                        {{ $shelter->is_active ? 'Active' : 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ route('admin.map.show', $shelter) }}" class="btn btn-sm btn-info" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.map.edit', $shelter) }}" class="btn btn-sm btn-warning" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('admin.map.toggleStatus', $shelter) }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm {{ $shelter->is_active ? 'btn-secondary' : 'btn-success' }}" title="{{ $shelter->is_active ? 'Deactivate' : 'Activate' }}">
+                                                <i class="fas {{ $shelter->is_active ? 'fa-times' : 'fa-check' }}"></i>
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('admin.map.destroy', $shelter) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this location? This action cannot be undone.')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
-        </div>
-        <div style="margin-top: 15px; font-size: 0.9rem; color: #6b7280;">
-            <i class="fas fa-info-circle"></i> 
-            Click on map markers to view location details.
-        </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">  
+                {{ $shelters->appends(request()->query())->links() }}
+            </div>
+        @endif
     </div>
 </div>
 
-<!-- Leaflet JavaScript -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<!-- Fullscreen Overlay -->
+<div id="fullscreen-overlay" class="fullscreen-overlay">
+    <div id="fullscreen-map" style="height: 100%; width: 100%;"></div>
+    <div class="map-controls">
+        <button id="exit-fullscreen-btn" class="map-btn" title="Exit Fullscreen">
+            <i class="fas fa-compress"></i>
+        </button>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
 <script>
 // Location data from backend
 const locations = @json($shelters->items());
 let allLocations = locations;
-let sharedMap = null;
 
 // Initialize map when document is ready
 document.addEventListener('DOMContentLoaded', function() {
-    // Wait a bit for the Vite assets to load
+    // Wait a bit for the assets to load
     setTimeout(function() {
         if (typeof SharedMap !== 'undefined') {
             // Initialize the shared map component
-            sharedMap = new SharedMap('shelterMap', allLocations, {
+            const sharedMap = new SharedMap('shelterMap', allLocations, {
                 fullscreenEnabled: true,
                 showViewDetails: true,
-                viewDetailsRoute: '/admin/map/location/'
+                viewDetailsRoute: '/admin/map/location/',
+                zoom: 15 // Focus more closely on locations
             });
             
             // Store reference to map for potential future use
             window.shelterMap = sharedMap;
         } else {
+            console.error('SharedMap is not available');
             // Fallback to basic map initialization
             initBasicMap();
         }
@@ -224,7 +317,7 @@ function initBasicMap() {
     // Create map centered on San Francisco, Agusan del Sur
     const map = L.map('shelterMap', {
         zoomControl: false // Disable zoom controls
-    }).setView([8.3450, 125.9800], 13);
+    }).setView([8.3450, 125.9800], 15);
     
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -359,7 +452,7 @@ function initFullscreenMap() {
     
     window.fullscreenMap = L.map('fullscreen-map', {
         zoomControl: false // Disable zoom controls
-    }).setView([8.3450, 125.9800], 13);
+    }).setView([8.3450, 125.9800], 15);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
@@ -427,15 +520,10 @@ function initFullscreenMap() {
         }
     });
     
-    // Ensure map renders properly
-    setTimeout(() => {
-        window.fullscreenMap.invalidateSize();
-    }, 100);
-    
-    // Ensure the map is properly rendered
-    setTimeout(() => {
-        window.fullscreenMap.invalidateSize();
-    }, 1000);
+    // Add click handler to exit fullscreen when clicking on the map
+    window.fullscreenMap.on('click', function() {
+        exitFullscreen();
+    });
 }
 
 function exitFullscreen() {
@@ -443,15 +531,6 @@ function exitFullscreen() {
     if (fullscreenOverlay) {
         fullscreenOverlay.style.display = 'none';
         document.body.style.overflow = 'auto';
-    }
-}
-
-function getTypeName(type) {
-    switch(type) {
-        case 'pet_shop': return 'Pet Shop';
-        case 'veterinarian': return 'Veterinarian';
-        case 'grooming': return 'Grooming Service';
-        default: return type;
     }
 }
 </script>

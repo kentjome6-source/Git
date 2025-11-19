@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Shelter extends Model
+class Vetshop extends Model
 {
     protected $table = 'vet_shop';
 
@@ -31,7 +31,7 @@ class Shelter extends Model
     ];
 
     /**
-     * Scope for active shelters
+     * Scope for active vetshops
      */
     public function scopeActive($query)
     {
@@ -39,7 +39,7 @@ class Shelter extends Model
     }
 
     /**
-     * Get the human-readable name for the shelter type
+     * Get the human-readable name for the vetshop type
      */
     public function getTypeNameAttribute()
     {
@@ -56,7 +56,7 @@ class Shelter extends Model
     }
 
     /**
-     * Get the grooming services for this shelter
+     * Get the grooming services for this vetshop
      */
     public function groomingServices()
     {

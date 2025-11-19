@@ -370,22 +370,14 @@
         <div class="shelter-overview">
             <div class="shelter-info">
                 <div class="shelter-header-info">
-                    <div class="shelter-icon icon-{{ $shelter->type }}">
-                        @if($shelter->type === 'pet_shop')
-                            <i class="fas fa-store"></i>
-                        @elseif($shelter->type === 'veterinarian')
-                            <i class="fas fa-user-md"></i>
-                        @elseif($shelter->type === 'grooming')
-                            <i class="fas fa-cut"></i>
-                        @else
-                            <i class="fas fa-home"></i>
-                        @endif
+                    <div class="shelter-icon icon-veterinarian">
+                        <i class="fas fa-user-md"></i>
                     </div>
                     <div class="shelter-details">
                         <h2>{{ $shelter->name }}</h2>
                         <div>
-                            <span class="badge badge-{{ $shelter->type === 'pet_shop' ? 'primary' : ($shelter->type === 'veterinarian' ? 'success' : ($shelter->type === 'grooming' ? 'warning' : 'info')) }}">
-                                {{ $shelter->type_name }}
+                            <span class="badge badge-success">
+                                Veterinarian
                             </span>
                             <span class="badge badge-{{ $shelter->is_active ? 'active' : 'inactive' }}">
                                 {{ $shelter->is_active ? 'Active' : 'Inactive' }}

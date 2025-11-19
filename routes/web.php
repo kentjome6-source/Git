@@ -133,6 +133,7 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
         'update' => 'admin.map.update',
         'destroy' => 'admin.map.destroy',
     ]);
+    Route::post('admin/map/{vetshop}/toggle-status', [MapController::class, 'toggleStatus'])->name('admin.map.toggleStatus');
     
     // Admin Pet User Management
     Route::resource('admin/pet-users', PetUserController::class);
@@ -143,7 +144,7 @@ Route::middleware(['auth'])->group(function () {
     // Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/user/profile', [ProfileController::class, 'edit'])->name('user.profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('x/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     // Pet Routes
@@ -190,9 +191,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/user/messages/mark-as-read', [ChatController::class, 'markAsRead'])->name('user.messages.mark-as-read');
     
     // Map Routes
-    Route::get('/view-map', [ViewMapController::class, 'index'])->name('view-map.index');
-    Route::get('/view-map/{id}', [ViewMapController::class, 'show'])->name('view-map.show');
     Route::get('/view-map', [ViewMapController::class, 'index'])->name('view.map');
+    Route::get('/view-map/{id}', [ViewMapController::class, 'show'])->name('view-map.show');
 });
 
 // Password Reset Routes

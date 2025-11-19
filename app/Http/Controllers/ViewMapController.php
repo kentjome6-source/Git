@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Shelter;
+use App\Models\Vetshop;
 use App\Models\LostFound;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,7 +15,7 @@ class ViewMapController extends Controller
     public function index(Request $request)
     {
         // Show all active shelters in San Francisco, Agusan Del Sur
-        $shelters = Shelter::active()
+        $shelters = Vetshop::active()
             ->where('city', 'San Francisco')
             ->where('province', 'Agusan Del Sur')
             ->get();
@@ -41,8 +41,16 @@ class ViewMapController extends Controller
     /**
      * Show shelter details for users
      */
-    public function showShelter(Shelter $shelter)
+    public function show($id)
     {
+        // Find shelter by ID
+        $shelter = Vetshop::find($id);
+        
+        // Ensure shelter exists
+        if (!$shelter) {
+            abort(404, 'Shelter not found.');
+        }
+        
         // Ensure shelter is active
         if (!$shelter->is_active) {
             abort(404, 'Shelter not found or inactive.');

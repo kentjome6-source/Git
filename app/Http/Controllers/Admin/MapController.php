@@ -4,14 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Shelter;
-use Illuminate\Validation\Rule;
+use App\Models\Vetshop;
 
 class MapController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Shelter::query();
+        $query = Vetshop::query();
         
         // Filter by San Francisco, Agusan Del Sur by default
         $query->where('city', 'San Francisco')
@@ -40,30 +39,7 @@ class MapController extends Controller
         $shelters = $query->orderBy('created_at', 'desc')
                           ->paginate(15);
         
-        // Get stats
-        $stats = [
-            'total_locations' => Shelter::where('city', 'San Francisco')
-                                       ->where('province', 'Agusan Del Sur')
-                                       ->count(),
-            'pet_shops' => Shelter::where('type', 'pet_shop')
-                                 ->where('city', 'San Francisco')
-                                 ->where('province', 'Agusan Del Sur')
-                                 ->count(),
-            'veterinarians' => Shelter::where('type', 'veterinarian')
-                                     ->where('city', 'San Francisco')
-                                     ->where('province', 'Agusan Del Sur')
-                                     ->count(),
-            'grooming_services' => Shelter::where('type', 'grooming')
-                                         ->where('city', 'San Francisco')
-                                         ->where('province', 'Agusan Del Sur')
-                                         ->count(),
-            'active_locations' => Shelter::where('is_active', true)
-                                        ->where('city', 'San Francisco')
-                                        ->where('province', 'Agusan Del Sur')
-                                        ->count(),
-        ];
-        
-        return view('admin.map.index', compact('shelters', 'stats'));
+        return view('admin.map.index', compact('shelters'));
     }
 
     public function create()
@@ -132,13 +108,13 @@ class MapController extends Controller
             $validated['operating_hours'] = $orderedHours;
         }
 
-        $shelter = Shelter::create($validated);
+        $shelter = Vetshop::create($validated);
 
         return redirect()->route('admin.map.index')
                     ->with('success', 'Shelter created successfully!');
     }
 
-    public function show(Shelter $shelter)
+    public function show(Vetshop $shelter)
     {
         // Ensure shelter is in San Francisco, Agusan Del Sur
         if ($shelter->city !== 'San Francisco' || $shelter->province !== 'Agusan Del Sur') {
@@ -148,7 +124,7 @@ class MapController extends Controller
         return view('admin.map.show', compact('shelter'));
     }
 
-    public function edit(Shelter $shelter)
+    public function edit(Vetshop $shelter)
     {
         // Ensure shelter is in San Francisco, Agusan Del Sur
         if ($shelter->city !== 'San Francisco' || $shelter->province !== 'Agusan Del Sur') {
@@ -158,7 +134,7 @@ class MapController extends Controller
         return view('admin.map.edit', compact('shelter'));
     }
 
-    public function update(Request $request, Shelter $shelter)
+    public function update(Request $request, Vetshop $shelter)
     {
         // Ensure shelter is in San Francisco, Agusan Del Sur
         if ($shelter->city !== 'San Francisco' || $shelter->province !== 'Agusan Del Sur') {
@@ -229,7 +205,7 @@ class MapController extends Controller
                     ->with('success', 'Shelter updated successfully!');
     }
 
-    public function destroy(Shelter $shelter)
+    public function destroy(Vetshop $shelter)
     {
         // Ensure shelter is in San Francisco, Agusan Del Sur
         if ($shelter->city !== 'San Francisco' || $shelter->province !== 'Agusan Del Sur') {
@@ -242,7 +218,7 @@ class MapController extends Controller
                         ->with('success', 'Location deleted successfully!');
     }
     
-    public function toggleStatus(Shelter $shelter)
+    public function toggleStatus(Vetshop $shelter)
     {
         // Ensure shelter is in San Francisco, Agusan Del Sur
         if ($shelter->city !== 'San Francisco' || $shelter->province !== 'Agusan Del Sur') {

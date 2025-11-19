@@ -319,7 +319,7 @@ function initFullscreenFunctionality() {
 function initFullscreenMap() {
     window.fullscreenLostFoundMap = L.map('fullscreen-map', {
         zoomControl: false // Disable zoom controls
-    }).setView([8.3450, 125.9800], 13);
+    }).setView([8.3450, 125.9800], 15);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
