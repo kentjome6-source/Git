@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-header bg-gradient bg-danger text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">
                         <i class="fas fa-paw me-2"></i>Manage Pets
                     </h4>
@@ -78,7 +78,7 @@
                                 <div class="swipeable-table-row">
                                     <div class="swipeable-table-item">
                                         <span class="swipeable-table-label">Name</span>
-                                        <span class="swipeable-table-value">{{ $pet->name }}</span>
+                                        <span class="pet-name-value">{{ $pet->name }}</span>
                                     </div>
                                     <div class="swipeable-table-item">
                                         <span class="swipeable-table-label">Owner</span>
@@ -239,6 +239,13 @@
         font-weight: 600;
         color: #e74c3c;
         min-width: 100px;
+    }
+    
+    .pet-name-value {
+        font-weight: 600;
+        color: #333;
+        text-align: right;
+        flex: 1;
     }
     
     .swipeable-table-value {

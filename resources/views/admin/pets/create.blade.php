@@ -7,7 +7,7 @@
     <div class="row justify-content-center">
         <div class="col-12 col-md-8">
             <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-header bg-gradient bg-danger text-white">
+                <div class="card-header bg-danger text-white">
                     <h4 class="mb-0">
                         <i class="fas fa-plus-circle me-2"></i>Add New Pet
                     </h4>
