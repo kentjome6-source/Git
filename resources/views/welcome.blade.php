@@ -76,13 +76,13 @@
     <section class="hero-section text-center">
         <div class="container">
             <h1 class="display-4 fw-bold mb-3">🐾 Welcome to PawPortal</h1>
-            <p class="lead mb-4">Your comprehensive pet care management system</p>
+            <p class="lead mb-4">Find veterinarian services and lost/found pets in your area</p>
             <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
                 <a href="{{ route('login') }}" class="btn btn-light btn-lg px-4">
                     <i class="fas fa-sign-in-alt me-2"></i>Login
                 </a>
                 <a href="{{ route('register') }}" class="btn btn-outline-light btn-lg px-4">
-                    <i class="fas fa-user-plus me-2"></i>Register as Pet Owner
+                    <i class="fas fa-user-plus me-2"></i>Register as Pet Parent
                 </a>
             </div>
         </div>
@@ -94,7 +94,7 @@
             <div class="row text-center mb-5">
                 <div class="col-12">
                     <h2 class="fw-bold">Why Choose PawPortal?</h2>
-                    <p class="text-muted">Everything you need to keep your pets healthy and happy</p>
+                    <p class="text-muted">Find veterinarian services and lost/found pets in your area</p>
                 </div>
             </div>
             
@@ -103,10 +103,10 @@
                     <div class="card h-100 feature-card border-0 shadow-sm">
                         <div class="card-body text-center p-4">
                             <div class="mb-3">
-                                <i class="fas fa-heart-pulse fa-3x text-primary"></i>
+                                <i class="fas fa-stethoscope fa-3x text-success"></i>
                             </div>
-                            <h5 class="card-title">Health Records</h5>
-                            <p class="card-text text-muted">Keep track of your pet's health records, vaccinations, and medical history in one place.</p>
+                            <h5 class="card-title">Vet Appointments</h5>
+                            <p class="card-text text-muted">Connect with qualified veterinarians for consultations and professional advice.</p>
                         </div>
                     </div>
                 </div>
@@ -115,10 +115,10 @@
                     <div class="card h-100 feature-card border-0 shadow-sm">
                         <div class="card-body text-center p-4">
                             <div class="mb-3">
-                                <i class="fas fa-stethoscope fa-3x text-success"></i>
+                                <i class="fas fa-map-marked-alt fa-3x text-success"></i>
                             </div>
-                            <h5 class="card-title">Vet Appointments</h5>
-                            <p class="card-text text-muted">Connect with qualified veterinarians for consultations and professional advice.</p>
+                            <h5 class="card-title">Interactive Maps</h5>
+                            <p class="card-text text-muted">Locate nearby veterinarian shops and view lost/found pets in your area.</p>
                         </div>
                     </div>
                 </div>
@@ -158,18 +158,6 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 feature-card border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="mb-3">
-                                <i class="fas fa-map-marked-alt fa-3x text-success"></i>
-                            </div>
-                            <h5 class="card-title">Interactive Maps</h5>
-                            <p class="card-text text-muted">Locate nearby pet services, parks, and veterinary clinics with our interactive map.</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -178,7 +166,7 @@
     <section class="bg-light py-5">
         <div class="container text-center">
             <h3 class="fw-bold mb-3">Ready to Get Started?</h3>
-            <p class="text-muted mb-4">Join thousands of pet owners who trust PawPortal for their pet care needs.</p>
+            <p class="text-muted mb-4">Find veterinarian services and lost/found pets in your area.</p>
             <a href="{{ route('login') }}" class="btn btn-primary btn-lg px-4">
                 <i class="fas fa-paw me-2"></i>Start Your Journey
             </a>

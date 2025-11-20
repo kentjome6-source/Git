@@ -123,7 +123,7 @@
             </a>
         </div>
         
-        <a href="{{ route('register') }}" class="register-link">Register as Pet Owner</a>
+        <a href="{{ route('register') }}" class="register-link">Register as Pet Parent</a>
         <a href="{{ route('register.vet') }}" class="vet-register-link">⚕️ Register as Veterinarian</a>
     </div>
 </body>

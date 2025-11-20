@@ -26,7 +26,7 @@
         }
         .card h3 {
             font-weight: bold;
-            color: #28a745; /* green for register */
+            color: #5b4b9b; /* purple for pet parent */
         }
         .vet-register-link {
             display: block;
@@ -82,7 +82,7 @@
 </head>
 <body>
     <div class="card">
-        <h3 class="text-center mb-3">🐾 Register Pet User</h3>
+        <h3 class="text-center mb-3">🐾 Register Pet Parent</h3>
         <form method="POST" action="{{ route('register.post') }}">
             @csrf
             <div class="mb-3">
@@ -101,7 +101,7 @@
                 <label>Confirm Password</label>
                 <input type="password" name="password_confirmation" class="form-control" required>
             </div>
-            <button class="btn btn-success w-100">Register</button>
+            <button class="btn w-100" style="background-color: #5b4b9b; border-color: #5b4b9b; color: white;">Register</button>
         </form>
         
         <div class="text-center my-3">
