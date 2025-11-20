@@ -48,9 +48,8 @@ This document summarizes the implementation of the veterinarian registration and
 ### For Administrators
 1. Navigate to User Management section
 2. View pending veterinarian registrations
-3. Click "Verify" to approve a veterinarian
-4. Click "Reject" to reject a veterinarian verification
-5. View certificate images directly in the user details page
+3. Click "Verify" to approve a veterinarian or "Reject" to reject the verification
+4. View certificate images directly in the user details page
 
 ## Technical Details
 

@@ -283,7 +283,7 @@
 
         <div class="menu">
             <div class="menu-item">
-                <a href="{{ route('vet.appointments') }}" class="menu-link {{ request()->routeIs('vet.appointments') ? 'active' : '' }}">
+                <a href="{{ route('vet.appointments') }}" class="menu-link {{ request()->routeIs('vet.appointments') || request()->routeIs('vet.appointments.show') ? 'active' : '' }}">
                     <i class="fas fa-stethoscope menu-icon"></i>
                     <span class="menu-text">Appointment Management</span>
                 </a>

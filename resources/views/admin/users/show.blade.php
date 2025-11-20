@@ -609,12 +609,11 @@
                     ✅ Verify Veterinarian
                 </button>
             </form>
-        @else
             <form method="POST" action="{{ route('admin.users.reject-vet', $user) }}" 
                   style="display: inline;">
                 @csrf
                 <button type="submit" class="btn btn-warning">
-                    ❌ Reject Verification
+                    ❌ Reject Veterinarian
                 </button>
             </form>
         @endif
@@ -632,19 +631,6 @@
         </form>
     @endif
 </div>
-
-<!-- Mobile Action Buttons for Vet -->
-@if($user->role === 'vet' && !$user->is_verified_vet)
-<div class="action-buttons mobile-actions" style="display: none; margin-top: 10px;">
-    <form method="POST" action="{{ route('admin.users.verify-vet', $user) }}" 
-          style="display: inline; width: 100%;">
-        @csrf
-        <button type="submit" class="btn btn-success" style="width: 100%;">
-            ✅ Verify Veterinarian
-        </button>
-    </form>
-</div>
-@endif
 
 <script>
 function showTab(tabName) {
@@ -669,30 +655,5 @@ function showTab(tabName) {
         event.target.classList.add('active');
     }
 }
-
-// Handle mobile verification button
-document.addEventListener('DOMContentLoaded', function() {
-    const mediaQuery = window.matchMedia('(max-width: 768px)');
-    const desktopVerifyBtn = document.querySelector('.action-buttons .btn-success');
-    const mobileVerifyContainer = document.querySelector('.mobile-actions');
-    
-    function handleScreenChange(e) {
-        if (e.matches && desktopVerifyBtn && mobileVerifyContainer) {
-            // On mobile, hide desktop button and show mobile button
-            desktopVerifyBtn.style.display = 'none';
-            mobileVerifyContainer.style.display = 'block';
-        } else if (mobileVerifyContainer) {
-            // On desktop, show desktop button and hide mobile button
-            if (desktopVerifyBtn) desktopVerifyBtn.style.display = 'inline-flex';
-            mobileVerifyContainer.style.display = 'none';
-        }
-    }
-    
-    // Initial check
-    handleScreenChange(mediaQuery);
-    
-    // Listen for changes
-    mediaQuery.addListener(handleScreenChange);
-});
 </script>
 @endsection

@@ -263,8 +263,10 @@ class UserController extends Controller
         $user->is_verified_vet = false;
         $user->save();
         
-        return redirect()->back()->with('success', 'Veterinarian verification status updated! They will no longer have access to veterinarian features.');
+        return redirect()->back()->with('success', 'Veterinarian verification rejected! They will no longer have access to veterinarian features.');
     }
+    
+    
     
     /**
      * Perform bulk actions on users
