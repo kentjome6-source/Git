@@ -95,13 +95,18 @@
     }
 
     .user-avatar {
-        width: 40px; height: 40px; border-radius: 50%;
+        width: 40px !important; height: 40px !important; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         font-weight: 600; color: white; margin-right: 12px;
         background: #3498db;
+        flex-shrink: 0; /* Prevent shrinking */
+        transition: none; /* Remove any hover effects */
+        transform: none !important; /* Prevent any transforms */
+        transform-origin: center !important;
     }
     .user-avatar img {
         width: 100%; height: 100%; object-fit: cover;
+        transition: none; /* Remove any hover effects */
     }
     .user-info {
         display: flex; align-items: center;
@@ -245,8 +250,8 @@
         }
         
         .user-card-avatar {
-            width: 50px;
-            height: 50px;
+            width: 50px !important;
+            height: 50px !important;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -255,6 +260,10 @@
             color: white;
             margin-right: 12px;
             background: #3498db;
+            flex-shrink: 0; /* Prevent shrinking */
+            transition: none; /* Remove any hover effects */
+            transform: none !important; /* Prevent any transforms */
+            transform-origin: center !important;
         }
         
         .user-card-info {

@@ -67,7 +67,7 @@
             width:45px; height:45px; border-radius:50%;
             background: linear-gradient(135deg, #e74c3c 0%, #ff6b6b 100%); 
             color:#fff; display:flex; align-items:center; justify-content:center; 
-            font-weight:bold; margin-right:12px;
+            font-weight:bold; font-size: 1rem; margin-right:12px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
         .profile-details h4 { font-size:0.95rem; margin-bottom:2px; font-weight: 600; }
@@ -165,15 +165,56 @@
             border: 0;
         }
         
-        /* Profile picture in sidebar */
-        .sidebar-profile-picture {
-            width: 45px;
-            height: 45px;
+        /* Profile picture in sidebar - fixed size */
+        /* These rules ensure the admin avatar remains consistent across all pages */
+        .sidebar-profile-picture,
+        .profile-section .sidebar-profile-picture,
+        .user-profile .sidebar-profile-picture,
+        .user-details-header ~ .user-profile .sidebar-profile-picture,
+        .admin-avatar {
+            width: 45px !important;
+            height: 45px !important;
             border-radius: 50%;
             object-fit: cover;
             margin-right: 12px;
             border: 2px solid #e74c3c;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            flex-shrink: 0; /* Prevent shrinking */
+            transition: none; /* Remove any hover effects */
+            transform: none !important; /* Prevent any transforms */
+            transform-origin: center !important;
+            max-width: 45px !important;
+            max-height: 45px !important;
+            min-width: 45px !important;
+            min-height: 45px !important;
+        }
+        
+        /* Fixed size for profile avatar */
+        /* These rules ensure the admin avatar remains consistent across all pages */
+        .profile-avatar,
+        .profile-section .profile-avatar,
+        .user-profile .profile-avatar,
+        .user-details-header ~ .user-profile .profile-avatar,
+        .admin-avatar {
+            width: 45px !important;
+            height: 45px !important;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+            color: white;
+            margin-right: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            flex-shrink: 0; /* Prevent shrinking */
+            transition: none; /* Remove any hover effects */
+            transform: none !important; /* Prevent any transforms */
+            transform-origin: center !important;
+            max-width: 45px !important;
+            max-height: 45px !important;
+            min-width: 45px !important;
+            min-height: 45px !important;
         }
         
         /* Overlay for mobile */
@@ -232,6 +273,12 @@
             h5, .h5 { font-size: 1.1rem; }
             h6, .h6 { font-size: 1rem; }
             
+            /* Adjust avatar font size for mobile */
+            .profile-avatar,
+            .admin-avatar {
+                font-size: 0.85rem;
+            }
+            
             /* Ensure content fits within viewport */
             .container-fluid {
                 max-width: 100%;
@@ -267,6 +314,12 @@
             h4, .h4 { font-size: 1.2rem; }
             h5, .h5 { font-size: 1.1rem; }
             h6, .h6 { font-size: 1rem; }
+            
+            /* Adjust avatar font size for very small screens */
+            .profile-avatar,
+            .admin-avatar {
+                font-size: 0.75rem;
+            }
             
             /* Further reduce padding on very small screens */
             .card-body {
@@ -345,9 +398,9 @@
             <div class="profile-section">
                 <div class="profile-info">
                     @if(Auth::user()->profile_picture_path)
-                        <img src="{{ asset('storage/' . Auth::user()->profile_picture_path) }}" alt="Profile Picture" class="sidebar-profile-picture">
+                        <img src="{{ asset('storage/' . Auth::user()->profile_picture_path) }}" alt="Admin Profile Picture" class="sidebar-profile-picture admin-avatar" width="45" height="45">
                     @else
-                        <div class="profile-avatar" aria-label="Admin avatar">AD</div>
+                        <div class="profile-avatar admin-avatar" aria-label="Admin avatar">AD</div>
                     @endif
                     <div class="profile-details">
                         <h4>Administrator</h4>

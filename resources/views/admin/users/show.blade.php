@@ -39,13 +39,18 @@
         }
     }
     .profile-avatar {
-        width: 80px; height: 80px; border-radius: 50%;
+        width: 80px !important; height: 80px !important; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         font-size: 1.5rem; font-weight: bold; color: white;
         background: #e74c3c; margin-right: 20px;
+        flex-shrink: 0; /* Prevent shrinking */
+        transition: none; /* Remove any hover effects */
+        transform: none !important; /* Prevent any transforms */
+        transform-origin: center !important;
     }
     .profile-avatar img {
         width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+        transition: none; /* Remove any hover effects */
     }
     .profile-info h2 { margin: 0; color: #2c3e50; }
     .profile-info p { margin: 5px 0; color: #666; }
