@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Create map centered on San Francisco, Agusan del Sur
     const map = L.map('lostFoundMap', {
         zoomControl: false // Disable zoom controls
-    }).setView([8.3450, 125.9800], 13);
+    }).setView([8.504588, 125.975800], 13);
     
     
     // Add tile layer
@@ -319,7 +319,7 @@ function initFullscreenFunctionality() {
 function initFullscreenMap() {
     window.fullscreenLostFoundMap = L.map('fullscreen-map', {
         zoomControl: false // Disable zoom controls
-    }).setView([8.3450, 125.9800], 15);
+    }).setView([8.504588, 125.975800], 15);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'

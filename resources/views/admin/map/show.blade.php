@@ -6,7 +6,7 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
-    .shelter-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 0; color: white; text-align: center; }
+    .shelter-header { background: #e74c3c; padding: 30px 0; color: white; text-align: center; border-bottom: 1px solid #ddd; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
     .shelter-title { font-size: 2rem; font-weight: 700; margin-bottom: 10px; }
     .shelter-subtitle { font-size: 1rem; opacity: 0.9; }
 
@@ -242,6 +242,15 @@
             height: 230px !important;
         }
     }
+    
+    /* Mobile header styles to match sidebar */
+    @media (max-width: 768px) {
+        .shelter-header {
+            background: #e74c3c;
+            color: white;
+            border-bottom: 1px solid #ddd;
+        }
+    }
 </style>
 @endsection
 
@@ -249,7 +258,7 @@
 <div class="shelter-header">
     <div class="container">
         <h1 class="shelter-title">Location Details</h1>
-        <p class="shelter-subtitle">Complete information about {{ $shelter->name }}</p>
+        <p class="shelter-subtitle">Complete information about {{ $map->name }}</p>
     </div>
 </div>
 
@@ -275,20 +284,20 @@
                         <i class="fas fa-user-md"></i>
                     </div>
                     <div class="shelter-details">
-                        <h2>{{ $shelter->name }}</h2>
+                        <h2>{{ $map->name }}</h2>
                         <div>
                             <span class="badge badge-success">
                                 Veterinarian
                             </span>
-                            <span class="badge badge-{{ $shelter->is_active ? 'active' : 'inactive' }}">
-                                {{ $shelter->is_active ? 'Active' : 'Inactive' }}
+                            <span class="badge badge-{{ $map->is_active ? 'active' : 'inactive' }}">
+                                {{ $map->is_active ? 'Active' : 'Inactive' }}
                             </span>
                         </div>
                     </div>
                 </div>
                 
-                @if($shelter->description)
-                    <p class="shelter-description">{{ $shelter->description }}</p>
+                @if($map->description)
+                    <p class="shelter-description">{{ $map->description }}</p>
                 @endif
             </div>
             
@@ -312,47 +321,47 @@
                     <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
                     <div class="contact-details">
                         <strong>Address:</strong>
-                        <span>{{ $shelter->address }}</span>
+                        <span>{{ $map->address }}</span>
                     </div>
                 </div>
                 
-                @if($shelter->phone)
+                @if($map->phone)
                     <div class="contact-item">
                         <div class="contact-icon"><i class="fas fa-phone"></i></div>
                         <div class="contact-details">
                             <strong>Phone:</strong>
-                            <a href="tel:{{ $shelter->phone }}">{{ $shelter->phone }}</a>
+                            <a href="tel:{{ $map->phone }}">{{ $map->phone }}</a>
                         </div>
                     </div>
                 @endif
 
-                @if($shelter->email)
+                @if($map->email)
                     <div class="contact-item">
                         <div class="contact-icon"><i class="fas fa-envelope"></i></div>
                         <div class="contact-details">
                             <strong>Email:</strong>
-                            <a href="mailto:{{ $shelter->email }}">{{ $shelter->email }}</a>
+                            <a href="mailto:{{ $map->email }}">{{ $map->email }}</a>
                         </div>
                     </div>
                 @endif
 
-                @if($shelter->website)
+                @if($map->website)
                     <div class="contact-item">
                         <div class="contact-icon"><i class="fas fa-globe"></i></div>
                         <div class="contact-details">
                             <strong>Website:</strong>
-                            <a href="{{ $shelter->website }}" target="_blank">{{ $shelter->website }}</a>
+                            <a href="{{ $map->website }}" target="_blank">{{ $map->website }}</a>
                         </div>
                     </div>
                 @endif
 
-                @if($shelter->operating_hours)
+                @if($map->operating_hours)
                     <div class="contact-item">
                         <div class="contact-icon"><i class="fas fa-clock"></i></div>
                         <div class="contact-details">
                             <strong>Operating Hours:</strong>
                             @php
-                                $hours = is_string($shelter->operating_hours) ? json_decode($shelter->operating_hours, true) : $shelter->operating_hours;
+                                $hours = is_string($map->operating_hours) ? json_decode($map->operating_hours, true) : $map->operating_hours;
                                 // Define default hours
                                 $defaultHours = [
                                     'monday' => '8 AM - 5 PM',
@@ -424,7 +433,7 @@
                 <h3 class="section-title"><i class="fas fa-map"></i> Location Map</h3>
             </div>
             
-            @if($shelter->latitude && $shelter->longitude)
+            @if($map->latitude && $map->longitude)
                 <div id="shelter-map" class="map-container">
                     <div class="map-controls">
                         <div class="map-btn" id="fullscreen-btn" title="View Fullscreen">
@@ -457,7 +466,7 @@
 <!-- Leaflet JavaScript -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-@if($shelter->latitude && $shelter->longitude)
+@if($map->latitude && $map->longitude)
 <script>
     // Initialize map when document is ready
     document.addEventListener('DOMContentLoaded', function() {
@@ -466,15 +475,15 @@
             if (typeof SharedMap !== 'undefined') {
                 // Create a single-item array for the shelter
                 const shelterData = [{
-                    id: {{ $shelter->id }},
-                    name: "{{ $shelter->name }}",
-                    address: "{{ $shelter->address }}",
-                    city: "{{ $shelter->city }}",
-                    province: "{{ $shelter->province }}",
-                    phone: "{{ $shelter->phone }}",
-                    email: "{{ $shelter->email }}",
-                    latitude: "{{ $shelter->latitude }}",
-                    longitude: "{{ $shelter->longitude }}",
+                    id: {{ $map->id }},
+                    name: "{{ $map->name }}",
+                    address: "{{ $map->address }}",
+                    city: "{{ $map->city }}",
+                    province: "{{ $map->province }}",
+                    phone: "{{ $map->phone }}",
+                    email: "{{ $map->email }}",
+                    latitude: "{{ $map->latitude }}",
+                    longitude: "{{ $map->longitude }}",
                     type: "veterinarian"
                 }];
                 
@@ -498,8 +507,8 @@
     // Fallback function for basic map initialization
     function initBasicMap() {
         // Parse coordinates
-        const lat = parseFloat({{ $shelter->latitude }});
-        const lng = parseFloat({{ $shelter->longitude }});
+        const lat = parseFloat({{ $map->latitude }});
+        const lng = parseFloat({{ $map->longitude }});
         
         if (isNaN(lat) || isNaN(lng)) {
             console.error('Invalid coordinates');
@@ -540,25 +549,25 @@
                         <i class="fas fa-user-md"></i>
                     </div>
                     <div>
-                        <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">{{ $shelter->name }}</h4>
+                        <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">{{ $map->name }}</h4>
                         <span style="background: #e5e7eb; color: #374151; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Veterinarian</span>
                     </div>
                 </div>
                 <div style="margin-bottom: 8px; color: #4b5563;">
                     <i class="fas fa-map-marker-alt" style="color: #667eea; margin-right: 6px;"></i>
-                    {{ $shelter->address }}<br>
-                    {{ $shelter->city }}, {{ $shelter->province }}
+                    {{ $map->address }}<br>
+                    {{ $map->city }}, {{ $map->province }}
                 </div>
-                @if($shelter->phone)
+                @if($map->phone)
                 <div style="margin-bottom: 8px; color: #4b5563;">
                     <i class="fas fa-phone" style="color: #667eea; margin-right: 6px;"></i>
-                    {{ $shelter->phone }}
+                    {{ $map->phone }}
                 </div>
                 @endif
-                @if($shelter->email)
+                @if($map->email)
                 <div style="margin-bottom: 12px; color: #4b5563;">
                     <i class="fas fa-envelope" style="color: #667eea; margin-right: 6px;"></i>
-                    {{ $shelter->email }}
+                    {{ $map->email }}
                 </div>
                 @endif
             </div>
@@ -632,8 +641,8 @@
     
     function initFullscreenMap() {
         // Parse coordinates
-        const lat = parseFloat({{ $shelter->latitude }});
-        const lng = parseFloat({{ $shelter->longitude }});
+        const lat = parseFloat({{ $map->latitude }});
+        const lng = parseFloat({{ $map->longitude }});
         
         if (isNaN(lat) || isNaN(lng)) {
             console.error('Invalid coordinates');
@@ -672,25 +681,25 @@
                         <i class="fas fa-user-md"></i>
                     </div>
                     <div>
-                        <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">{{ $shelter->name }}</h4>
+                        <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">{{ $map->name }}</h4>
                         <span style="background: #e5e7eb; color: #374151; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Veterinarian</span>
                     </div>
                 </div>
                 <div style="margin-bottom: 8px; color: #4b5563;">
                     <i class="fas fa-map-marker-alt" style="color: #667eea; margin-right: 6px;"></i>
-                    {{ $shelter->address }}<br>
-                    {{ $shelter->city }}, {{ $shelter->province }}
+                    {{ $map->address }}<br>
+                    {{ $map->city }}, {{ $map->province }}
                 </div>
-                @if($shelter->phone)
+                @if($map->phone)
                 <div style="margin-bottom: 8px; color: #4b5563;">
                     <i class="fas fa-phone" style="color: #667eea; margin-right: 6px;"></i>
-                    {{ $shelter->phone }}
+                    {{ $map->phone }}
                 </div>
                 @endif
-                @if($shelter->email)
+                @if($map->email)
                 <div style="margin-bottom: 12px; color: #4b5563;">
                     <i class="fas fa-envelope" style="color: #667eea; margin-right: 6px;"></i>
-                    {{ $shelter->email }}
+                    {{ $map->email }}
                 </div>
                 @endif
             </div>

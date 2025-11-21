@@ -134,7 +134,6 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
         'update' => 'admin.map.update',
         'destroy' => 'admin.map.destroy',
     ]);
-    Route::post('admin/map/{vetshop}/toggle-status', [MapController::class, 'toggleStatus'])->name('admin.map.toggleStatus');
     
     // Admin Pet User Management
     Route::resource('admin/pet-users', PetUserController::class);

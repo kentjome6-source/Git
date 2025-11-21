@@ -98,7 +98,7 @@
         }
 
         /* Main Content */
-        .main-content { flex:1; margin-left:250px; padding:40px; padding-top: 20px; transition: margin-left 0.3s ease; }
+        .main-content { flex:1; margin-left:250px; padding:40px; padding-top: 20px; transition: margin-left 0.3s ease; max-width: calc(100vw - 250px); overflow-x: hidden; }
 
         /* Mobile Header */
         .mobile-header {
@@ -211,6 +211,8 @@
             .main-content {
                 margin-left: 0;
                 padding: 80px 20px 20px 20px;
+                max-width: 100vw;
+                overflow-x: hidden;
             }
             
             .mobile-header {
@@ -255,6 +257,8 @@
             
             .main-content {
                 padding: 80px 10px 10px 10px;
+                max-width: 100vw;
+                overflow-x: hidden;
             }
             
             h1, .h1 { font-size: 1.75rem; }

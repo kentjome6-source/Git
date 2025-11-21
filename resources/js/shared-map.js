@@ -8,7 +8,7 @@ class SharedMap {
         this.mapElementId = mapElementId;
         this.locations = locations;
         this.options = {
-            center: [8.3450, 125.9800], // San Francisco, Agusan del Sur
+            center: [8.504588, 125.975800], // San Francisco, Agusan del Sur
             zoom: 15, // Changed from 13 to 15 to focus more closely on San Francisco, Agusan del Sur
             fullscreenEnabled: false,
             showToggleButtons: false,
@@ -39,6 +39,9 @@ class SharedMap {
         
         // Add specific mobile handling
         this.addMobileHandling();
+        
+        // Ensure map fits within container on mobile
+        this.ensureMobileFit();
     }
     
     initMap() {
@@ -62,6 +65,8 @@ class SharedMap {
         this.map.whenReady(() => {
             setTimeout(() => {
                 this.map.invalidateSize();
+                // Re-center the map after invalidating size to ensure it stays centered
+                this.map.setView(this.options.center, this.options.zoom);
             }, 100);
         });
     }
@@ -83,11 +88,15 @@ class SharedMap {
         // Ensure map renders properly
         setTimeout(() => {
             this.fullscreenMap.invalidateSize();
+            // Re-center the map after invalidating size to ensure it stays centered
+            this.fullscreenMap.setView(this.options.center, this.options.zoom);
         }, 100);
         
         // Additional fix for clean desktop design
         setTimeout(() => {
             this.fullscreenMap.invalidateSize();
+            // Re-center the map after invalidating size to ensure it stays centered
+            this.fullscreenMap.setView(this.options.center, this.options.zoom);
         }, 1000);
     }
     
@@ -107,6 +116,8 @@ class SharedMap {
                     this.loadMarkersToMap(this.fullscreenMap, this.fullscreenMarkersLayer, this.locations);
                     setTimeout(() => {
                         this.fullscreenMap.invalidateSize();
+                        // Re-center the map after invalidating size to ensure it stays centered
+                        this.fullscreenMap.setView(this.options.center, this.options.zoom);
                     }, 100);
                 }
             });
@@ -199,6 +210,10 @@ class SharedMap {
         
         // NOTE: We're removing the automatic fitting to bounds to maintain the intended center focus
         // on San Francisco, Agusan del Sur. The map will stay centered on the predefined coordinates.
+        
+        // Prevent automatic fitting to bounds - keep map centered on predefined coordinates
+        // Only fit bounds if there are markers and we want to show all of them
+        // For now, we're keeping the map centered on the predefined coordinates
         
         // Add additional event listeners for clean desktop design
         targetMap.on('popupopen', (e) => {
@@ -440,13 +455,44 @@ class SharedMap {
                 mobileResizeTimeout = setTimeout(() => {
                     if (this.map) {
                         this.map.invalidateSize();
-                        // Re-center the map on the location
-                        if (this.locations && this.locations.length > 0 && this.locations[0].latitude && this.locations[0].longitude) {
-                            this.map.setView([this.locations[0].latitude, this.locations[0].longitude], this.options.zoom);
-                        }
+                        // Re-center the map on the predefined center coordinates
+                        this.map.setView(this.options.center, this.options.zoom);
                     }
                 }, 300);
             });
+        }
+    }
+    
+    // Ensure map fits properly on mobile devices
+    ensureMobileFit() {
+        // Check if we're on a mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            // Ensure the map container doesn't cause horizontal scrolling
+            const mapContainer = document.getElementById(this.mapElementId);
+            if (mapContainer) {
+                mapContainer.style.maxWidth = '100vw';
+                mapContainer.style.overflow = 'hidden';
+                
+                // Also ensure parent containers don't cause overflow
+                let parent = mapContainer.parentElement;
+                while (parent && parent !== document.body) {
+                    parent.style.maxWidth = '100vw';
+                    parent.style.overflowX = 'hidden';
+                    parent = parent.parentElement;
+                }
+            }
+            
+            // Additional handling for mobile map display
+            if (this.map) {
+                // Ensure map tiles load properly on mobile
+                this.map.whenReady(() => {
+                    setTimeout(() => {
+                        this.map.invalidateSize();
+                    }, 100);
+                });
+            }
         }
     }
 }

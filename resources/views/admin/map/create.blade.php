@@ -8,7 +8,7 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
-    .admin-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 0; color: white; }
+    .admin-header { background: #e74c3c; padding: 30px 0; color: white; }
     .admin-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
     .admin-subtitle { font-size: 1.1rem; opacity: 0.9; }
 
@@ -28,6 +28,7 @@
         border: 2px solid #e5e7eb; 
         position: relative; 
         margin-bottom: 20px;
+        max-width: 100vw;
     }
     
     .map-controls { position: absolute; top: 10px; right: 10px; z-index: 1000; display: flex; gap: 5px; }
@@ -57,6 +58,7 @@
     @media (max-width: 768px) {
         .admin-header {
             padding: 20px 0;
+            background: #e74c3c;
         }
         
         .admin-title {
@@ -75,6 +77,7 @@
         .map-container {
             height: 300px;
             border-radius: 6px;
+            max-width: 100vw;
         }
         
         .action-buttons {
@@ -90,6 +93,7 @@
     @media (max-width: 576px) {
         .admin-header {
             padding: 15px 0;
+            background: #e74c3c;
         }
         
         .admin-title {
@@ -102,6 +106,7 @@
         
         .map-container {
             height: 250px;
+            max-width: 100vw;
         }
         
         .map-btn {
@@ -111,6 +116,62 @@
         
         .map-btn i {
             font-size: 12px;
+        }
+        
+        /* Add action button styles */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        /* Add button focus styles for accessibility */
+        .btn:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        /* Ensure form elements fit on small screens */
+        .form-control {
+            font-size: 0.9rem;
+            padding: 10px;
+        }
+        
+        .form-label {
+            font-size: 0.9rem;
         }
     }
 </style>
@@ -135,6 +196,9 @@
                         <label for="name" class="form-label">Shelter Name *</label>
                         <input type="text" name="name" id="name" class="form-control" required>
                     </div>
+                    
+                    <!-- Add hidden type field for veterinarian -->
+                    <input type="hidden" name="type" value="veterinarian">
                     
                     <div class="form-group">
                         <label for="description" class="form-label">Description</label>
@@ -247,11 +311,11 @@
             </div>
             
             <div class="action-buttons">
-                <a href="{{ route('admin.map.index') }}" class="btn-secondary">
+                <a href="{{ route('admin.map.index') }}" class="btn btn-secondary" title="Back to Map">
                     <i class="fas fa-arrow-left"></i> Back to Map
                 </a>
-                <button type="submit" class="btn-primary">
-                    <i class="fas fa-save"></i> Save Shelter
+                <button type="submit" class="btn btn-primary" title="Save Location">
+                    <i class="fas fa-save"></i> Save Location
                 </button>
             </div>
         </form>
@@ -266,7 +330,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize map centered on San Francisco, Agusan del Sur
-    const map = L.map('shelterMap').setView([8.3450, 125.9800], 15);
+    const map = L.map('shelterMap').setView([8.504588, 125.975800], 15);
     
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

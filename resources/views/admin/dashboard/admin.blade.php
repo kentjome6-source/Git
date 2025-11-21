@@ -2,12 +2,61 @@
 
 @section('title', 'Dashboard')
 
+@section('styles')
+<style>
+    .admin-header {
+        background: #e74c3c; padding: 30px; border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .admin-header h1 { 
+        font-size: 2.5rem; color: white; margin-bottom: 10px; font-weight: 700; 
+    }
+    
+    .admin-subtitle { 
+        font-size: 1.1rem; color: white; opacity: 0.9; margin-bottom: 0; 
+    }
+    
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+        .admin-header {
+            padding: 20px 15px;
+            background: #e74c3c;
+        }
+        
+        .admin-header h1 {
+            font-size: 2rem;
+            text-align: center;
+            color: white;
+        }
+        
+        .admin-subtitle {
+            font-size: 1rem;
+            text-align: center;
+            color: white;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .admin-header h1 {
+            font-size: 1.75rem;
+        }
+        
+        .admin-subtitle {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <h1>Dashboard</h1>
-            <p>Welcome to the PawPortal Admin Dashboard. Manage the platform efficiently using the options below.</p>
+            <div class="admin-header mb-4">
+                <h1>Dashboard</h1>
+                <p class="admin-subtitle">Welcome to the PawPortal Admin Dashboard. Manage the platform efficiently using the options below.</p>
+            </div>
             
             <!-- Statistics Cards -->
             <div class="row mb-4">

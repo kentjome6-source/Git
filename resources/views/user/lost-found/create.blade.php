@@ -425,8 +425,8 @@
         // Initialize map when document is ready
         document.addEventListener('DOMContentLoaded', function() {
             // Create map centered on San Francisco, Agusan del Sur with zoom level 15
-            // Using the correct coordinates: [8.3450, 125.9800]
-            const map = L.map('map').setView([8.3450, 125.9800], 15);
+            // Using the correct coordinates: [8.504588, 125.975800]
+            const map = L.map('map').setView([8.504588, 125.975800], 15);
             
             // Add tile layer
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -437,7 +437,7 @@
             setTimeout(function() {
                 map.invalidateSize();
                 // Double-check that the map is centered correctly
-                map.setView([8.3450, 125.9800], 15);
+                map.setView([8.504588, 125.975800], 15);
             }, 100);
             
             // Add click event to set marker

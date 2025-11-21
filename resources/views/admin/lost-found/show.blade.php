@@ -5,11 +5,11 @@
 @section('styles')
 <style>
     .admin-header {
-        background: #fff; padding: 30px; border-radius: 15px; margin-bottom: 30px;
+        background: #e74c3c; padding: 30px; border-radius: 15px; margin-bottom: 30px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.08);
     }
-    .admin-title { font-size: 2rem; color: #5b4b9b; margin-bottom: 10px; }
-    .admin-subtitle { font-size: 1rem; color: #666; }
+    .admin-title { font-size: 2rem; color: white; margin-bottom: 10px; }
+    .admin-subtitle { font-size: 1rem; color: white; opacity: 0.9; }
 
     .back-link {
         display: inline-flex; align-items: center; gap: 8px;
@@ -135,6 +135,20 @@
         
         .admin-subtitle {
             font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-header {
+                background: #e74c3c;
+            }
+            
+            .admin-title {
+                color: white;
+            }
+            
+            .admin-subtitle {
+                color: white;
+            }
         }
         
         .listing-content {

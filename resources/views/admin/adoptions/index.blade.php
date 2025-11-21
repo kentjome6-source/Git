@@ -4,27 +4,20 @@
 
 @section('content')
 <div class="container-fluid px-0">
-    <div class="row justify-content-center mx-0">
-        <div class="col-12 col-lg-10 px-0">
+    <div class="row mx-0">
+        <div class="col-12 px-0">
             <!-- Header Section -->
-            <div class="row mb-4 mx-2 mx-md-0">
+            <div class="row mb-4 mx-0">
                 <div class="col-12">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div>
-                            <h2 class="mb-1" id="page-heading">Adoption History</h2>
-                            <p class="text-muted mb-0">View all adoption activities across the platform</p>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary" role="button" aria-label="Back to Dashboard">
-                                <i class="fas fa-arrow-left me-2" aria-hidden="true"></i>Back to Dashboard
-                            </a>
-                        </div>
+                    <div class="adoption-history-header">
+                        <h2 class="mb-1" id="page-heading">Adoption History</h2>
+                        <p class="mb-0">View all adoption activities across the platform</p>
                     </div>
                 </div>
             </div>
 
             <!-- Adoption Records Table -->
-            <div class="row mx-2 mx-md-0">
+            <div class="row mx-0">
                 <div class="col-12">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body">
@@ -243,13 +236,43 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Back to Dashboard Button -->
+            <div class="row mt-4 mx-0">
+                <div class="col-12 text-end">
+                    <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary" role="button" aria-label="Back to Dashboard">
+                        <i class="fas fa-arrow-left me-2" aria-hidden="true"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
+    .adoption-history-header {
+        background: #e74c3c; padding: 30px; border-radius: 15px; margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    .adoption-history-header h2 { font-size: 2.5rem; color: white; margin-bottom: 10px; font-weight: 700; }
+    .adoption-history-header p { font-size: 1.1rem; color: white; opacity: 0.9; }
+    
 /* Mobile-specific styles */
 @media (max-width: 767.98px) {
+    .adoption-history-header {
+        padding: 20px 15px;
+    }
+    
+    .adoption-history-header h2 {
+        font-size: 2rem;
+        text-align: center;
+    }
+    
+    .adoption-history-header p {
+        font-size: 1rem;
+        text-align: center;
+    }
+    
     .card-body {
         padding: 1rem;
     }

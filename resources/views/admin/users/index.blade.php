@@ -5,11 +5,11 @@
 @section('styles')
 <style>
     .user-management-header {
-        background: #fff; padding: 30px; border-radius: 15px; margin-bottom: 30px;
+        background: #e74c3c; padding: 30px; border-radius: 15px; margin-bottom: 30px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.08);
     }
-    .page-title { font-size: 2.5rem; color: #2c3e50; margin-bottom: 10px; font-weight: 700; }
-    .page-subtitle { font-size: 1.1rem; color: #666; }
+    .page-title { font-size: 2.5rem; color: white; margin-bottom: 10px; font-weight: 700; }
+    .page-subtitle { font-size: 1.1rem; color: white; opacity: 0.9; }
     
     .stats-grid {
         display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -159,6 +159,20 @@
         .page-subtitle {
             font-size: 1rem;
             text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .user-management-header {
+                background: #e74c3c;
+            }
+            
+            .page-title {
+                color: white;
+            }
+            
+            .page-subtitle {
+                color: white;
+            }
         }
         
         .stats-grid {

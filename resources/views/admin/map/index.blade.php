@@ -6,9 +6,15 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
-    .page-header { margin-bottom: 25px; }
-    .page-title { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: 8px; }
-    .page-subtitle { font-size: 1rem; color: #6b7280; }
+    .page-header { 
+        background: #e74c3c; padding: 30px; border-radius: 15px; margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .page-header h1 { color: white; }
+    .page-header p { color: white; opacity: 0.9; }
+    .page-title { font-size: 2rem; font-weight: 700; color: white; margin-bottom: 8px; }
+    .page-subtitle { font-size: 1rem; color: white; opacity: 0.9; }
 
     /* Stats Cards */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
@@ -42,6 +48,7 @@
         border: 2px solid #e5e7eb; 
         position: relative; 
         width: 100%;
+        max-width: 100vw;
     }
     
     /* Map Controls */
@@ -96,15 +103,28 @@
     
     /* Responsive styles */
     @media (max-width: 768px) {
-        .page-title { font-size: 1.75rem; }
-        .page-subtitle { font-size: 0.9rem; }
+        .page-header {
+            padding: 20px 15px;
+            background: #e74c3c;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            color: white;
+        }
+        
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: white;
+        }
         
         .stats-grid { grid-template-columns: 1fr; gap: 15px; margin-bottom: 25px; }
         .stat-card { padding: 15px; }
         .stat-icon { width: 50px; height: 50px; font-size: 1.25rem; margin-right: 12px; }
         .stat-info h3 { font-size: 1.5rem; }
         
-        .section-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+        .section-header { flex-direction: column; align-items: flex-start; gap: 15px; width: 100%; }
+        .section-header .btn-primary { align-self: flex-end; }
         .section-title { font-size: 1.35rem; }
         
         .search-filter-container { width: 100%; }
@@ -123,6 +143,28 @@
         .empty-state { padding: 40px 15px; }
         .empty-state i { font-size: 2.5rem; margin-bottom: 15px; }
         .empty-state h3 { font-size: 1.25rem; }
+        
+        /* Mobile specific adjustments for map */
+        .map-container {
+            height: 300px;
+            max-width: 100vw;
+            overflow: hidden;
+        }
+        
+        /* Ensure table fits on mobile */
+        .table-responsive {
+            overflow-x: auto;
+            max-width: 100vw;
+        }
+        
+        .data-table {
+            min-width: 600px; /* Ensures table doesn't shrink too much */
+        }
+        
+        .data-table th, .data-table td {
+            white-space: nowrap;
+            font-size: 0.8rem;
+        }
     }
     
     @media (max-width: 576px) {
@@ -140,19 +182,183 @@
         .filter-dropdown select { padding: 8px 12px; font-size: 0.85rem; }
         
         .map-section { padding: 15px; margin-bottom: 20px; }
-        .map-container { height: 300px; border-radius: 6px; }
+        .map-container { height: 250px; border-radius: 6px; }
         
         .map-btn { width: 24px; height: 24px; }
         .map-btn i { font-size: 10px; }
         
-        .data-table th, .data-table td { padding: 10px 8px; font-size: 0.85rem; }
+        .data-table th, .data-table td { padding: 8px 6px; font-size: 0.75rem; }
         
-        .btn { padding: 6px 10px; font-size: 0.8rem; }
-        .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+        .btn { padding: 5px 8px; font-size: 0.75rem; }
+        .btn-sm { padding: 3px 6px; font-size: 0.7rem; }
         
-        .empty-state { padding: 30px 10px; }
-        .empty-state i { font-size: 2rem; margin-bottom: 12px; }
-        .empty-state h3 { font-size: 1.1rem; }
+        .empty-state { padding: 20px 10px; }
+        .empty-state i { font-size: 1.75rem; margin-bottom: 10px; }
+        .empty-state h3 { font-size: 1rem; }
+        
+        /* Further mobile optimizations */
+        .map-container {
+            height: 250px;
+            max-width: 100vw;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 6px 4px;
+            font-size: 0.7rem;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            gap: 3px;
+        }
+        
+        .action-buttons .btn {
+            width: 100%;
+            margin-bottom: 3px;
+        }
+    }
+    
+    /* Mobile swipeable view styles */
+    .mobile-swipeable-view {
+        display: none;
+        padding: 15px;
+    }
+    
+    .swipeable-location-card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .swipeable-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .swipeable-item:last-child {
+        border-bottom: none;
+    }
+    
+    .swipeable-item .label {
+        font-weight: 600;
+        color: #495057;
+        min-width: 100px;
+    }
+    
+    .swipeable-item .value {
+        text-align: right;
+        flex: 1;
+    }
+    
+    .swipeable-actions {
+        padding: 15px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .swipeable-actions .btn {
+        flex: 1;
+        min-width: 80px;
+    }
+    
+    .swipeable-actions form {
+        flex: 1;
+        margin: 0;
+    }
+    
+    .swipeable-actions form .btn {
+        width: 100%;
+    }
+    
+    /* Mobile responsiveness improvements */
+    @media (max-width: 768px) {
+        .desktop-table {
+            display: none;
+        }
+        
+        .mobile-swipeable-view {
+            display: block;
+        }
+        
+        .swipeable-item {
+            padding: 10px 12px;
+        }
+        
+        .swipeable-item .label {
+            min-width: 90px;
+            font-size: 0.9rem;
+        }
+        
+        .swipeable-actions {
+            padding: 12px;
+        }
+        
+        .swipeable-actions .btn {
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            min-width: 80px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .swipeable-item {
+            padding: 8px 10px;
+        }
+        
+        .swipeable-item .label {
+            font-size: 0.85rem;
+            min-width: 80px;
+        }
+        
+        .swipeable-actions {
+            padding: 10px;
+            gap: 5px;
+        }
+        
+        .swipeable-actions .btn {
+            padding: 5px 8px;
+            font-size: 0.8rem;
+            min-width: 70px;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .swipeable-item {
+            padding: 6px 8px;
+        }
+        
+        .swipeable-item .label {
+            font-size: 0.8rem;
+            min-width: 70px;
+        }
+        
+        .swipeable-actions {
+            padding: 8px;
+            gap: 4px;
+        }
+        
+        .swipeable-actions .btn {
+            padding: 4px 6px;
+            font-size: 0.75rem;
+            min-width: 60px;
+        }
+    }
+    
+    /* Desktop view */
+    @media (min-width: 769px) {
+        .mobile-swipeable-view {
+            display: none !important;
+        }
+        .desktop-table {
+            display: block !important;
+        }
     }
 </style>
 @endsection
@@ -186,79 +392,145 @@
     <!-- Vet Shops List -->
     <div class="content-section">
         @if($shelters->count() > 0)
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Address</th>
-                            <th>Contact</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($shelters as $shelter)
+            <!-- Desktop Table View -->
+            <div class="desktop-table">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
                             <tr>
-                                <td>
-                                    <div class="table-cell-content">
-                                        <strong>{{ $shelter->name }}</strong>
-                                        <small class="text-muted">{{ $shelter->city }}, {{ $shelter->province }}</small>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge badge-{{ $shelter->type === 'pet_shop' ? 'info' : ($shelter->type === 'veterinarian' ? 'success' : 'warning') }}">
-                                        {{ $shelter->getTypeNameAttribute() }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="table-cell-content">
-                                        <small>{{ $shelter->address }}</small>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="contact-info">
-                                        @if($shelter->phone)
-                                            <div><i class="fas fa-phone"></i> {{ $shelter->phone }}</div>
-                                        @endif
-                                        @if($shelter->email)
-                                            <div><i class="fas fa-envelope"></i> {{ $shelter->email }}</div>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="status-badge {{ $shelter->is_active ? 'status-active' : 'status-inactive' }}">
-                                        {{ $shelter->is_active ? 'Active' : 'Inactive' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="{{ route('admin.map.show', $shelter) }}" class="btn btn-sm btn-info" title="View">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ route('admin.map.edit', $shelter) }}" class="btn btn-sm btn-warning" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form action="{{ route('admin.map.toggleStatus', $shelter) }}" method="POST" style="display: inline;">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm {{ $shelter->is_active ? 'btn-secondary' : 'btn-success' }}" title="{{ $shelter->is_active ? 'Deactivate' : 'Activate' }}">
-                                                <i class="fas {{ $shelter->is_active ? 'fa-times' : 'fa-check' }}"></i>
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('admin.map.destroy', $shelter) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this location? This action cannot be undone.')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Address</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach($shelters as $shelter)
+                                <tr>
+                                    <td>
+                                        <div class="table-cell-content">
+                                            <strong>{{ $shelter->name }}</strong>
+                                            <small class="text-muted">{{ $shelter->city }}, {{ $shelter->province }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{{ $shelter->type === 'pet_shop' ? 'info' : ($shelter->type === 'veterinarian' ? 'success' : 'warning') }}">
+                                            {{ $shelter->getTypeNameAttribute() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="table-cell-content">
+                                            <small>{{ $shelter->address }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="contact-info">
+                                            @if($shelter->phone)
+                                                <div><i class="fas fa-phone"></i> {{ $shelter->phone }}</div>
+                                            @endif
+                                            @if($shelter->email)
+                                                <div><i class="fas fa-envelope"></i> {{ $shelter->email }}</div>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge {{ $shelter->is_active ? 'status-active' : 'status-inactive' }}">
+                                            {{ $shelter->is_active ? 'Active' : 'Inactive' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="{{ route('admin.map.show', $shelter) }}" class="btn btn-sm btn-info" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ route('admin.map.edit', $shelter) }}" class="btn btn-sm btn-warning" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ route('admin.map.destroy', $shelter) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this location? This action cannot be undone.')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Mobile Swipeable View -->
+            <div class="mobile-swipeable-view">
+                @foreach($shelters as $shelter)
+                    <div class="swipeable-location-card">
+                        <div class="swipeable-item">
+                            <span class="label">Name:</span>
+                            <span class="value">
+                                <strong>{{ $shelter->name }}</strong>
+                                <br>
+                                <small class="text-muted">{{ $shelter->city }}, {{ $shelter->province }}</small>
+                            </span>
+                        </div>
+                        
+                        <div class="swipeable-item">
+                            <span class="label">Type:</span>
+                            <span class="value">
+                                <span class="badge badge-{{ $shelter->type === 'pet_shop' ? 'info' : ($shelter->type === 'veterinarian' ? 'success' : 'warning') }}">
+                                    {{ $shelter->getTypeNameAttribute() }}
+                                </span>
+                            </span>
+                        </div>
+                        
+                        <div class="swipeable-item">
+                            <span class="label">Address:</span>
+                            <span class="value">
+                                {{ $shelter->address }}
+                            </span>
+                        </div>
+                        
+                        <div class="swipeable-item">
+                            <span class="label">Contact:</span>
+                            <span class="value">
+                                @if($shelter->phone)
+                                    <div><i class="fas fa-phone"></i> {{ $shelter->phone }}</div>
+                                @endif
+                                @if($shelter->email)
+                                    <div><i class="fas fa-envelope"></i> {{ $shelter->email }}</div>
+                                @endif
+                            </span>
+                        </div>
+                        
+                        <div class="swipeable-item">
+                            <span class="label">Status:</span>
+                            <span class="value">
+                                <span class="status-badge {{ $shelter->is_active ? 'status-active' : 'status-inactive' }}">
+                                    {{ $shelter->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </span>
+                        </div>
+                        
+                        <div class="swipeable-actions">
+                            <a href="{{ route('admin.map.show', $shelter) }}" class="btn btn-sm btn-info" title="View">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            <a href="{{ route('admin.map.edit', $shelter) }}" class="btn btn-sm btn-warning" title="Edit">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <form action="{{ route('admin.map.destroy', $shelter) }}" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('Are you sure you want to delete this location? This action cannot be undone.')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endforeach
             </div>
 
             <!-- Pagination -->
@@ -289,6 +561,9 @@
 const locations = @json($shelters->items());
 let allLocations = locations;
 
+// Define base route URL for map details
+const baseUrl = "{{ url('admin/map') }}";
+
 // Initialize map when document is ready
 document.addEventListener('DOMContentLoaded', function() {
     // Wait a bit for the assets to load
@@ -298,7 +573,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const sharedMap = new SharedMap('shelterMap', allLocations, {
                 fullscreenEnabled: true,
                 showViewDetails: true,
-                viewDetailsRoute: '/admin/map/location/',
+                viewDetailsRoute: baseUrl + '/',
                 zoom: 15 // Focus more closely on locations
             });
             
@@ -317,7 +592,7 @@ function initBasicMap() {
     // Create map centered on San Francisco, Agusan del Sur
     const map = L.map('shelterMap', {
         zoomControl: false // Disable zoom controls
-    }).setView([8.3450, 125.9800], 15);
+    }).setView([8.504588, 125.975800], 15);
     
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -374,7 +649,7 @@ function initBasicMap() {
                         </div>
                     ` : ''}
                     <div style="display: flex; gap: 5px; margin-top: 12px;">
-                        <a href="/admin/map/location/${location.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+                        <a href="${baseUrl}/${location.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>
                     </div>
@@ -452,7 +727,7 @@ function initFullscreenMap() {
     
     window.fullscreenMap = L.map('fullscreen-map', {
         zoomControl: false // Disable zoom controls
-    }).setView([8.3450, 125.9800], 15);
+    }).setView([8.504588, 125.975800], 15);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
@@ -508,7 +783,7 @@ function initFullscreenMap() {
                         </div>
                     ` : ''}
                     <div style="display: flex; gap: 5px; margin-top: 12px;">
-                        <a href="/admin/map/location/${location.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+                        <a href="${baseUrl}/${location.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>
                     </div>

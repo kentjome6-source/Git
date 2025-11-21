@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-reddish-orange text-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">
                         <i class="fas fa-paw me-2"></i>Pet Management
                     </h4>
@@ -387,6 +387,11 @@
         .swipeable-action-buttons .btn {
             width: 100%;
         }
+    }
+    
+    /* Custom reddish-orange background */
+    .bg-reddish-orange {
+        background: #e74c3c !important;
     }
     
     /* Ensure content fits within viewport */

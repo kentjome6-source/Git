@@ -7,7 +7,7 @@
     <div class="row justify-content-center">
         <div class="col-12 col-md-8">
             <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-header bg-danger text-white">
+                <div class="card-header bg-reddish-orange text-white">
                     <h4 class="mb-0">
                         <i class="fas fa-edit me-2"></i>Edit Pet
                     </h4>
@@ -66,6 +66,11 @@
 
 @section('styles')
 <style>
+    /* Custom reddish-orange background */
+    .bg-reddish-orange {
+        background: #e74c3c !important;
+    }
+    
     /* Mobile Responsive Improvements */
     @media (max-width: 768px) {
         .card-body {
