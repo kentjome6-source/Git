@@ -446,10 +446,6 @@
 @endsection
 
 @section('content')
-<div class="user-management-header">
-    <h1 class="page-title">👥 User Management</h1>
-    <p class="page-subtitle">Manage legitimate registered users and admin accounts only</p>
-</div>
 
 <!-- Stats Cards -->
 <div class="stats-grid">
