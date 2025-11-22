@@ -144,7 +144,7 @@ Route::middleware(['auth'])->group(function () {
     // Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/user/profile', [ProfileController::class, 'edit'])->name('user.profile.edit');
-    Route::patch('x/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::match(['PUT', 'PATCH'], '/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     // Pet Routes

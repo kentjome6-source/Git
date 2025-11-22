@@ -82,7 +82,10 @@
 </head>
 <body>
     <div class="card">
-        <h3 class="text-center mb-3">🐾 Register Pet Parent</h3>
+        <h3 class="text-center mb-3">
+            <img src="{{ asset('images/logo/logo.png') }}" alt="PawPortal Logo" class="img-fluid me-2" style="max-height: 40px; width: auto;">
+            Register Pet Parent
+        </h3>
         <form method="POST" action="{{ route('register.post') }}">
             @csrf
             <div class="mb-3">
@@ -104,17 +107,20 @@
             <button class="btn w-100" style="background-color: #5b4b9b; border-color: #5b4b9b; color: white;">Register</button>
         </form>
         
-        <div class="text-center my-3">
+        <div class="text-center my-4">
             <div class="d-flex align-items-center mb-3">
-                <hr class="flex-grow-1">
-                <span class="px-3 text-muted">OR</span>
-                <hr class="flex-grow-1">
+                <hr class="flex-grow-1" style="opacity: 0.2;">
+                <span class="px-3 text-muted small fw-medium">OR CONTINUE WITH</span>
+                <hr class="flex-grow-1" style="opacity: 0.2;">
             </div>
-            <a href="{{ route('auth.google') }}" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-google me-2" viewBox="0 0 16 16">
-                    <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"/>
+            <a href="{{ route('auth.google') }}" class="btn btn-light border w-100 d-flex align-items-center justify-content-center py-2 shadow-sm" style="max-width: 300px; margin: 0 auto; background-color: #fff;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" style="margin-right: 12px;">
+                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
                 </svg>
-                Continue with Google
+                <span class="fw-medium text-dark">Continue with Google</span>
             </a>
         </div>
         

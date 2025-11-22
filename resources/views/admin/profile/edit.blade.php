@@ -48,8 +48,9 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('profile.update') }}">
+            <form method="POST" action="{{ route('admin.profile.update') }}">
                 @csrf
+                @method('PATCH')
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold"><i class="fa-solid fa-user me-1"></i>Name</label>

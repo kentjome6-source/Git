@@ -119,7 +119,6 @@ class UserController extends Controller
                            ->with('error', 'User not found.');
         }
         
-        // Load pets without health records to avoid the error
         $user->load(['pets']);
         
         // Initialize default stats structure

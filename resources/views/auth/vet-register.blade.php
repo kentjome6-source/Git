@@ -150,7 +150,10 @@
 </head>
 <body>
     <div class="card">
-        <h3 class="text-center mb-3">🐾 Register as Veterinarian</h3>
+        <h3 class="text-center mb-3">
+            <img src="{{ asset('images/logo/logo.png') }}" alt="PawPortal Logo" class="img-fluid me-2" style="max-height: 40px; width: auto;">
+            Register as Veterinarian
+        </h3>
         <form method="POST" action="{{ route('register.vet') }}" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">

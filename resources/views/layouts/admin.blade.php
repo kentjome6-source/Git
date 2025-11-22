@@ -339,7 +339,10 @@
     
     <!-- Mobile Header -->
     <div class="mobile-header">
-        <div class="logo">⚙️ PawPortal Admin</div>
+        <div class="logo d-flex align-items-center">
+            <img src="{{ asset('images/logo/logo.png') }}" alt="PawPortal Logo" class="img-fluid me-2" style="max-height: 30px; width: auto;">
+            <span>PawPortal Admin</span>
+        </div>
         <button class="menu-toggle" id="menu-toggle">
             <i class="fas fa-bars"></i>
         </button>
@@ -352,8 +355,11 @@
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
             <div class="sidebar-header">
-                <div class="logo">⚙️ PawPortal Admin</div>
-                <div class="subtitle">Administration Panel</div>
+                <div class="logo d-flex align-items-center justify-content-center mb-2">
+                    <img src="{{ asset('images/logo/logo.png') }}" alt="PawPortal Logo" class="img-fluid me-2" style="max-height: 40px; width: auto;">
+                    <span class="fs-5 fw-bold">PawPortal Admin</span>
+                </div>
+                <div class="subtitle text-center">Administration Panel</div>
             </div>
 
             <div class="menu">

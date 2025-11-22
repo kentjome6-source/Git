@@ -163,7 +163,7 @@
     .stat-card.pets { border-left-color: #27ae60; }
     .stat-card.adoptions { border-left-color: #9b59b6; }
     .stat-card.appointments { border-left-color: #3498db; }
-    .stat-card.health { border-left-color: #e74c3c; }
+
     .stat-card.lost-found { border-left-color: #f39c12; }
     
     .stat-number {
@@ -459,10 +459,7 @@
                 <div class="stat-number">{{ number_format($stats['appointments_count'] ?? 0) }}</div>
                 <div class="stat-label">Appointments</div>
             </div>
-            <div class="stat-card health vet-stats-card">
-                <div class="stat-number">{{ number_format($stats['health_records_count'] ?? 0) }}</div>
-                <div class="stat-label">Health Records</div>
-            </div>
+
         @else
             <div class="stat-card adoptions">
                 <div class="stat-number">{{ number_format($stats['adoption_listings_count'] ?? 0) }}</div>
@@ -472,10 +469,7 @@
                 <div class="stat-number">{{ number_format($stats['appointments_count'] ?? 0) }}</div>
                 <div class="stat-label">Appointments</div>
             </div>
-            <div class="stat-card health">
-                <div class="stat-number">{{ number_format($stats['health_records_count'] ?? 0) }}</div>
-                <div class="stat-label">Health Records</div>
-            </div>
+
             <div class="stat-card lost-found">
                 <div class="stat-number">{{ number_format($stats['lost_found_count'] ?? 0) }}</div>
                 <div class="stat-label">Lost & Found</div>
@@ -491,7 +485,7 @@
     @if($user->role !== 'admin')
     <div class="activity-tabs">
         <button class="tab-btn active" onclick="showTab('adoptions')">🐾 Adoptions</button>
-        <button class="tab-btn" onclick="showTab('health')">❤️ Health Records</button>
+
         <button class="tab-btn" onclick="showTab('appointments')">📅 Appointments</button>
         @if($user->role !== 'vet')
         <button class="tab-btn" onclick="showTab('lost-found')">🔍 Lost & Found</button>

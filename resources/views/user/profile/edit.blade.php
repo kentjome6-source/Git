@@ -137,6 +137,7 @@
 
             <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
                 @csrf
+                @method('PATCH')
                 
                 <div class="profile-picture-container">
                     <h5 class="section-title">Profile Picture</h5>
