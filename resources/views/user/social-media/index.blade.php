@@ -59,17 +59,12 @@
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li>
-                                                        <a class="dropdown-item" href="{{ route('social-media.show', $post) }}">
-                                                            <i class="fas fa-eye me-2"></i>View
-                                                        </a>
-                                                    </li>
-                                                    <li>
                                                         <a class="dropdown-item text-danger" href="#" 
                                                            onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this post?')) { document.getElementById('delete-post-{{ $post->id }}').submit(); }">
                                                             <i class="fas fa-trash-alt me-2"></i>Delete
                                                         </a>
                                                         <form id="delete-post-{{ $post->id }}" 
-                                                              action="{{ route('social-media.destroy', $post) }}" 
+                                                              action="{{ route('social-media.destroy', $post->id) }}" 
                                                               method="POST" style="display: none;">
                                                             @csrf
                                                             @method('DELETE')
@@ -77,10 +72,6 @@
                                                     </li>
                                                 </ul>
                                             </div>
-                                        @else
-                                            <a href="{{ route('social-media.show', $post) }}" class="btn btn-sm btn-outline-primary ms-auto">
-                                                <i class="fas fa-eye me-1"></i>View
-                                            </a>
                                         @endif
                                     </div>
                                     

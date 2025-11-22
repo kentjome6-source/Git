@@ -324,7 +324,7 @@
                 </a>
             </div>
             <div class="menu-item">
-                <a href="{{ route('view.map') }}" class="menu-link {{ request()->routeIs('view.map*') ? 'active' : '' }}">
+                <a href="{{ route('view.map') }}" class="menu-link {{ request()->routeIs('view.map*') || request()->routeIs('view-map.show') ? 'active' : '' }}">
                     <i class="fas fa-paw menu-icon" aria-hidden="true"></i>
                     <span class="menu-text">Map</span>
                 </a>

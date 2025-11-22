@@ -126,7 +126,10 @@ class AppointmentController extends Controller
 
     public function update(Request $request, Appointment $appointment)
     {
-        Gate::authorize('update-appointment', $appointment);
+        // Only allow updating if appointment is pending and user owns it
+        if ($appointment->user_id !== Auth::id() || $appointment->status !== 'pending') {
+            abort(403, 'Cannot update this appointment.');
+        }
 
         $validated = $request->validate([
             'appointment_type' => 'required|in:appointment',
@@ -170,7 +173,7 @@ class AppointmentController extends Controller
 
         $appointment->update($appointmentData);
 
-        return redirect()->route('appointments.show', $appointment)
+        return redirect()->back()
             ->with('success', 'Appointment updated successfully!');
     }
 

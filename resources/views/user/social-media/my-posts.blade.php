@@ -47,11 +47,6 @@
                                             </button>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <a class="dropdown-item" href="{{ route('social-media.show', $post) }}">
-                                                        <i class="fas fa-eye me-2"></i>View
-                                                    </a>
-                                                </li>
-                                                <li>
                                                     <a class="dropdown-item text-danger" href="#" 
                                                        onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this post?')) { document.getElementById('delete-post-{{ $post->id }}').submit(); }">
                                                         <i class="fas fa-trash-alt me-2"></i>Delete

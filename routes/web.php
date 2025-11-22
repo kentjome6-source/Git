@@ -164,24 +164,29 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('appointments', AppointmentController::class);
     
     // Adoption Routes
-    Route::resource('adoptions', UserAdoptionController::class);
     Route::get('/adoptions/history', [UserAdoptionController::class, 'history'])->name('adoptions.history');
+    Route::resource('adoptions', UserAdoptionController::class);
+    Route::post('/adoptions/{adoption}/adopt', [UserAdoptionController::class, 'adopt'])->name('adoptions.adopt');
+    Route::post('/adoptions/{adoption}/approve', [UserAdoptionController::class, 'approveAdoption'])->name('adoptions.approve');
+    Route::post('/adoptions/{adoption}/reject', [UserAdoptionController::class, 'rejectAdoption'])->name('adoptions.reject');
+    Route::post('/adoptions/{adoption}/complete', [UserAdoptionController::class, 'completeAdoption'])->name('adoptions.complete');
     
     // Lost & Found Routes
     Route::get('pet/lostfound', [LostFoundController::class, 'index'])->name('pet.lostfound');
     Route::resource('lost-found', LostFoundController::class);
+    Route::patch('lost-found/{lostFound}/resolve', [LostFoundController::class, 'markResolved'])->name('lost-found.resolve');
     
     // Social Media Routes
-    Route::resource('social-media', PostController::class)->names([
-        'index' => 'social-media.index',
-        'create' => 'social-media.create',
-        'store' => 'social-media.store',
-        'show' => 'social-media.show',
-        'edit' => 'social-media.edit',
-        'update' => 'social-media.update',
-        'destroy' => 'social-media.destroy',
-    ]);
-    Route::post('social-media/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::get('social-media', [PostController::class, 'index'])->name('social-media.index');
+    Route::get('social-media/create', [PostController::class, 'create'])->name('social-media.create');
+    Route::post('social-media', [PostController::class, 'store'])->name('social-media.store');
+    Route::get('social-media/{post}', [PostController::class, 'show'])->name('social-media.show')->where('post', '[0-9]+');
+    Route::get('social-media/{post}/edit', [PostController::class, 'edit'])->name('social-media.edit')->where('post', '[0-9]+');
+    Route::put('social-media/{post}', [PostController::class, 'update'])->name('social-media.update')->where('post', '[0-9]+');
+    Route::delete('social-media/{postId}', [PostController::class, 'destroy'])->name('social-media.destroy')->where('postId', '[0-9]+');
+    Route::get('social-media/my-posts', [PostController::class, 'myPosts'])->name('social-media.my-posts');
+    Route::post('social-media/{post}/comments', [CommentController::class, 'store'])->name('comments.store')->where('post', '[0-9]+');
+    Route::post('social-media/{post}/toggle-like', [PostController::class, 'toggleLike'])->name('social-media.toggle-like')->where('post', '[0-9]+');
     
     // Chat Routes
     Route::get('/messages', [ChatController::class, 'index'])->name('messages.index');

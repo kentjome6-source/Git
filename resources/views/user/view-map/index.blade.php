@@ -461,12 +461,27 @@ function initBasicMap() {
             const lat = parseFloat(item.latitude);
             const lng = parseFloat(item.longitude);
             
-            // Create custom icon for lost/found items
+            // Create custom icon with pet image if available
+            let iconHtml = '';
+            if (item.image_path) {
+                // Use the pet image as the marker without any icon overlay
+                iconHtml = `<div style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <img src="/storage/${item.image_path}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>`;
+            } else {
+                // Use the default icon if no image is available
+                const color = item.type === 'lost' ? '#e74c3c' : '#27ae60';
+                const iconClass = item.type === 'lost' ? 'fas fa-heart-broken' : 'fas fa-heart';
+                iconHtml = `<div style="background: ${color}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <i class="${iconClass}" style="font-size: 16px;"></i>
+                </div>`;
+            }
+            
             const customIcon = L.divIcon({
-                html: `<div style="background: #ef4444; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="fas fa-question-circle" style="font-size: 12px;"></i></div>`,
-                iconSize: [36, 36],
-                iconAnchor: [18, 18],
-                popupAnchor: [0, -18],
+                html: iconHtml,
+                iconSize: item.image_path ? [56, 56] : [46, 46],
+                iconAnchor: item.image_path ? [28, 28] : [23, 23],
+                popupAnchor: [0, -28],
                 className: 'custom-marker'
             });
             
@@ -477,9 +492,14 @@ function initBasicMap() {
             const popupContent = `
                 <div style="min-width: 250px;">
                     <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                        <div style="background: #ef4444; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                            <i class="fas fa-question-circle"></i>
-                        </div>
+                        ${item.image_path ? 
+                            `<div style="width: 60px; height: 60px; border-radius: 8px; overflow: hidden; margin-right: 12px;">
+                                <img src="/storage/${item.image_path}" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>` : 
+                            `<div style="background: ${item.type === 'lost' ? '#e74c3c' : '#27ae60'}; color: white; width: 60px; height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                                <i class="fas ${item.type === 'lost' ? 'fa-heart-broken' : 'fa-heart'}" style="font-size: 24px;"></i>
+                            </div>`
+                        }
                         <div>
                             <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">${item.pet_name}</h4>
                             <span style="background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Lost/Found</span>
@@ -498,7 +518,7 @@ function initBasicMap() {
                         ${item.user ? item.user.name : 'Anonymous'}
                     </div>
                     <div style="display: flex; gap: 5px; margin-top: 12px;">
-                        <a href="/user/lost-found/${item.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+                        <a href="/lost-found/${item.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>
                     </div>
@@ -652,12 +672,27 @@ function initFullscreenMap() {
             const lat = parseFloat(item.latitude);
             const lng = parseFloat(item.longitude);
             
-            // Create custom icon for lost/found items
+            // Create custom icon with pet image if available
+            let iconHtml = '';
+            if (item.image_path) {
+                // Use the pet image as the marker without any icon overlay
+                iconHtml = `<div style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <img src="/storage/${item.image_path}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>`;
+            } else {
+                // Use the default icon if no image is available
+                const color = item.type === 'lost' ? '#e74c3c' : '#27ae60';
+                const iconClass = item.type === 'lost' ? 'fas fa-heart-broken' : 'fas fa-heart';
+                iconHtml = `<div style="background: ${color}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <i class="${iconClass}" style="font-size: 16px;"></i>
+                </div>`;
+            }
+            
             const customIcon = L.divIcon({
-                html: `<div style="background: #ef4444; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="fas fa-question-circle" style="font-size: 12px;"></i></div>`,
-                iconSize: [36, 36],
-                iconAnchor: [18, 18],
-                popupAnchor: [0, -18],
+                html: iconHtml,
+                iconSize: item.image_path ? [56, 56] : [46, 46],
+                iconAnchor: item.image_path ? [28, 28] : [23, 23],
+                popupAnchor: [0, -28],
                 className: 'custom-marker'
             });
             
@@ -668,9 +703,14 @@ function initFullscreenMap() {
             const popupContent = `
                 <div style="min-width: 250px;">
                     <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                        <div style="background: #ef4444; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                            <i class="fas fa-question-circle"></i>
-                        </div>
+                        ${item.image_path ? 
+                            `<div style="width: 60px; height: 60px; border-radius: 8px; overflow: hidden; margin-right: 12px;">
+                                <img src="/storage/${item.image_path}" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>` : 
+                            `<div style="background: ${item.type === 'lost' ? '#e74c3c' : '#27ae60'}; color: white; width: 60px; height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                                <i class="fas ${item.type === 'lost' ? 'fa-heart-broken' : 'fa-heart'}" style="font-size: 24px;"></i>
+                            </div>`
+                        }
                         <div>
                             <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">${item.pet_name}</h4>
                             <span style="background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Lost/Found</span>
@@ -689,7 +729,7 @@ function initFullscreenMap() {
                         ${item.user ? item.user.name : 'Anonymous'}
                     </div>
                     <div style="display: flex; gap: 5px; margin-top: 12px;">
-                        <a href="/user/lost-found/${item.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+                        <a href="/lost-found/${item.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>
                     </div>

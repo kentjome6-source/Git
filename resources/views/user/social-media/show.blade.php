@@ -30,17 +30,17 @@
                         <div class="card mb-4 shadow-sm rounded-3 border-0" style="max-width: 800px; width: 100%;">
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
-                                    @if($post->user->profile_picture_path)
+                                    @if($post->user && $post->user->profile_picture_path)
                                         <img src="{{ asset('storage/' . $post->user->profile_picture_path) }}" alt="{{ $post->user->name }} Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
                                     @else
                                         <div class="profile-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
                                              style="width: 50px; height: 50px; font-size: 1.2rem;">
-                                            {{ substr($post->user->name, 0, 2) }}
+                                            {{ $post->user ? substr($post->user->name, 0, 2) : 'U' }}
                                         </div>
                                     @endif
                                     <div>
-                                        <h6 class="mb-0 fw-bold" style="font-size: 1.1rem;">{{ $post->user->name }}</h6>
-                                        <small class="text-muted">{{ $post->created_at->diffForHumans() }}</small>
+                                        <h6 class="mb-0 fw-bold" style="font-size: 1.1rem;">{{ $post->user ? $post->user->name : 'Unknown User' }}</h6>
+                                        <small class="text-muted">{{ $post->created_at ? $post->created_at->diffForHumans() : 'Unknown date' }}</small>
                                     </div>
                                 </div>
                                 @if($post->user_id == Auth::id())
@@ -55,7 +55,7 @@
                                                     <i class="fas fa-trash-alt me-2"></i>Delete
                                                 </a>
                                                 <form id="delete-post-{{ $post->id }}" 
-                                                      action="{{ route('social-media.destroy', $post) }}" 
+                                                      action="{{ route('social-media.destroy', $post->id) }}" 
                                                       method="POST" style="display: none;">
                                                     @csrf
                                                     @method('DELETE')
@@ -103,9 +103,8 @@
                         
                         <div class="card-body">
                             {{-- Add Comment Form --}}
-                            <form action="{{ route('comments.store') }}" method="POST" class="mb-4">
+                            <form action="{{ route('comments.store', ['post' => $post->id]) }}" method="POST" class="mb-4">
                                 @csrf
-                                <input type="hidden" name="post_id" value="{{ $post->id }}">
                                 
                                 <div class="mb-3">
                                     <textarea class="form-control rounded-3 @error('content') is-invalid @enderror" 
@@ -132,17 +131,17 @@
                                     <div class="card mb-3 rounded-3 border-0 shadow-sm">
                                         <div class="card-body">
                                             <div class="d-flex align-items-center mb-2">
-                                                @if($comment->user->profile_picture_path)
+                                                @if($comment->user && $comment->user->profile_picture_path)
                                                     <img src="{{ asset('storage/' . $comment->user->profile_picture_path) }}" alt="{{ $comment->user->name }} Profile Picture" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
                                                 @else
                                                     <div class="profile-avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2" 
                                                          style="width: 40px; height: 40px; font-size: 1rem;">
-                                                        {{ substr($comment->user->name, 0, 2) }}
+                                                        {{ $comment->user ? substr($comment->user->name, 0, 2) : 'U' }}
                                                     </div>
                                                 @endif
                                                 <div>
-                                                    <h6 class="mb-0 fw-bold" style="font-size: 1rem;">{{ $comment->user->name }}</h6>
-                                                    <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
+                                                    <h6 class="mb-0 fw-bold" style="font-size: 1rem;">{{ $comment->user ? $comment->user->name : 'Unknown User' }}</h6>
+                                                    <small class="text-muted">{{ $comment->created_at ? $comment->created_at->diffForHumans() : 'Unknown date' }}</small>
                                                 </div>
                                             </div>
                                             

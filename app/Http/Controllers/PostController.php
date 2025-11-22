@@ -63,6 +63,9 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        // Log the post ID for debugging
+        \Log::info('Loading post with ID: ' . $post->id);
+        
         // Load the post with user, comments, and likes
         $post->load('user', 'comments.user', 'likes');
         
@@ -85,10 +88,17 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy($postId)
     {
+        // Log the post ID for debugging
+        \Log::info('Attempting to delete post with ID: ' . $postId);
+        
+        // Find the post by ID
+        $post = Post::findOrFail($postId);
+        
         // Check if the authenticated user owns this post
         if ($post->user_id != Auth::id()) {
+            \Log::warning('User ' . Auth::id() . ' attempted to delete post ' . $post->id . ' which belongs to user ' . $post->user_id);
             return redirect()->route('social-media.index')
                 ->with('error', 'You are not authorized to delete this post.');
         }
@@ -99,6 +109,8 @@ class PostController extends Controller
         }
 
         $post->delete();
+        
+        \Log::info('Post ' . $post->id . ' deleted successfully');
 
         return redirect()->route('social-media.my-posts')
             ->with('success', 'Post deleted successfully!');

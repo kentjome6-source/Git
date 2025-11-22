@@ -16,6 +16,12 @@ class Post extends Model
         'image_path',
     ];
     
+    // Specify the route key name for route model binding
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+    
     // Relationship: a Post belongs to a user
     public function user()
     {
