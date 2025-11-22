@@ -359,6 +359,33 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // Helper function to update unread message count display
+    function updateUnreadMessageCount(count) {
+        const unreadCountElements = document.querySelectorAll('#unread-message-count');
+        unreadCountElements.forEach(element => {
+            if (count > 0) {
+                element.textContent = count;
+                element.style.display = 'inline-block';
+            } else {
+                element.style.display = 'none';
+            }
+        });
+    }
+    
+    // Function to fetch and update unread count
+    function fetchAndUpdateUnreadCount() {
+        // Only fetch if we're on a page that displays the count
+        const unreadCountElement = document.getElementById('unread-message-count');
+        if (unreadCountElement) {
+            fetch('{{ route("vet.messages.unread-count") }}')
+                .then(response => response.json())
+                .then(data => {
+                    updateUnreadMessageCount(data.unread_count);
+                })
+                .catch(error => console.error('Error fetching unread count:', error));
+        }
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('sidebar');
@@ -409,6 +436,12 @@
                 document.body.classList.toggle('sidebar-open', sidebar.classList.contains('active'));
             }
         });
+        
+        // Fetch initial unread count when page loads
+        fetchAndUpdateUnreadCount();
+        
+        // Update unread count periodically as a fallback (every 30 seconds)
+        setInterval(fetchAndUpdateUnreadCount, 30000);
     });
 </script>
 

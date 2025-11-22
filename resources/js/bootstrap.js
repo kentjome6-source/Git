@@ -170,6 +170,7 @@ window.addEventListener('offline', function() {
 });
 
 // Automatically subscribe to user channel on all pages if user is logged in
+// This needs to work on both desktop and mobile
 document.addEventListener('DOMContentLoaded', function() {
     if (window.userId && typeof window.subscribeUserChannel === 'function') {
         console.log('Subscribing to user channel for user:', window.userId);
@@ -194,6 +195,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Also update any other unread count elements (for different layouts)
                         const allUnreadCountElements = document.querySelectorAll('[id="unread-message-count"]');
                         allUnreadCountElements.forEach(element => {
+                            // Skip the element we already updated
+                            if (element === unreadCountElement) return;
+                            
                             if (data.unread_count > 0) {
                                 element.textContent = data.unread_count;
                                 element.style.display = 'inline-block';
@@ -206,6 +210,25 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Error subscribing to user channel globally:', error);
+        }
+    }
+});
+
+// Also subscribe when page becomes visible (important for mobile)
+document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') {
+        if (window.userId && typeof window.subscribeUserChannel === 'function') {
+            console.log('Page became visible, ensuring user channel subscription');
+            try {
+                // Check if we're already subscribed
+                const expectedChannel = 'users.' + window.userId;
+                if (!window.activeChannels || !window.activeChannels.has(expectedChannel)) {
+                    const userChannel = window.subscribeUserChannel();
+                    console.log('Re-subscribed to user channel on page visibility change');
+                }
+            } catch (error) {
+                console.error('Error re-subscribing to user channel on visibility change:', error);
+            }
         }
     }
 });
