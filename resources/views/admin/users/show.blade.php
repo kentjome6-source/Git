@@ -5,13 +5,13 @@
 @section('styles')
 <style>
     .user-details-header {
-        background: #fff; padding: 30px; border-radius: 15px; margin-bottom: 30px;
+        background: #e74c3c; padding: 30px; border-radius: 15px; margin-bottom: 30px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.08);
     }
     .page-title { 
-        font-size: 2.2rem; color: #2c3e50; margin-bottom: 10px; font-weight: 700; 
+        font-size: 2.2rem; color: white; margin-bottom: 10px; font-weight: 700; 
     }
-    .page-subtitle { font-size: 1.1rem; color: #666; }
+    .page-subtitle { font-size: 1.1rem; color: white; opacity: 0.9; }
     .breadcrumb {
         display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
         font-size: 14px; color: #666;
@@ -357,13 +357,6 @@
 
 @section('content')
 <div class="user-details-header">
-    <div class="breadcrumb">
-        <a href="{{ route('admin.dashboard') }}">Dashboard</a> 
-        <span>→</span>
-        <a href="{{ route('admin.users.index') }}">User Management</a>
-        <span>→</span>
-        <span>User Details</span>
-    </div>
     <h1 class="page-title">👤 User Details</h1>
     <p class="page-subtitle">Complete user information and activity overview</p>
 </div>

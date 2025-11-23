@@ -85,7 +85,7 @@
         .status-badge.rejected { background: #e74c3c; color: #fff; }
 
         .action-buttons-cell {
-            display: flex; gap: 8px;
+            display: flex; gap: 8px; justify-content: flex-end;
         }
         .btn-sm {
             padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;
@@ -253,6 +253,7 @@
             .action-buttons-cell {
                 flex-direction: column;
                 gap: 5px;
+                align-items: flex-end;
             }
             
             .btn-sm {

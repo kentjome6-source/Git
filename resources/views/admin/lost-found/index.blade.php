@@ -93,7 +93,7 @@
         overflow: hidden;
     }
     .listing-footer {
-        display: flex; justify-content: between; align-items: center;
+        display: flex; justify-content: space-between; align-items: center;
     }
     .listing-date {
         font-size: 0.85rem; color: #999;
@@ -116,7 +116,7 @@
     .status-badge.unresolved { background: #e74c3c; color: #fff; }
 
     .action-buttons {
-        display: flex; gap: 8px;
+        display: flex; gap: 8px; margin-left: auto;
     }
     .btn {
         padding: 8px 16px; border: none; border-radius: 6px;
@@ -202,6 +202,7 @@
         display: flex;
         gap: 8px;
         padding: 10px 15px;
+        justify-content: flex-end;
     }
     
     .swipeable-action-buttons .btn {
@@ -285,6 +286,7 @@
         .action-buttons {
             flex-direction: column;
             gap: 5px;
+            align-items: flex-end;
         }
         
         .btn {
