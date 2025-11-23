@@ -102,6 +102,78 @@
                             @enderror
                         </div>
 
+                        <!-- Veterinary Appointment Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-stethoscope me-2"></i>
+                                    Veterinary Appointment (Optional)
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Schedule a veterinary appointment for your pet's health check-up before adoption.</p>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="schedule_appointment" name="schedule_appointment" 
+                                           {{ old('schedule_appointment') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="schedule_appointment">
+                                        Schedule a veterinary appointment
+                                    </label>
+                                </div>
+                                
+                                <div id="appointment-fields" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="vet_id" class="form-label">Select Veterinarian *</label>
+                                        <select class="form-select @error('vet_id') is-invalid @enderror" 
+                                                id="vet_id" name="vet_id" aria-describedby="vet-help">
+                                            <option value="">Select a veterinarian</option>
+                                            @foreach($vets as $vet)
+                                                @if($vet->is_verified_vet)
+                                                    <option value="{{ $vet->id }}" 
+                                                            {{ old('vet_id') == $vet->id ? 'selected' : '' }}>
+                                                        Dr. {{ $vet->name }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                        <div id="vet-help" class="form-text">Only verified veterinarians are listed here.</div>
+                                        @error('vet_id')
+                                            <div class="invalid-feedback" role="alert">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="preferred_date" class="form-label">Preferred Date</label>
+                                                <input type="date" class="form-control @error('preferred_date') is-invalid @enderror" 
+                                                       id="preferred_date" name="preferred_date" 
+                                                       value="{{ old('preferred_date') }}" 
+                                                       aria-describedby="date-help">
+                                                <div id="date-help" class="form-text">Select your preferred appointment date.</div>
+                                                @error('preferred_date')
+                                                    <div class="invalid-feedback" role="alert">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="preferred_time" class="form-label">Preferred Time</label>
+                                                <input type="time" class="form-control @error('preferred_time') is-invalid @enderror" 
+                                                       id="preferred_time" name="preferred_time" 
+                                                       value="{{ old('preferred_time') }}" 
+                                                       aria-describedby="time-help">
+                                                <div id="time-help" class="form-text">Select your preferred appointment time.</div>
+                                                @error('preferred_time')
+                                                    <div class="invalid-feedback" role="alert">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="d-flex justify-content-between flex-wrap gap-2 adoption-form-buttons">
                             <a href="{{ route('adoptions.index') }}" class="btn btn-secondary cancel-btn" role="button" aria-label="Cancel and return to adoptions">
                                 Cancel
@@ -261,4 +333,54 @@ a:focus,
     color: #dc3545;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle appointment fields based on checkbox
+    const scheduleCheckbox = document.getElementById('schedule_appointment');
+    const appointmentFields = document.getElementById('appointment-fields');
+    
+    if (scheduleCheckbox && appointmentFields) {
+        // Show/hide appointment fields based on checkbox state
+        scheduleCheckbox.addEventListener('change', function() {
+            appointmentFields.style.display = this.checked ? 'block' : 'none';
+        });
+        
+        // If checkbox is already checked (e.g., after validation error), show fields
+        if (scheduleCheckbox.checked) {
+            appointmentFields.style.display = 'block';
+        }
+    }
+    
+    // Set minimum date to current date for appointment scheduling
+    const dateInput = document.getElementById('preferred_date');
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+    }
+    
+    // Set minimum time based on current date
+    const timeInput = document.getElementById('preferred_time');
+    if (dateInput && timeInput) {
+        dateInput.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            selectedDate.setHours(0, 0, 0, 0);
+            
+            // If selected date is today, set minimum time to current time
+            if (selectedDate.getTime() === today.getTime()) {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = Math.ceil(now.getMinutes() / 30) * 30; // Round up to nearest 30 minutes
+                const roundedMinutes = minutes >= 60 ? '00' : String(minutes).padStart(2, '0');
+                const minTime = minutes >= 60 ? String(parseInt(hours) + 1).padStart(2, '0') + ':' + roundedMinutes : hours + ':' + roundedMinutes;
+                timeInput.min = minTime;
+            } else {
+                timeInput.min = '00:00';
+            }
+        });
+    }
+});
+</script>
 @endsection
