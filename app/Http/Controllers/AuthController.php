@@ -113,6 +113,10 @@ class AuthController extends Controller
 
     public function redirectToGoogle()
     {
+        // Store a fresh state in the session
+        $state = Str::random(40);
+        session()->put('state', $state);
+        
         return Socialite::driver('google')->redirect();
     }
 
@@ -153,7 +157,12 @@ class AuthController extends Controller
             } else {
                 return redirect()->route('pet.multipet.index');
             }
+        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+            // Handle state mismatch specifically - redirect back to Google login
+            return redirect()->route('auth.google');
         } catch (\Exception $e) {
+            // Log the actual error for debugging
+            \Log::error('Google authentication error: ' . $e->getMessage());
             return redirect()->route('login')->with('error', 'Google authentication failed. Please try again.');
         }
     }
