@@ -34,12 +34,7 @@ class AdoptionController extends Controller
      */
     public function create()
     {
-        // Get verified veterinarians for appointment scheduling
-        $vets = \App\Models\User::where('role', 'vet')
-            ->where('is_verified_vet', true)
-            ->get();
-        
-        return view('user.adoptions.create', compact('vets'));
+        return view('user.adoptions.create');
     }
 
     /**
@@ -54,11 +49,6 @@ class AdoptionController extends Controller
             'gender' => 'nullable|string|in:male,female',
             'description' => 'nullable|string|max:1000',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            // Appointment validation rules (only required if scheduling appointment)
-            'schedule_appointment' => 'nullable|boolean',
-            'vet_id' => 'nullable|required_if:schedule_appointment,1|exists:users,id',
-            'preferred_date' => 'nullable|required_if:schedule_appointment,1|date',
-            'preferred_time' => 'nullable|required_if:schedule_appointment,1|date_format:H:i',
         ]);
 
         // Handle image upload
@@ -79,39 +69,7 @@ class AdoptionController extends Controller
         $adoption->is_adopted = false;
         $adoption->save();
 
-        // Handle appointment scheduling if requested
-        if ($request->schedule_appointment) {
-            // Determine pet type based on adoption data
-            $petType = 'Pet';
-            if ($request->breed) {
-                $petType = $request->breed;
-            } elseif ($request->gender) {
-                $petType = ucfirst($request->gender) . ' Pet';
-            }
-            
-            $appointmentData = [
-                'user_id' => Auth::id(),
-                'vet_id' => $request->vet_id,
-                'status' => 'pending',
-                // Owner Information
-                'owner_name' => Auth::user()->name,
-                'owner_phone' => Auth::user()->phone ?? '',
-                'email' => Auth::user()->email,
-                'owner_address' => Auth::user()->address ?? '',
-                // Pet Information
-                'pet_name' => $request->pet_name,
-                'pet_type' => $petType,
-                'pet_services_received' => 'Pre-adoption health check for ' . $request->pet_name,
-                // Scheduling
-                'scheduled_datetime' => isset($request->preferred_date) && isset($request->preferred_time) ? 
-                    $request->preferred_date . ' ' . $request->preferred_time . ':00' : null,
-            ];
 
-            $appointment = Appointment::create($appointmentData);
-            
-            // Add success message about appointment
-            return redirect()->route('adoptions.index')->with('success', 'Pet listed for adoption successfully! A veterinary appointment has also been scheduled.');
-        }
 
         return redirect()->route('adoptions.index')->with('success', 'Pet listed for adoption successfully!');
     }
