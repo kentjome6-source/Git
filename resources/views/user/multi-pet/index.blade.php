@@ -55,11 +55,6 @@
                                     @endif
                                     
                                     {{-- Overlay Badge --}}
-                                    <div class="position-absolute top-0 end-0 m-3">
-                                        <span class="badge bg-white text-dark shadow-sm px-3 py-2 rounded-pill">
-                                            <i class="fas fa-heart text-danger me-1"></i> Available
-                                        </span>
-                                    </div>
                                 </div>
 
                                 {{-- Card Body --}}
@@ -142,7 +137,7 @@
         }
         
         .card-img-top {
-            height: 200px !important;
+            height: 280px !important; /* Increased from 250px */
         }
     }
     
@@ -161,7 +156,7 @@
         }
         
         .card-img-top {
-            height: 180px !important;
+            height: 250px !important; /* Increased from 220px */
         }
         
         .card-body {
@@ -184,7 +179,7 @@
         }
         
         .card-img-top {
-            height: 160px !important;
+            height: 230px !important; /* Increased from 200px */
         }
         
         .card-title {
