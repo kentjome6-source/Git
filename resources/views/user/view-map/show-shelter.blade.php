@@ -4,7 +4,7 @@
 
 @section('styles')
 <style>
-    .shelter-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 0; color: white; text-align: center; }
+    .shelter-header { background: #5b4b9b; padding: 30px 0; color: white; text-align: center; }
     .shelter-title { font-size: 2rem; font-weight: 700; margin-bottom: 10px; }
     .shelter-subtitle { font-size: 1rem; opacity: 0.9; }
 

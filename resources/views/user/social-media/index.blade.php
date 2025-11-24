@@ -8,7 +8,7 @@
         <div class="col-12">
             <div class="card shadow-lg border-0 rounded-4 overflow-hidden w-100">
                 {{-- Header --}}
-                <div class="card-header bg-gradient bg-primary text-white d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 py-3">
+                <div class="card-header text-white d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 py-3" style="background: #5b4b9b;">
                     <h4 class="mb-0 text-center text-md-start fs-5">
                         <i class="fas fa-users me-2"></i>Furparent Social Media
                     </h4>

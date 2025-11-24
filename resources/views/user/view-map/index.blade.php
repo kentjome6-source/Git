@@ -6,7 +6,7 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
-    .map-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 0; color: white; text-align: center; }
+    .map-header { background: #5b4b9b; padding: 30px 0; color: white; text-align: center; }
     .map-title { font-size: 2rem; font-weight: 700; margin-bottom: 10px; }
     .map-subtitle { font-size: 1rem; opacity: 0.9; }
 
