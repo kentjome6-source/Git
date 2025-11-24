@@ -82,7 +82,7 @@ use Illuminate\Support\Str;
                                            <td>
                                                 <div class="btn-group-vertical btn-group-sm" role="group">
                                                     <a href="{{ route('appointments.history.show', $appointment) }}" class="btn btn-info btn-sm me-1" title="View Details">
-                                                        <i class="fas fa-eye"></i>
+                                                        <i class="fas fa-eye"></i> View
                                                     </a>
                                                 </div>
                                             </td>

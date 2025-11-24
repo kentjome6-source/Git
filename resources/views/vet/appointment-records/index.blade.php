@@ -11,9 +11,9 @@ use Illuminate\Support\Str;
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="fas fa-file-medical me-2"></i>Appointment Records</h2>
+                <h2><i class="fas fa-file-medical me-2" style="color: #27ae60;"></i>Appointment Records</h2>
                 <div class="d-flex gap-2">
-                    <span class="badge badge-info">{{ $appointments->total() }} Records (Accepted/Rejected)</span>
+                    <span class="badge bg-success">{{ $appointments->total() }} Records</span>
                 </div>
             </div>
 
@@ -114,7 +114,7 @@ use Illuminate\Support\Str;
                                            <td>
                                                 <div class="btn-group-vertical btn-group-sm" role="group">
                                                     <a href="{{ route('vet.appointment.records.show', $appointment) }}" class="btn btn-info btn-sm me-1" title="View Details">
-                                                        <i class="fas fa-eye"></i>
+                                                        <i class="fas fa-eye"></i> View
                                                     </a>
                                                 </div>
                                             </td>

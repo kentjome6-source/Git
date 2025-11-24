@@ -116,11 +116,22 @@
             right: 0;
             z-index: 999;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: 63.59px;
         }
         
-        .mobile-header .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
+        .mobile-header .logo.d-flex.align-items-center {
+            height: 33.59px;
+            display: flex !important;
+            align-items: center !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 0 !important;
+        }
+        
+        .mobile-header .logo span {
+            display: inline-block;
+            height: 33.59px;
+            line-height: 33.59px;
         }
         
         .menu-toggle {
@@ -129,6 +140,8 @@
             color: white;
             font-size: 1.5rem;
             cursor: pointer;
+            width: 18.38px;
+            height: 33.59px;
         }
 
         /* Focus indicators for keyboard navigation */
@@ -265,11 +278,11 @@
     <!-- Mobile Header -->
     <div class="mobile-header">
         <div class="logo d-flex align-items-center">
-            <img src="{{ asset('images/logo/logo.png') }}" alt="PawPortal Logo" class="img-fluid me-2" style="max-height: 30px; width: auto;">
-            <span>Vet Portal</span>
+            <img src="{{ asset('images/logo/logo.png') }}" alt="PawPortal Logo" class="img-fluid" style="width: 30px; height: 30px; padding: 0; margin: 0;">
+            <span style="width: 99.94px; height: 33.59px; display: inline-block; line-height: 33.59px; padding: 0; margin: 0;">Vet Portal</span>
         </div>
         <button class="menu-toggle" id="menu-toggle">
-            <i class="fas fa-bars"></i>
+            <i class="fas fa-bars" style="width: 18.38px; height: 21px;"></i>
         </button>
     </div>
     

@@ -7,7 +7,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2><i class="fas fa-stethoscope me-2"></i>Pending Appointments</h2>
                 <div class="d-flex gap-2">
-                    <span class="badge badge-info">{{ $appointments->total() }} Pending Appointments</span>
+                    <span class="badge bg-success">{{ $appointments->total() }} Pending Appointments</span>
                 </div>
             </div>
 
@@ -79,7 +79,7 @@
                                            <td>
     <div class="btn-group-vertical btn-group-sm" role="group">
         <a href="{{ route('vet.appointments.show', $appointment) }}" class="btn btn-info btn-sm me-1" title="View Details">
-            <i class="fas fa-eye"></i>
+            <i class="fas fa-eye"></i> View
         </a>
         
         {{-- Show Accept/Reject buttons for pending appointments --}}

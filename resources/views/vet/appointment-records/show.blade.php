@@ -9,11 +9,7 @@
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row gap-3">
                 <h2><i class="fas fa-stethoscope me-2"></i>Appointment Details</h2>
-                <div class="d-flex gap-2 flex-wrap">
-                    <a href="{{ route('vet.appointment.records') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Records
-                    </a>
-                </div>
+                <!-- Back button moved to bottom -->
             </div>
 
             <!-- Main Card -->
@@ -124,6 +120,13 @@
                 </div>
             </div>
             @endif
+            
+            <!-- Back Button at Bottom Right -->
+            <div class="d-flex justify-content-end mt-4">
+                <a href="{{ route('vet.appointment.records') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Records
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -163,15 +166,14 @@
         font-size: 0.9rem;
     }
     
-    .d-flex {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 1rem;
+    /* Keep button on the right side on mobile */
+    .d-flex.justify-content-end {
+        justify-content: flex-end !important;
     }
     
     .d-flex .btn {
-        width: 100%;
-        justify-content: center;
+        width: auto;
+        justify-content: flex-start;
     }
     
     .badge {

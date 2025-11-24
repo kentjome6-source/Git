@@ -9,16 +9,7 @@
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row gap-3">
                 <h2><i class="fas fa-stethoscope me-2"></i>Appointment</h2>
-                <div class="d-flex gap-2 flex-wrap">
-                    @if($appointment->status === 'pending' && $appointment->user_id === auth()->id())
-                        <a href="{{ route('appointments.edit', $appointment) }}" class="btn btn-warning">
-                            <i class="fas fa-edit me-2"></i>Edit Request
-                        </a>
-                    @endif
-                    <a href="{{ auth()->user()->role === 'vet' ? route('vet.appointments') : route('appointments.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Back
-                    </a>
-                </div>
+                <!-- Back button moved to bottom -->
             </div>
 
             <!-- Main Card -->
@@ -149,6 +140,18 @@
                     </div>
                 </div>
             @endif
+            
+            <!-- Back Button at Bottom Right -->
+            <div class="d-flex justify-content-end mt-4 gap-2 flex-wrap">
+                @if($appointment->status === 'pending' && $appointment->user_id === auth()->id())
+                    <a href="{{ route('appointments.edit', $appointment) }}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Edit Request
+                    </a>
+                @endif
+                <a href="{{ auth()->user()->role === 'vet' ? route('vet.appointments') : route('appointments.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -193,15 +196,14 @@
         font-size: 0.9rem;
     }
     
-    .d-flex {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 1rem;
+    /* Keep buttons on the right side on mobile */
+    .d-flex.justify-content-end {
+        justify-content: flex-end !important;
     }
     
     .d-flex .btn {
-        width: 100%;
-        justify-content: center;
+        width: auto;
+        justify-content: flex-start;
     }
     
     .badge {
