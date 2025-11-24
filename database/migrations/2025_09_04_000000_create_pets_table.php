@@ -11,8 +11,11 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name')->nullable(); // Animal Type
+            $table->string('breed')->nullable(); // Breed
             $table->string('image_path')->nullable(); // Image
             $table->text('description')->nullable(); // Description
+            $table->text('appropriate_food')->nullable(); // Appropriate Food
+            $table->text('other_care_details')->nullable(); // Other Essential Care Details
             $table->foreignId('adopter_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });

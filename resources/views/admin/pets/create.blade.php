@@ -26,6 +26,14 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="breed" class="form-label">Breed</label>
+                            <input type="text" name="breed" id="breed" class="form-control @error('breed') is-invalid @enderror" value="{{ old('breed') }}">
+                            @error('breed')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
                             <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" rows="4" placeholder="Enter pet description">{{ old('description') }}</textarea>
                             @error('description')
@@ -40,6 +48,22 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                             <div class="form-text">Upload an image of the pet (JPG, PNG, GIF - max 2MB)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="appropriate_food" class="form-label">Appropriate Food</label>
+                            <textarea name="appropriate_food" id="appropriate_food" class="form-control @error('appropriate_food') is-invalid @enderror" rows="3" placeholder="Enter appropriate food">{{ old('appropriate_food') }}</textarea>
+                            @error('appropriate_food')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="other_care_details" class="form-label">Other Essential Care Details</label>
+                            <textarea name="other_care_details" id="other_care_details" class="form-control @error('other_care_details') is-invalid @enderror" rows="3" placeholder="Enter other essential care details">{{ old('other_care_details') }}</textarea>
+                            @error('other_care_details')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="d-flex justify-content-between flex-column flex-md-row gap-2">

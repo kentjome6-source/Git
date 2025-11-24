@@ -74,16 +74,10 @@
                                     <hr class="my-3">
 
                                     {{-- Footer Info --}}
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-2" 
-                                                 style="width: 32px; height: 32px;">
-                                                <i class="fas fa-user text-primary" style="font-size: 0.8rem;"></i>
-                                            </div>
-                                            <small class="text-muted fw-medium">{{ $pet->user->name }}</small>
-                                        </div>
-                                        
-                                        {{-- Action Button Removed as per user request --}}
+                                    <div class="d-flex justify-content-end align-items-center">
+                                        <a href="{{ route('pet.multipet.show', $pet) }}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>View Details
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -124,6 +118,25 @@
     
     .card {
         overflow: hidden;
+    }
+    
+    /* Match sidebar color theme */
+    .display-4 {
+        color: #5b4b9b !important;
+    }
+    
+    .btn-primary {
+        background: #5b4b9b !important;
+        border-color: #5b4b9b !important;
+    }
+    
+    .btn-primary:hover {
+        background: #4a3d82 !important;
+        border-color: #4a3d82 !important;
+    }
+    
+    .card-title {
+        color: #5b4b9b !important;
     }
     
     /* Responsive adjustments */

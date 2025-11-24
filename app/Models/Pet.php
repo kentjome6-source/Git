@@ -12,8 +12,11 @@ class Pet extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'breed',
         'image_path',
         'description',
+        'appropriate_food',
+        'other_care_details',
     ];
 
     // Relationship: a Pet belongs to a user

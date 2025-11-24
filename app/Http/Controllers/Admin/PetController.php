@@ -35,15 +35,21 @@ class PetController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'breed' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'description' => 'nullable|string|max:1000',
+            'appropriate_food' => 'nullable|string|max:1000',
+            'other_care_details' => 'nullable|string|max:1000',
         ]);
 
         $pet = new Pet();
         // Use the authenticated admin user as the owner
         $pet->user_id = Auth::id();
         $pet->name = $request->name;
+        $pet->breed = $request->breed;
         $pet->description = $request->description;
+        $pet->appropriate_food = $request->appropriate_food;
+        $pet->other_care_details = $request->other_care_details;
 
         // Handle image upload
         if ($request->hasFile('image')) {
@@ -80,12 +86,18 @@ class PetController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'breed' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'description' => 'nullable|string|max:1000',
+            'appropriate_food' => 'nullable|string|max:1000',
+            'other_care_details' => 'nullable|string|max:1000',
         ]);
 
         $pet->name = $request->name;
+        $pet->breed = $request->breed;
         $pet->description = $request->description;
+        $pet->appropriate_food = $request->appropriate_food;
+        $pet->other_care_details = $request->other_care_details;
 
         // Handle image upload
         if ($request->hasFile('image')) {
