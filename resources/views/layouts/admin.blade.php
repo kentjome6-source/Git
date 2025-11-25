@@ -215,6 +215,8 @@
             max-height: 45px !important;
             min-width: 45px !important;
             min-height: 45px !important;
+            /* Changed background to match admin sidebar theme */
+            background: linear-gradient(135deg, #e74c3c 0%, #ff6b6b 100%); 
         }
         
         /* Overlay for mobile */

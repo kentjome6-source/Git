@@ -215,8 +215,15 @@ class AdoptionController extends Controller
             ->where('adopter_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
+            
+        // Get adoption listings that the user has uploaded but not yet adopted
+        $uploadedPets = Adoption::with(['adoptionRequests'])
+            ->where('user_id', Auth::id())
+            ->whereDoesntHave('adoptionHistory')
+            ->orderBy('created_at', 'desc')
+            ->get();
         
-        return view('user.adoptions.history', compact('adoptedPetsAsUploader', 'adoptedPetsAsAdopter'));
+        return view('user.adoptions.history', compact('adoptedPetsAsUploader', 'adoptedPetsAsAdopter', 'uploadedPets'));
     }
 
     /**

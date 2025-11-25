@@ -442,7 +442,7 @@ function initBasicMap() {
                             ${shelter.email}
                         </div>
                     ` : ''}
-                    <div style="display: flex; gap: 5px; margin-top: 12px;">
+                    <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
                         <a href="/view-map/${shelter.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>
@@ -517,7 +517,7 @@ function initBasicMap() {
                         <i class="fas fa-user" style="color: #667eea; margin-right: 6px;"></i>
                         ${item.user ? item.user.name : 'Anonymous'}
                     </div>
-                    <div style="display: flex; gap: 5px; margin-top: 12px;">
+                    <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
                         <a href="/lost-found/${item.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>
@@ -653,7 +653,7 @@ function initFullscreenMap() {
                             ${shelter.email}
                         </div>
                     ` : ''}
-                    <div style="display: flex; gap: 5px; margin-top: 12px;">
+                    <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
                         <a href="/view-map/${shelter.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>
@@ -728,7 +728,7 @@ function initFullscreenMap() {
                         <i class="fas fa-user" style="color: #667eea; margin-right: 6px;"></i>
                         ${item.user ? item.user.name : 'Anonymous'}
                     </div>
-                    <div style="display: flex; gap: 5px; margin-top: 12px;">
+                    <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
                         <a href="/lost-found/${item.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>

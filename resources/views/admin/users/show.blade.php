@@ -27,11 +27,53 @@
         display: flex; align-items: center; gap: 20px; margin-bottom: 20px;
     }
     
+    /* Make vet and admin profile layout vertical (stacked) */
+    .profile-header.vet-header,
+    .profile-header.user-header,
+    .profile-header.admin-header {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+    
+    .profile-header.vet-header .profile-avatar,
+    .profile-header.user-header .profile-avatar,
+    .profile-header.admin-header .profile-avatar {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .profile-header.vet-header .profile-info,
+    .profile-header.user-header .profile-info,
+    .profile-header.admin-header .profile-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+    
     @media (max-width: 768px) {
         .profile-header {
             flex-direction: column;
             text-align: center;
             gap: 10px;
+        }
+        
+        .profile-header.vet-header,
+        .profile-header.user-header,
+        .profile-header.admin-header {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        
+        .profile-header.vet-header .profile-info,
+        .profile-header.user-header .profile-info,
+        .profile-header.admin-header .profile-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
         }
         
         .profile-avatar {
@@ -42,6 +84,7 @@
         width: 80px !important; height: 80px !important; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         font-size: 1.5rem; font-weight: bold; color: white;
+        /* Updated to use admin red color for consistency */
         background: #e74c3c; margin-right: 20px;
         flex-shrink: 0; /* Prevent shrinking */
         transition: none; /* Remove any hover effects */
@@ -106,14 +149,26 @@
         border-left-color: #27ae60;
     }
     
+    .user-header {
+        border-left-color: #3498db;
+    }
+    
     .vet-stats-card {
         border-left-color: #27ae60;
+    }
+    
+    .user-stats-card {
+        border-left-color: #3498db;
     }
     
     .certificate-section {
         background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 30px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         border-left: 4px solid #27ae60;
+    }
+    
+    .certificate-section.user-certificate {
+        border-left-color: #3498db;
     }
     
     .certificate-section h3 {
@@ -244,6 +299,7 @@
         margin-top: 20px;
     }
     
+    /* Mobile adjustments for pet parent action buttons */
     @media (max-width: 768px) {
         .action-buttons {
             flex-wrap: wrap;
@@ -260,8 +316,41 @@
             flex-direction: column;
         }
         
+        .action-buttons.pet-parent-actions,
+        .action-buttons.vet-actions,
+        .action-buttons.admin-actions {
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        
+        .action-buttons.pet-parent-actions .btn-secondary,
+        .action-buttons.vet-actions .btn-secondary,
+        .action-buttons.admin-actions .btn-secondary {
+            order: -1; /* Move back button to the left */
+            width: auto;
+            flex: 0 0 auto;
+            min-width: 70px; /* Reduced width for mobile */
+            max-width: fit-content;
+        }
+        
         .btn {
             width: 100%;
+        }
+        
+        .action-buttons.pet-parent-actions .btn,
+        .action-buttons.admin-actions .btn {
+            width: auto;
+            flex: 0 0 auto;
+            min-width: 100px; /* Reduced width for mobile */
+            max-width: fit-content;
+        }
+        
+        .action-buttons.pet-parent-actions .btn-danger,
+        .action-buttons.vet-actions .btn-danger,
+        .action-buttons.admin-actions .btn-danger {
+            flex: 0 0 auto;
+            min-width: 80px;
+            max-width: fit-content;
         }
     }
     .btn {
@@ -363,7 +452,7 @@
 
 <!-- User Profile -->
 <div class="user-profile">
-    <div class="profile-header {{ $user->role === 'vet' ? 'vet-header' : '' }}">
+    <div class="profile-header {{ $user->role === 'vet' ? 'vet-header' : ($user->role === 'user' ? 'user-header' : 'admin-header') }}">
         <div class="profile-avatar" style="background: {{ (isset($user) && isset($user->role) && strtolower($user->role) === 'admin') ? '#e74c3c' : ($user->role === 'vet' ? '#27ae60' : '#3498db') }};">
             @if($user->profile_picture_path)
                 <img src="{{ $user->profile_picture_url }}" alt="{{ $user->name }}">
@@ -380,7 +469,7 @@
         <div class="profile-info">
             <h2>{{ $user->role === 'vet' ? 'Dr. ' : '' }}{{ $user->name }}</h2>
             <p>{{ $user->email }}</p>
-            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center;">
                 <span class="role-badge role-{{ $user->role }}">
                     {{ ucfirst($user->role) }}
                 </span>
@@ -435,35 +524,24 @@
 
 <!-- Detailed Statistics -->
 <div class="stats-grid">
-    @if($user->role === 'vet')
-    <div class="stat-card pets {{ $user->role === 'vet' ? 'vet-stats-card' : '' }}">
-        <div class="stat-number">{{ number_format($stats['pets_count'] ?? 0) }}</div>
-        <div class="stat-label">Registered Pets</div>
-    </div>
-    @endif
-    
     @if($user->role !== 'admin')
         @if($user->role === 'vet')
-            <div class="stat-card adoptions vet-stats-card">
-                <div class="stat-number">{{ number_format($stats['adoption_listings_count'] ?? 0) }}</div>
-                <div class="stat-label">Adoption Listings</div>
-            </div>
             <div class="stat-card appointments vet-stats-card">
                 <div class="stat-number">{{ number_format($stats['appointments_count'] ?? 0) }}</div>
                 <div class="stat-label">Appointments</div>
             </div>
 
         @else
-            <div class="stat-card adoptions">
+            <div class="stat-card adoptions {{ $user->role === 'user' ? 'user-stats-card' : '' }}">
                 <div class="stat-number">{{ number_format($stats['adoption_listings_count'] ?? 0) }}</div>
                 <div class="stat-label">Adoption Listings</div>
             </div>
-            <div class="stat-card appointments">
+            <div class="stat-card appointments {{ $user->role === 'user' ? 'user-stats-card' : '' }}">
                 <div class="stat-number">{{ number_format($stats['appointments_count'] ?? 0) }}</div>
                 <div class="stat-label">Appointments</div>
             </div>
 
-            <div class="stat-card lost-found">
+            <div class="stat-card lost-found {{ $user->role === 'user' ? 'user-stats-card' : '' }}">
                 <div class="stat-number">{{ number_format($stats['lost_found_count'] ?? 0) }}</div>
                 <div class="stat-label">Lost & Found</div>
             </div>
@@ -471,123 +549,10 @@
     @endif
 </div>
 
-<!-- Detailed Activity Sections -->
-<div class="activity-section">
-    <h3 class="section-title">📊 User Activities</h3>
-    
-    @if($user->role !== 'admin')
-    <div class="activity-tabs">
-        <button class="tab-btn active" onclick="showTab('adoptions')">🐾 Adoptions</button>
 
-        <button class="tab-btn" onclick="showTab('appointments')">📅 Appointments</button>
-        @if($user->role !== 'vet')
-        <button class="tab-btn" onclick="showTab('lost-found')">🔍 Lost & Found</button>
-        @endif
-    </div>
-    
-    <!-- Adoptions Tab -->
-    <div id="adoptions-tab" class="tab-content active">
-        @if(isset($stats['recent_activity']['adoptions']) && count($stats['recent_activity']['adoptions']) > 0)
-            <div class="activity-list">
-                @foreach($stats['recent_activity']['adoptions'] as $adoption)
-                <div class="pet-card">
-                    <h4>🐾 {{ $adoption->pet_name }}</h4>
-                    <div class="pet-details">
-                        @if($adoption->breed)
-                        <span>📋 {{ $adoption->breed }}</span>
-                        @endif
-                        @if($adoption->age)
-                        <span>🎂 {{ $adoption->age }} years old</span>
-                        @endif
-                        @if($adoption->gender)
-                        <span>⚥ {{ ucfirst($adoption->gender) }}</span>
-                        @endif
-                    </div>
-                    <div class="activity-date">
-                        Posted for adoption {{ $adoption->created_at->diffForHumans() }}
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        @else
-            <div class="no-activity">
-                <h3>No Adoption Listings</h3>
-                <p>This user hasn't listed any pets for adoption yet.</p>
-            </div>
-        @endif
-    </div>
-    
-    <!-- Appointments Tab -->
-    <div id="appointments-tab" class="tab-content">
-        @if(isset($stats['recent_activity']['appointments']) && count($stats['recent_activity']['appointments']) > 0)
-            <div class="activity-list">
-                @foreach($stats['recent_activity']['appointments'] as $appointment)
-                <div class="pet-card">
-                    <h4>📅 {{ $appointment->pet_name }}</h4>
-                    <div class="pet-details">
-                        @if($appointment->pet_species)
-                        <span>🏷️ {{ ucfirst($appointment->pet_species) }}</span>
-                        @endif
-                        @if($appointment->pet_services_received)
-                        <span>🛠️ {{ $appointment->pet_services_received }}</span>
-                        @endif
-                    </div>
-                    <div class="activity-date">
-                        Appointment requested {{ $appointment->created_at->diffForHumans() }}
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        @else
-            <div class="no-activity">
-                <h3>No Appointments</h3>
-                <p>This user hasn't requested any appointments yet.</p>
-            </div>
-        @endif
-    </div>
-    
-    <!-- Lost & Found Tab -->
-    @if($user->role !== 'vet')
-    <div id="lost-found-tab" class="tab-content">
-        @if(isset($stats['recent_activity']['lost_found']) && count($stats['recent_activity']['lost_found']) > 0)
-            <div class="activity-list">
-                @foreach($stats['recent_activity']['lost_found'] as $item)
-                <div class="pet-card">
-                    <h4>🔍 {{ $item->pet_name }}</h4>
-                    <div class="pet-details">
-                        <span>🏷️ {{ ucfirst($item->type) }}</span>
-                        @if($item->pet_type)
-                        <span>🐾 {{ ucfirst($item->pet_type) }}</span>
-                        @endif
-                        @if($item->location)
-                        <span>📍 {{ $item->location }}</span>
-                        @endif
-                    </div>
-                    <div class="activity-date">
-                        {{ ucfirst($item->type) }} reported {{ $item->created_at->diffForHumans() }}
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        @else
-            <div class="no-activity">
-                <h3>No Lost & Found Listings</h3>
-                <p>This user hasn't reported any lost or found pets yet.</p>
-            </div>
-        @endif
-    </div>
-    @endif
-    @else
-    <!-- For admin users, show a simplified message -->
-    <div class="no-activity">
-        <h3>Admin Account</h3>
-        <p>Administrators have access to all system features through the dashboard.</p>
-    </div>
-    @endif
-</div>
 
 <!-- Action Buttons -->
-<div class="action-buttons">
+<div class="action-buttons {{ $user->role === 'user' ? 'pet-parent-actions' : ($user->role === 'vet' ? 'vet-actions' : 'admin-actions') }}">
     <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
         ← Back to Users
     </a>
@@ -624,28 +589,5 @@
     @endif
 </div>
 
-<script>
-function showTab(tabName) {
-    // Hide all tab contents
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    // Remove active class from all tab buttons
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Show selected tab content if it exists
-    const tabContent = document.getElementById(tabName + '-tab');
-    if (tabContent) {
-        tabContent.classList.add('active');
-    }
-    
-    // Add active class to clicked button if event is available
-    if (typeof event !== 'undefined' && event && event.target) {
-        event.target.classList.add('active');
-    }
-}
-</script>
+
 @endsection

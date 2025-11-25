@@ -44,9 +44,10 @@ class UserController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
         
+        // Removed pagination to show all users at once
         $users = $query->withCount(['pets'])
                       ->orderBy('created_at', 'desc')
-                      ->paginate(15);
+                      ->get(); // Changed from paginate(15) to get()
         
         // Get stats for the dashboard
         $stats = [

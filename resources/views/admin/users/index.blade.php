@@ -239,13 +239,18 @@
             border-left-color: #e74c3c;
         }
         
+        .user-card.user-card {
+            border-left-color: #3498db;
+        }
+        
         .user-card-header {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
         }
         
-        .user-card-header.vet-header {
+        .user-card-header.vet-header,
+        .user-card-header.user-header {
             align-items: flex-start;
         }
         
@@ -259,7 +264,8 @@
             font-weight: 600;
             color: white;
             margin-right: 12px;
-            background: #3498db;
+            /* Updated to use admin red color for consistency */
+            background: #e74c3c;
             flex-shrink: 0; /* Prevent shrinking */
             transition: none; /* Remove any hover effects */
             transform: none !important; /* Prevent any transforms */
@@ -334,8 +340,26 @@
             border-top: 1px solid #eee;
         }
         
+        /* Pet parent specific mobile view adjustments */
+        .user-card-actions.pet-parent-actions {
+            justify-content: space-between; /* Space between buttons */
+        }
+        
+        .user-card-actions.pet-parent-actions .btn-view-mobile {
+            flex: 0 0 auto;
+            min-width: 100px; /* Reduced width */
+            max-width: fit-content;
+        }
+        
+        .user-card-actions.pet-parent-actions .btn-delete-mobile {
+            flex: 0 0 auto;
+            min-width: 80px;
+            max-width: fit-content;
+        }
+        
         /* Vet-specific mobile improvements */
-        .user-card-header.vet-header .user-card-info {
+        .user-card-header.vet-header .user-card-info,
+        .user-card-header.user-header .user-card-info {
             display: flex;
             flex-direction: column;
         }
@@ -373,6 +397,10 @@
         
         .btn-view-mobile.vet-view {
             background: #27ae60;
+        }
+        
+        .btn-view-mobile.user-view {
+            background: #3498db;
         }
         
         .btn-delete-mobile {
@@ -419,9 +447,36 @@
             flex-direction: column;
         }
         
+        .user-card-actions.pet-parent-actions,
+        .user-card-actions.vet-actions {
+            flex-direction: row;
+            justify-content: space-between; /* Space between buttons */
+            gap: 10px; /* Add some spacing between buttons */
+        }
+        
         .user-card-btn {
             width: 100%;
             margin-bottom: 5px;
+        }
+        
+        .user-card-actions.pet-parent-actions .user-card-btn,
+        .user-card-actions.vet-actions .user-card-btn {
+            width: auto;
+            margin-bottom: 0;
+        }
+        
+        .user-card-actions.pet-parent-actions .btn-view-mobile,
+        .user-card-actions.vet-actions .btn-view-mobile {
+            flex: 0 0 auto;
+            min-width: 100px; /* Reduced width */
+            max-width: fit-content;
+        }
+        
+        .user-card-actions.pet-parent-actions .btn-delete-mobile,
+        .user-card-actions.vet-actions .btn-delete-mobile {
+            flex: 0 0 auto;
+            min-width: 80px;
+            max-width: fit-content;
         }
         
         .user-card-name {
@@ -558,7 +613,7 @@
                     </td>
                     <td>
                         <div class="user-info">
-                            <div class="user-avatar" style="background: {{ (isset($user) && isset($user->role) && strtolower($user->role) === 'admin') ? '#e74c3c' : '#3498db' }};">
+                            <div class="user-avatar" style="background: {{ (isset($user) && isset($user->role) && strtolower($user->role) === 'admin') ? '#e74c3c' : ($user->role === 'vet' ? '#27ae60' : '#3498db') }};">
                                 @if($user->profile_picture_path)
                                     <img src="{{ asset('storage/' . $user->profile_picture_path) }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                                 @else
@@ -634,8 +689,8 @@
 <!-- Users Mobile Cards (Mobile) -->
 <div class="users-mobile-container">
     @forelse($users as $user)
-    <div class="user-card {{ $user->role === 'vet' ? 'vet-card' : ($user->role === 'admin' ? 'admin-card' : '') }}">
-        <div class="user-card-header {{ $user->role === 'vet' ? 'vet-header' : '' }}">
+    <div class="user-card {{ $user->role === 'vet' ? 'vet-card' : ($user->role === 'admin' ? 'admin-card' : 'user-card') }}">
+        <div class="user-card-header {{ $user->role === 'vet' ? 'vet-header' : ($user->role === 'user' ? 'user-header' : '') }}">
             <div class="user-card-avatar" style="background: {{ (isset($user) && isset($user->role) && strtolower($user->role) === 'admin') ? '#e74c3c' : ($user->role === 'vet' ? '#27ae60' : '#3498db') }};">
                 @if($user->profile_picture_path)
                     <img src="{{ asset('storage/' . $user->profile_picture_path) }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
@@ -703,8 +758,8 @@
             </div>
         </div>
         
-        <div class="user-card-actions">
-            <a href="{{ route('admin.users.show', $user) }}" class="user-card-btn btn-view-mobile {{ $user->role === 'vet' ? 'vet-view' : '' }}">
+        <div class="user-card-actions {{ $user->role === 'user' ? 'pet-parent-actions' : ($user->role === 'vet' ? 'vet-actions' : '') }}">
+            <a href="{{ route('admin.users.show', $user) }}" class="user-card-btn btn-view-mobile {{ $user->role === 'vet' ? 'vet-view' : ($user->role === 'user' ? 'user-view' : '') }}">
                 👁️ View Details
             </a>
             @if($user->id !== auth()->id())
@@ -739,13 +794,6 @@
     </div>
     @endforelse
 </div>
-
-<!-- Pagination -->
-@if($users->hasPages())
-<div class="pagination-wrapper">
-    {{ $users->appends(request()->query())->links() }}
-</div>
-@endif
 
 <!-- JavaScript for bulk actions -->
 <script>

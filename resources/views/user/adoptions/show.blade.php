@@ -101,7 +101,7 @@
                                 <div class="d-flex gap-2 flex-wrap mt-3 adoption-detail-buttons">
                                     <form action="{{ route('adoptions.approve', $adoption) }}" method="POST" class="d-inline">
                                         @csrf
-                                        <button type="submit" class="btn btn-success btn-lg" 
+                                        <button type="submit" class="btn btn-success btn-lg approve-btn" 
                                                 onclick="return confirm('Are you sure you want to approve the adoption request for {{ $adoption->pet_name }}?')"
                                                 aria-label="Approve adoption request for {{ $adoption->pet_name }}">
                                             <i class="fas fa-check me-2" aria-hidden="true"></i>Approve Request
@@ -109,13 +109,13 @@
                                     </form>
                                     <form action="{{ route('adoptions.reject', $adoption) }}" method="POST" class="d-inline">
                                         @csrf
-                                        <button type="submit" class="btn btn-danger btn-lg" 
+                                        <button type="submit" class="btn btn-danger btn-lg reject-btn" 
                                                 onclick="return confirm('Are you sure you want to reject the adoption request for {{ $adoption->pet_name }}?')"
                                                 aria-label="Reject adoption request for {{ $adoption->pet_name }}">
                                             <i class="fas fa-times me-2" aria-hidden="true"></i>Reject Request
                                         </button>
                                     </form>
-                                    <a href="{{ route('adoptions.index') }}" class="btn btn-secondary btn-lg back-btn" role="button" aria-label="Back to Adoptions">
+                                    <a href="{{ route('adoptions.index') }}" class="btn btn-secondary btn-lg ms-auto back-btn" role="button" aria-label="Back to Adoptions">
                                         Back to Adoptions
                                     </a>
                                 </div>
@@ -249,93 +249,47 @@
 @media (min-width: 768px) {
     /* Desktop button size reduction */
     .adopt-btn,
+    .approve-btn,
+    .reject-btn,
     .back-btn {
         padding: 0.375rem 0.75rem;
         font-size: 0.875rem;
         min-height: 36px;
+    }
+    
+    /* Align back button to the right on desktop */
+    .adoption-detail-buttons {
+        justify-content: flex-start;
+    }
+    
+    .back-btn {
+        margin-left: auto;
     }
 }
 
 @media (max-width: 767.98px) {
     /* Mobile button size reduction */
     .adopt-btn,
+    .approve-btn,
+    .reject-btn,
     .back-btn {
         padding: 0.25rem 0.5rem;
-        font-size: 0.8125rem;
-        min-height: 36px;
+        font-size: 0.75rem;
+        min-height: 32px;
     }
     
     .adoption-detail-buttons {
         gap: 0.5rem !important;
-    }
-}
-
-/* @media (max-width: 768px) {
-    .container {
-        padding: 1rem;
+        flex-direction: column;
+        align-items: stretch;
     }
     
-    .card-img-top {
-        height: 250px !important;
-    }
-    
-    h2 {
-        font-size: 1.5rem;
-    }
-    
-    .btn {
-        width: 100%;
-        margin-bottom: 0.5rem;
-        justify-content: center;
-    }
-    
-    .d-flex {
-        flex-direction: column !important;
-    }
-    
-    .adoption-detail-buttons {
-        width: 100%;
-        justify-content: flex-end !important;
-    }
-    
-    .adopt-btn,
+    .approve-btn,
+    .reject-btn,
     .back-btn {
-        width: auto;
-        min-width: 44px;
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
+        width: 100%;
     }
-    
-    /* @media (max-width: 480px) {
-        .adoption-detail-buttons {
-            flex-direction: column !important;
-            align-items: flex-end !important;
-        }
-        
-        .adopt-btn,
-        .back-btn {
-            width: auto;
-        }
-    } */
 }
-
-/* @media (max-width: 576px) {
-    .card-body {
-        padding: 1rem;
-    }
-    
-    .card-img-top {
-        height: 200px !important;
-    }
-    
-    h2 {
-        font-size: 1.3rem;
-    }
-    
-    h5 {
-        font-size: 1.1rem;
-    }
-} */ */
 
 /* Focus indicators for keyboard navigation */
 .btn:focus, 
@@ -361,14 +315,5 @@ a:focus {
 .text-muted {
     color: #6c757d !important;
 }
-
-
-/* .btn, 
-a {
-    min-height: 44px;
-    min-width: 44px;
-    display: inline-flex;
-    align-items: center;
-} */
 </style>
 @endsection

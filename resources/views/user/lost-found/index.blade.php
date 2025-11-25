@@ -50,7 +50,7 @@
         .btn-secondary:hover { background: #5a6268; }
         
         .listings-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 30px; margin-bottom: 40px;
         }
         .listing-card {
@@ -59,7 +59,7 @@
         }
         .listing-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
         .listing-image {
-            height: 200px; overflow: hidden; position: relative;
+            height: 250px; overflow: hidden; position: relative;
         }
         .listing-image img {
             width: 100%; height: 100%; object-fit: cover;
@@ -96,7 +96,7 @@
             overflow: hidden;
         }
         .listing-footer {
-            display: flex; justify-content: between; align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
         }
         .listing-date {
             font-size: 0.85rem; color: #999;
@@ -169,7 +169,7 @@
             }
             
             .listing-image {
-                height: 180px;
+                height: 250px;
             }
             
             .listing-content {
@@ -204,7 +204,7 @@
             }
             
             .listing-image {
-                height: 160px;
+                height: 280px;
             }
             
             .type-badge {

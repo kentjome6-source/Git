@@ -21,6 +21,9 @@
         .listing-detail {
             background: #fff; border-radius: 15px; overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-bottom: 30px;
+            max-width: 1200px; /* Increased width */
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Full image adjustments */
@@ -61,7 +64,7 @@
         }
 
         .pet-details {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px; margin-bottom: 30px;
         }
         .detail-item {
@@ -416,6 +419,14 @@
                 @method('PATCH')
                 <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to mark this listing as resolved?')">
                     <i class="fas fa-check-circle"></i> Mark as Resolved
+                </button>
+            </form>
+            
+            <form action="{{ route('lost-found.destroy', $lostFound) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this listing? This action cannot be undone.')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete Listing
                 </button>
             </form>
         </div>
