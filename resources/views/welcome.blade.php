@@ -75,7 +75,8 @@
     <!-- Hero Section -->
     <section class="hero-section text-center">
         <div class="container">
-            <h1 class="display-4 fw-bold mb-3">🐾 Welcome to PawPortal</h1>
+            <img src="{{ asset('images/logo/logo.png') }}" alt="PawPortal Logo" class="mb-4" style="max-height: 150px;">
+            <h1 class="display-4 fw-bold mb-3">Welcome to PawPortal</h1>
             <p class="lead mb-4">Find veterinarian services and lost/found pets in your area</p>
             <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
                 <a href="{{ route('login') }}" class="btn btn-light btn-lg px-4">
