@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     const messageContent = document.createElement('div');
                     messageContent.className = data.sender_id == {{ Auth::id() }} ? 
-                        'd-inline-block p-3 rounded-3 shadow-sm bg-primary text-white' : 
+                        'd-inline-block p-3 rounded-3 shadow-sm bg-purple text-white' : 
                         'd-inline-block p-3 rounded-3 shadow-sm bg-light';
                     messageContent.style.maxWidth = '80%';
                     messageContent.style.wordWrap = 'break-word';
@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                                     const messageContent = document.createElement('div');
                                     messageContent.className = msg.sender_id == {{ Auth::id() }} ?
-                                        'd-inline-block p-3 rounded-3 shadow-sm bg-primary text-white' :
+                                        'd-inline-block p-3 rounded-3 shadow-sm bg-purple text-white' :  // Fixed: Changed from bg-primary to bg-purple
                                         'd-inline-block p-3 rounded-3 shadow-sm bg-light';
                                     messageContent.style.maxWidth = '80%';
                                     messageContent.style.wordWrap = 'break-word';

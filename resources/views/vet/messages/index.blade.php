@@ -28,7 +28,7 @@
                                         @if($user->profile_picture_path)
                                             <img src="{{ asset('storage/' . $user->profile_picture_path) }}" alt="{{ $user->name }} Profile Picture" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
                                         @else
-                                            <div class="avatar bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <div class="avatar bg-vet-green text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                                 {{ substr($user->name, 0, 1) }}
                                             </div>
                                         @endif
@@ -88,7 +88,7 @@
                                 @foreach($messages as $message)
                                     <div class="mb-3 {{ $message->sender_id == Auth::id() ? 'text-end' : 'text-start' }}">
                                         <div class="d-inline-block p-3 rounded-3 shadow-sm 
-                                            {{ $message->sender_id == Auth::id() ? 'bg-success text-white' : 'bg-light' }}" 
+                                            {{ $message->sender_id == Auth::id() ? 'bg-vet-green text-white' : 'bg-light' }}" 
                                             style="max-width: 80%; word-wrap: break-word;">
                                             {{ $message->message }}
                                             <div class="small mt-1">
@@ -158,7 +158,8 @@
     border-color: #219653 !important;
 }
 
-.badge.bg-success {
+.badge.bg-success,
+.badge.bg-vet-green {
     background-color: #27ae60 !important;
 }
 </style>
@@ -372,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     const messageContent = document.createElement('div');
                     messageContent.className = data.sender_id == {{ Auth::id() }} ? 
-                        'd-inline-block p-3 rounded-3 shadow-sm bg-primary text-white' : 
+                        'd-inline-block p-3 rounded-3 shadow-sm bg-vet-green text-white' : 
                         'd-inline-block p-3 rounded-3 shadow-sm bg-light';
                     messageContent.style.maxWidth = '80%';
                     messageContent.style.wordWrap = 'break-word';
