@@ -319,7 +319,7 @@
                     <span class="menu-text">Messages</span>
                     @php
                         // For vets, only count messages from regular users (not admins)
-                        $validSenderIds = App\Models\User::where('role', 'user')->pluck('id');
+                        $validSenderIds = App\Models\User::where('role', 'user')->legitimate()->pluck('id');
                         $unreadCount = Auth::check() ? App\Models\ChatMessage::where('receiver_id', Auth::id())
                             ->whereIn('sender_id', $validSenderIds)
                             ->where('is_read', false)
@@ -405,6 +405,63 @@
         }
     }
     
+    // Set up real-time updates for messages
+    function setupRealTimeMessageUpdates() {
+        // Subscribe to user's private channel for real-time notifications
+        if (window.userId && typeof window.subscribeUserChannel === 'function') {
+            console.log('Subscribing to user channel for real-time message updates:', window.userId);
+            try {
+                const userChannel = window.subscribeUserChannel();
+                if (userChannel) {
+                    // Listen for new messages
+                    userChannel.listen('.message.sent', function (data) {
+                        console.log('Received new message notification:', data);
+                        // Update the navigation unread count
+                        fetchAndUpdateUnreadCount();
+                        
+                        // Dispatch a custom event so other parts of the app can react
+                        const event = new CustomEvent('realtime-message-received', { detail: data });
+                        window.dispatchEvent(event);
+                    });
+                    
+                    // Listen for unread message count updates
+                    userChannel.listen('.unread.message.count.updated', function (data) {
+                        console.log('Received unread count update:', data);
+                        // Check if this update is for the current user
+                        if (data.userId == window.userId) {
+                            updateUnreadMessageCount(data.unread_count);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error subscribing to user channel for real-time updates:', error);
+            }
+        }
+    }
+    
+    // Mobile-specific enhancements for sidebar message count updates
+    function setupMobileSidebarEnhancements() {
+        // Check if we're on a mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            console.log('Setting up mobile sidebar enhancements');
+            
+            // Force update when window gains focus
+            window.addEventListener('focus', function() {
+                console.log('Mobile window focused, updating message count');
+                fetchAndUpdateUnreadCount();
+            });
+            
+            // Periodic update every 60 seconds to ensure accuracy
+            setInterval(function() {
+                if (document.visibilityState === 'visible') {
+                    fetchAndUpdateUnreadCount();
+                }
+            }, 60000); // 1 minute
+        }
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('sidebar');
@@ -455,6 +512,12 @@
                 document.body.classList.toggle('sidebar-open', sidebar.classList.contains('active'));
             }
         });
+        
+        // Set up real-time message updates
+        setupRealTimeMessageUpdates();
+        
+        // Set up mobile sidebar enhancements
+        setupMobileSidebarEnhancements();
         
         // Fetch initial unread count when page loads
         fetchAndUpdateUnreadCount();

@@ -169,6 +169,65 @@ window.addEventListener('offline', function() {
     // Connection will be automatically handled by Pusher
 });
 
+// Mobile-specific connection handling for better reliability
+function setupMobileConnectionHandling() {
+    // Check if we're on a mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        console.log('Setting up mobile-specific connection handling');
+        
+        // Force reconnection every 2 minutes to prevent mobile connection issues
+        setInterval(function() {
+            if (window.Echo && window.Echo.connector && window.Echo.connector.pusher) {
+                const state = window.Echo.connector.pusher.connection.state;
+                console.log('Mobile connection check - Current state:', state);
+                
+                // If not connected, try to reconnect
+                if (state !== 'connected') {
+                    console.log('Forcing reconnection for mobile device');
+                    window.Echo.connector.pusher.connect();
+                }
+            }
+        }, 120000); // 2 minutes
+        
+        // Additional handling for mobile page lifecycle events
+        let hiddenTime = null;
+        
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Page is hidden, record the time
+                hiddenTime = Date.now();
+            } else {
+                // Page is visible again
+                if (hiddenTime) {
+                    const timeHidden = Date.now() - hiddenTime;
+                    console.log('Page was hidden for', timeHidden, 'ms');
+                    
+                    // If page was hidden for more than 15 seconds, force reconnection
+                    if (timeHidden > 15000) {
+                        console.log('Page was hidden for >15s, forcing reconnection');
+                        if (window.Echo && window.Echo.connector && window.Echo.connector.pusher) {
+                            window.Echo.connector.pusher.connect();
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Handle mobile app going to background/foreground
+        window.addEventListener('focus', function() {
+            console.log('Window focused, checking connection');
+            if (window.Echo && window.Echo.connector && window.Echo.connector.pusher) {
+                const state = window.Echo.connector.pusher.connection.state;
+                if (state !== 'connected') {
+                    window.Echo.connector.pusher.connect();
+                }
+            }
+        });
+    }
+}
+
 // Automatically subscribe to user channel on all pages if user is logged in
 // This needs to work on both desktop and mobile
 document.addEventListener('DOMContentLoaded', function() {
@@ -212,6 +271,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error subscribing to user channel globally:', error);
         }
     }
+    
+    // Set up mobile connection handling
+    setupMobileConnectionHandling();
 });
 
 // Also subscribe when page becomes visible (important for mobile)

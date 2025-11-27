@@ -53,7 +53,8 @@ class ChatController extends Controller
                 ->update(['is_read' => true]);
         }
         
-        return view('user.messages.index', compact('users', 'messages', 'selectedUserId'));
+        // Return the unified template
+        return view('messages.index', compact('users', 'messages', 'selectedUserId'));
     }
 
     /**
@@ -98,7 +99,8 @@ class ChatController extends Controller
                 ->update(['is_read' => true]);
         }
         
-        return view('vet.messages.index', compact('users', 'messages', 'selectedUserId'));
+        // Return the unified template
+        return view('messages.index', compact('users', 'messages', 'selectedUserId'));
     }
 
     /**
@@ -141,7 +143,7 @@ class ChatController extends Controller
         $chatMessage->load('sender');
 
         // First, broadcast the message to the chat channel
-        broadcast(new MessageSent($chatMessage))->toOthers();
+        broadcast(new MessageSent($chatMessage));
 
         // Small delay to ensure database consistency
         usleep(100000); // 0.1 second delay
@@ -150,13 +152,13 @@ class ChatController extends Controller
         $receiverUnreadCount = ChatMessage::where('receiver_id', $request->receiver_id)
             ->where('is_read', false)
             ->count();
-        broadcast(new UnreadMessageCountUpdated($request->receiver_id, $receiverUnreadCount))->toOthers();
+        broadcast(new UnreadMessageCountUpdated($request->receiver_id, $receiverUnreadCount));
         
         // Finally, update unread count for the sender and broadcast it immediately
         $senderUnreadCount = ChatMessage::where('receiver_id', Auth::id())
             ->where('is_read', false)
             ->count();
-        broadcast(new UnreadMessageCountUpdated(Auth::id(), $senderUnreadCount))->toOthers();
+        broadcast(new UnreadMessageCountUpdated(Auth::id(), $senderUnreadCount));
 
         return response()->json(['success' => true, 'message' => $chatMessage]);
     }
@@ -284,7 +286,7 @@ class ChatController extends Controller
         $unreadCount = ChatMessage::where('receiver_id', Auth::id())
             ->where('is_read', false)
             ->count();
-        broadcast(new UnreadMessageCountUpdated(Auth::id(), $unreadCount))->toOthers();
+        broadcast(new UnreadMessageCountUpdated(Auth::id(), $unreadCount));
             
         return response()->json(['success' => true]);
     }

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends(Auth::user()->role === 'vet' ? 'layouts.vet' : 'layouts.app')
 
 @section('title', 'Messages')
 
@@ -8,7 +8,7 @@
         <!-- Contacts Panel -->
         <div class="col-lg-4 col-md-5 mb-4 mb-md-0" id="contacts-panel">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-purple text-white d-flex justify-content-between align-items-center">
+                <div class="card-header {{ Auth::user()->role === 'vet' ? 'bg-vet-green' : 'bg-purple' }} text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-users me-2"></i>Contacts</h5>
                     <span class="badge bg-light text-dark">{{ $users->count() }}</span>
                 </div>
@@ -21,14 +21,14 @@
                             </div>
                         @else
                             @foreach($users as $user)
-                                <a href="{{ route('user.messages.index', ['user' => $user->id]) }}" 
+                                <a href="{{ route(Auth::user()->role === 'vet' ? 'vet.messages.index' : 'user.messages.index', ['user' => $user->id]) }}" 
                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center contact-item {{ $selectedUserId == $user->id ? 'active' : '' }}"
                                    data-contact-id="{{ $user->id }}">
                                     <div class="d-flex align-items-center">
                                         @if($user->profile_picture_path)
                                             <img src="{{ asset('storage/' . $user->profile_picture_path) }}" alt="{{ $user->name }} Profile Picture" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
                                         @else
-                                            <div class="avatar bg-purple text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <div class="avatar {{ Auth::user()->role === 'vet' ? 'bg-vet-green' : 'bg-purple' }} text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                                 {{ substr($user->name, 0, 1) }}
                                             </div>
                                         @endif
@@ -40,6 +40,9 @@
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center">
+                                        @if(Auth::user()->role === 'vet' && $user->role !== 'vet')
+                                            <span class="badge {{ Auth::user()->role === 'vet' ? 'bg-vet-green' : 'bg-purple' }} me-2">User</span>
+                                        @endif
                                         @if($user->unread_count > 0)
                                             <span class="badge bg-danger rounded-pill unread-count-badge" data-contact-id="{{ $user->id }}">{{ $user->unread_count }}</span>
                                         @endif
@@ -55,7 +58,7 @@
         <!-- Messages Panel -->
         <div class="col-lg-8 col-md-7" id="messages-panel">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-purple text-white border-bottom d-flex justify-content-between align-items-center">
+                <div class="card-header {{ Auth::user()->role === 'vet' ? 'bg-vet-green' : 'bg-purple' }} text-white border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Messages</h5>
                     @if($selectedUserId)
                         @php
@@ -66,7 +69,7 @@
                                 @if($selectedUser->profile_picture_path)
                                     <img src="{{ asset('storage/' . $selectedUser->profile_picture_path) }}" alt="{{ $selectedUser->name }} Profile Picture" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
                                 @else
-                                    <div class="avatar bg-purple text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                    <div class="avatar {{ Auth::user()->role === 'vet' ? 'bg-vet-green' : 'bg-purple' }} text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
                                         {{ substr($selectedUser->name, 0, 1) }}
                                     </div>
                                 @endif
@@ -87,7 +90,7 @@
                                 @foreach($messages as $message)
                                     <div class="mb-3 {{ $message->sender_id == Auth::id() ? 'text-end' : 'text-start' }}">
                                         <div class="d-inline-block p-3 rounded-3 shadow-sm 
-                                            {{ $message->sender_id == Auth::id() ? 'bg-purple text-white' : 'bg-light' }}" 
+                                            {{ $message->sender_id == Auth::id() ? (Auth::user()->role === 'vet' ? 'bg-vet-green text-white' : 'bg-purple text-white') : 'bg-light' }}" 
                                             style="max-width: 80%; word-wrap: break-word;">
                                             {{ $message->message }}
                                             <div class="small mt-1">
@@ -103,7 +106,7 @@
                             <input type="hidden" id="receiver-id" value="{{ $selectedUserId }}">
                             <div class="input-group">
                                 <input type="text" id="message-input" class="form-control" placeholder="Type your message..." required>
-                                <button class="btn btn-purple" type="submit">
+                                <button class="btn {{ Auth::user()->role === 'vet' ? 'btn-vet-green' : 'btn-purple' }}" type="submit">
                                     <i class="fas fa-paper-plane"></i>
                                     <span class="d-none d-sm-inline ms-1">Send</span>
                                 </button>
@@ -127,7 +130,6 @@
     font-weight: 600;
     font-size: 0.9rem;
 }
-
 
 #message-container::-webkit-scrollbar {
     width: 6px;
@@ -157,6 +159,27 @@
 .btn-purple:hover {
     background-color: #4a3d82 !important;
     border-color: #4a3d82 !important;
+}
+
+/* Vet green theme for message headers, buttons, and bubbles */
+.bg-vet-green {
+    background-color: #27ae60 !important;
+}
+
+.btn-vet-green {
+    background-color: #27ae60 !important;
+    border-color: #27ae60 !important;
+    color: #fff !important;
+}
+
+.btn-vet-green:hover {
+    background-color: #219653 !important;
+    border-color: #219653 !important;
+}
+
+.badge.bg-success,
+.badge.bg-vet-green {
+    background-color: #27ae60 !important;
 }
 </style>
 
@@ -215,7 +238,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else {
             // Fetch the actual count from the server
-            fetch(`{{ url('/messages/contact-unread-count') }}?contact_id=${contactId}`)
+            let contactUnreadCountRoute;
+            if ("{{ Auth::user()->role }}" === "vet") {
+                contactUnreadCountRoute = "{{ route('vet.messages.contact-unread-count') }}";
+            } else {
+                contactUnreadCountRoute = "{{ route('user.messages.contact-unread-count') }}";
+            }
+            
+            fetch(`${contactUnreadCountRoute}?contact_id=${contactId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (badge) {
@@ -243,7 +273,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to update overall unread message count in navigation
     function updateNavigationUnreadCount() {
-        fetch('{{ route("user.messages.unread-count") }}')
+        let unreadCountRoute;
+        if ("{{ Auth::user()->role }}" === "vet") {
+            unreadCountRoute = "{{ route('vet.messages.unread-count') }}";
+        } else {
+            unreadCountRoute = "{{ route('user.messages.unread-count') }}";
+        }
+        
+        fetch(unreadCountRoute)
             .then(response => response.json())
             .then(data => {
                 const unreadCountElement = document.getElementById('unread-message-count');
@@ -261,7 +298,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to mark messages as read and update UI
     function markMessagesAsRead(contactId) {
-        fetch('{{ route("user.messages.mark-as-read") }}', {
+        let markAsReadRoute;
+        if ("{{ Auth::user()->role }}" === "vet") {
+            markAsReadRoute = "{{ route('vet.messages.mark-as-read') }}";
+        } else {
+            markAsReadRoute = "{{ route('user.messages.mark-as-read') }}";
+        }
+        
+        fetch(markAsReadRoute, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -316,34 +360,76 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!userChannel) return;
         
         try {
-            // Listen for new messages
+            // Listen for new messages on the user channel
             userChannel.listen('.message.sent', function (data) {
-                console.log('Received new message event:', data);
-                // Update unread count for the sender if they're not the selected user
-                updateContactUnreadCount(data.sender_id, null); // null means we need to fetch the count
+                console.log('Received message on user channel:', data);
                 
-                // Also update the navigation unread count
-                updateNavigationUnreadCount();
+                // Check if we're in a conversation with the sender
+                if (selectedUserId && (data.sender_id == selectedUserId || data.receiver_id == selectedUserId)) {
+                    // We're in the right conversation, add the message to the chat
+                    addMessageToChat(data);
+                } else {
+                    // Not in the conversation, just update the unread counts
+                    updateContactUnreadCount(data.sender_id, null); // null means we need to fetch the count
+                    updateNavigationUnreadCount();
+                }
             });
             
             // Listen for unread message count updates
             userChannel.listen('.unread.message.count.updated', function (data) {
-                console.log('Received unread count update:', data);
-                // Check if this update is for the current user
-                if (data.userId == {{ Auth::id() }}) {
-                    const unreadCountElement = document.getElementById('unread-message-count');
-                    if (unreadCountElement) {
-                        if (data.unread_count > 0) {
-                            unreadCountElement.textContent = data.unread_count;
-                            unreadCountElement.style.display = 'inline-block';
-                        } else {
-                            unreadCountElement.style.display = 'none';
-                        }
-                    }
+                console.log('Received unread count update on user channel:', data);
+                // Update the navigation unread count
+                updateNavigationUnreadCount();
+                
+                // If we're viewing a conversation with this user, update that count too
+                if (selectedUserId && data.userId == selectedUserId) {
+                    updateContactUnreadCount(selectedUserId, data.unread_count);
                 }
             });
         } catch (error) {
             console.error('Error setting up user channel listeners:', error);
+        }
+    }
+    
+    // Function to add a message to the chat display
+    function addMessageToChat(data) {
+        // Check if message already exists to prevent duplicates
+        const existingMessage = document.querySelector(`.message[data-message-id="${data.id}"]`);
+        if (existingMessage) {
+            return; // Message already exists, don't add it again
+        }
+        
+        const messageContainer = document.getElementById('message-container');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `mb-3 ${data.sender_id == {{ Auth::id() }} ? 'text-end' : 'text-start'} message`;
+        messageDiv.setAttribute('data-message-id', data.id);
+        
+        const bgColorClass = data.sender_id == {{ Auth::id() }} ? 
+            ("{{ Auth::user()->role }}" === "vet" ? 'bg-vet-green text-white' : 'bg-purple text-white') : 
+            'bg-light';
+        
+        const messageContent = document.createElement('div');
+        messageContent.className = `d-inline-block p-3 rounded-3 shadow-sm ${bgColorClass}`;
+        messageContent.style.maxWidth = '80%';
+        messageContent.style.wordWrap = 'break-word';
+        
+        // Format the timestamp from server data
+        const timestamp = formatTimestamp(data.created_at);
+        
+        messageContent.innerHTML = `
+            ${data.message}
+            <div class="small mt-1">
+                <em>${timestamp}</em>
+            </div>
+        `;
+        
+        messageDiv.appendChild(messageContent);
+        messageContainer.appendChild(messageDiv);
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+        
+        // If this is a new message from the selected user, mark it as read
+        if (data.sender_id == selectedUserId) {
+            markMessagesAsRead(selectedUserId);
         }
     }
     
@@ -354,44 +440,10 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             // Listen for new messages
             chatChannel.listen('.message.sent', function (data) {
-                // Only show messages from the selected user
-                if (data.sender_id == selectedUserId || data.receiver_id == selectedUserId) {
-                    // Check if message already exists to prevent duplicates
-                    const existingMessage = document.querySelector(`.message[data-message-id="${data.id}"]`);
-                    if (existingMessage) {
-                        return; // Message already exists, don't add it again
-                    }
-                    
-                    const messageContainer = document.getElementById('message-container');
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = `mb-3 ${data.sender_id == {{ Auth::id() }} ? 'text-end' : 'text-start'} message`;
-                    messageDiv.setAttribute('data-message-id', data.id);
-                    
-                    const messageContent = document.createElement('div');
-                    messageContent.className = data.sender_id == {{ Auth::id() }} ? 
-                        'd-inline-block p-3 rounded-3 shadow-sm bg-purple text-white' : 
-                        'd-inline-block p-3 rounded-3 shadow-sm bg-light';
-                    messageContent.style.maxWidth = '80%';
-                    messageContent.style.wordWrap = 'break-word';
-                    
-                    // Format the timestamp from server data
-                    const timestamp = formatTimestamp(data.created_at);
-                    
-                    messageContent.innerHTML = `
-                        ${data.message}
-                        <div class="small mt-1">
-                            <em>${timestamp}</em>
-                        </div>
-                    `;
-                    
-                    messageDiv.appendChild(messageContent);
-                    messageContainer.appendChild(messageDiv);
-                    messageContainer.scrollTop = messageContainer.scrollHeight;
-                    
-                    // If this is a new message from the selected user, mark it as read
-                    if (data.sender_id == selectedUserId) {
-                        markMessagesAsRead(selectedUserId);
-                    }
+                console.log('Received message on chat channel:', data);
+                // Add message to chat if it's from the selected user
+                if (selectedUserId && (data.sender_id == selectedUserId || data.receiver_id == selectedUserId)) {
+                    addMessageToChat(data);
                 } else {
                     // Update unread count for the sender if they're not the selected user
                     updateContactUnreadCount(data.sender_id, null); // null means we need to fetch the count
@@ -431,6 +483,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Mobile-specific enhancements for better reliability
+    function setupMobileMessagingEnhancements() {
+        // Check if we're on a mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            console.log('Setting up mobile messaging enhancements');
+            
+            // Force reconnection and resubscription when window gains focus
+            window.addEventListener('focus', function() {
+                console.log('Mobile window focused, resubscribing to channels');
+                subscribeToChannels();
+                
+                // Also update unread counts when returning to the app
+                if (selectedUserId) {
+                    updateContactUnreadCount(selectedUserId, null);
+                }
+                updateNavigationUnreadCount();
+            });
+            
+            // Periodic connection check every 2 minutes
+            setInterval(function() {
+                if (document.visibilityState === 'visible') {
+                    console.log('Performing periodic mobile connection check');
+                    subscribeToChannels();
+                }
+            }, 120000); // 2 minutes
+        }
+    }
+    
     if (selectedUserId) {
         // Mark messages as read when conversation is opened
         markMessagesAsRead(selectedUserId);
@@ -464,6 +546,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Set up mobile enhancements
+    setupMobileMessagingEnhancements();
+    
     // Handle form submission
     const messageForm = document.getElementById('message-form');
     if (messageForm) {
@@ -476,7 +561,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (message && receiverId) {
                 // Send message via AJAX
-                fetch('{{ route("user.messages.send") }}', {
+                let sendRoute;
+                if ("{{ Auth::user()->role }}" === "vet") {
+                    sendRoute = "{{ route('vet.messages.send') }}";
+                } else {
+                    sendRoute = "{{ route('user.messages.send') }}";
+                }
+                
+                fetch(sendRoute, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -507,10 +599,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                     messageDiv.className = `mb-3 ${msg.sender_id == {{ Auth::id() }} ? 'text-end' : 'text-start'} message`;
                                     messageDiv.setAttribute('data-message-id', msg.id);
 
+                                    const bgColorClass = msg.sender_id == {{ Auth::id() }} ?
+                                        ("{{ Auth::user()->role }}" === "vet" ? 'bg-vet-green text-white' : 'bg-purple text-white') :
+                                        'bg-light';
+
                                     const messageContent = document.createElement('div');
-                                    messageContent.className = msg.sender_id == {{ Auth::id() }} ?
-                                        'd-inline-block p-3 rounded-3 shadow-sm bg-purple text-white' :  // Fixed: Changed from bg-primary to bg-purple
-                                        'd-inline-block p-3 rounded-3 shadow-sm bg-light';
+                                    messageContent.className = `d-inline-block p-3 rounded-3 shadow-sm ${bgColorClass}`;
                                     messageContent.style.maxWidth = '80%';
                                     messageContent.style.wordWrap = 'break-word';
 

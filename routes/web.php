@@ -193,8 +193,10 @@ Route::middleware(['auth'])->group(function () {
     // User Messages Routes
     Route::get('/user/messages', [ChatController::class, 'index'])->name('user.messages.index');
     Route::post('/user/messages/send', [ChatController::class, 'send'])->name('user.messages.send');
+    Route::get('/user/messages/fetch', [ChatController::class, 'fetchMessages'])->name('user.messages.fetch');
     Route::get('/user/messages/unread-count', [ChatController::class, 'getUnreadCount'])->name('user.messages.unread-count');
     Route::post('/user/messages/mark-as-read', [ChatController::class, 'markAsRead'])->name('user.messages.mark-as-read');
+    Route::get('/user/messages/contact-unread-count', [ChatController::class, 'getContactUnreadCount'])->name('user.messages.contact-unread-count');
     
     // Map Routes
     Route::get('/view-map', [ViewMapController::class, 'index'])->name('view.map');

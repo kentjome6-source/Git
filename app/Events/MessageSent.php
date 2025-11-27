@@ -36,8 +36,11 @@ class MessageSent implements ShouldBroadcast
         $minUserId = min($this->chatMessage->sender_id, $this->chatMessage->receiver_id);
         $maxUserId = max($this->chatMessage->sender_id, $this->chatMessage->receiver_id);
         
+        // Broadcast to both the chat channel and individual user channels
         return [
             new PrivateChannel('chat.' . $minUserId . '.' . $maxUserId),
+            new PrivateChannel('users.' . $this->chatMessage->sender_id),
+            new PrivateChannel('users.' . $this->chatMessage->receiver_id),
         ];
     }
 
