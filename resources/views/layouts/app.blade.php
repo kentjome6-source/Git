@@ -371,8 +371,14 @@
                     <i class="fas fa-envelope menu-icon" aria-hidden="true"></i>
                     <span class="menu-text">Messages</span>
                     @php
-                        // For users, count messages from other users and vets
-                        $validSenderIds = App\Models\User::whereIn('role', ['user', 'vet'])->legitimate()->pluck('id');
+                        // For users, count messages from other users and verified vets
+                        $validSenderIds = App\Models\User::where(function($query) {
+                            $query->where('role', 'user')
+                                  ->orWhere(function($subQuery) {
+                                      $subQuery->where('role', 'vet')
+                                               ->where('is_verified_vet', true);
+                                  });
+                        })->legitimate()->pluck('id');
                         $unreadCount = Auth::check() ? App\Models\ChatMessage::where('receiver_id', Auth::id())
                             ->whereIn('sender_id', $validSenderIds)
                             ->where('is_read', false)

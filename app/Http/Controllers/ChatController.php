@@ -20,8 +20,16 @@ class ChatController extends Controller
     {
         // Get all legitimate users except the current user and admins
         // Filter out test/sample accounts using the legitimate scope
+        // For users, show both other users and verified veterinarians
         $users = User::where('id', '!=', Auth::id())
                     ->where('role', '!=', 'admin')
+                    ->where(function($query) {
+                        $query->where('role', 'user')
+                              ->orWhere(function($subQuery) {
+                                  $subQuery->where('role', 'vet')
+                                           ->where('is_verified_vet', true);
+                              });
+                    })
                     ->legitimate()
                     ->get();
         
@@ -117,9 +125,10 @@ class ChatController extends Controller
         $receiver = User::find($request->receiver_id);
         $sender = Auth::user();
         
-        // Regular users can message other users or vets
-        if ($sender->role === 'user' && !in_array($receiver->role, ['user', 'vet'])) {
-            return response()->json(['success' => false, 'message' => 'Users can only message other users or veterinary staff'], 403);
+        // Regular users can message other users or verified vets
+        if ($sender->role === 'user' && !in_array($receiver->role, ['user', 'vet']) || 
+            ($sender->role === 'user' && $receiver->role === 'vet' && !$receiver->is_verified_vet)) {
+            return response()->json(['success' => false, 'message' => 'Users can only message other users or verified veterinary staff'], 403);
         }
         
         // Vets can only message regular users
@@ -176,8 +185,9 @@ class ChatController extends Controller
         $user = User::find($request->user_id);
         $sender = Auth::user();
         
-        // Regular users can fetch messages with other users or vets
-        if ($sender->role === 'user' && !in_array($user->role, ['user', 'vet'])) {
+        // Regular users can fetch messages with other users or verified vets
+        if ($sender->role === 'user' && !in_array($user->role, ['user', 'vet']) || 
+            ($sender->role === 'user' && $user->role === 'vet' && !$user->is_verified_vet)) {
             return response()->json(['messages' => []]);
         }
         
@@ -223,8 +233,15 @@ class ChatController extends Controller
                 ->where('is_read', false)
                 ->count();
         } elseif ($currentUser->role === 'user') {
-            // For users, count messages from other users and vets
-            $validSenderIds = User::whereIn('role', ['user', 'vet'])->legitimate()->pluck('id');
+            // For users, count messages from other users and verified vets
+            $validSenderIds = User::where(function($query) {
+                $query->where('role', 'user')
+                      ->orWhere(function($subQuery) {
+                          $subQuery->where('role', 'vet')
+                                   ->where('is_verified_vet', true);
+                      });
+            })->legitimate()->pluck('id');
+            
             $unreadCount = ChatMessage::where('receiver_id', Auth::id())
                 ->whereIn('sender_id', $validSenderIds)
                 ->where('is_read', false)

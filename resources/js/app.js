@@ -1,5 +1,6 @@
 import './bootstrap';
 import SharedMap from './shared-map';
+import './messaging';
 
 // Make SharedMap available globally
 window.SharedMap = SharedMap;
