@@ -113,7 +113,7 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
         'destroy' => 'admin.adoptions.destroy',
     ]);
     
-    // Admin Lost & Found Management
+    // Admin Lost & Found Records
     Route::resource('admin/lost-found', AdminLostFoundController::class)->names([
         'index' => 'admin.lost-found.index',
         'create' => 'admin.lost-found.create',

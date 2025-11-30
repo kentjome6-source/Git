@@ -374,7 +374,7 @@
                 <div class="menu-item">
                     <a href="{{ route('admin.lost-found.index') }}" class="menu-link {{ request()->routeIs('admin.lost-found.*') ? 'active' : '' }}">
                         <i class="fas fa-search-location menu-icon" aria-hidden="true"></i>
-                        <span class="menu-text">Lost & Found Management</span>
+                        <span class="menu-text">Lost & Found Records</span>
                     </a>
                 </div>
                 <div class="menu-item">

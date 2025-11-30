@@ -280,7 +280,7 @@
 
 @section('content')
 <a href="{{ route('admin.lost-found.index') }}" class="back-link">
-    <i class="fas fa-arrow-left"></i> Back to Lost & Found Management
+    <i class="fas fa-arrow-left"></i> Back to Lost & Found Records
 </a>
 
 <div class="admin-header">

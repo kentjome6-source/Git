@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Lost & Found Management')
+@section('title', 'Lost & Found Records')
 
 @section('styles')
 <style>
@@ -346,8 +346,8 @@
 
 @section('content')
     <div class="admin-header">
-        <h1 class="admin-title">Lost & Found Management</h1>
-        <p class="admin-subtitle">Manage lost and found pet listings</p>
+        <h1 class="admin-title">Lost & Found Records</h1>
+        <p class="admin-subtitle">View lost and found pet listings</p>
     </div>
 
     @if(session('success'))

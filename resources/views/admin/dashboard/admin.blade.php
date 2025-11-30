@@ -137,8 +137,8 @@
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">Lost & Found</h5>
-                            <p class="card-text">Manage lost and found pet listings.</p>
-                            <a href="{{ route('admin.lost-found.index') }}" class="btn btn-primary mt-auto">Manage Listings</a>
+                            <p class="card-text">View lost and found pet listings.</p>
+                            <a href="{{ route('admin.lost-found.index') }}" class="btn btn-primary mt-auto">View Records</a>
                         </div>
                     </div>
                 </div>
