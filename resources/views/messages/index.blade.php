@@ -393,43 +393,63 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to add a message to the chat display
     function addMessageToChat(data) {
-        // Check if message already exists to prevent duplicates
-        const existingMessage = document.querySelector(`.message[data-message-id="${data.id}"]`);
-        if (existingMessage) {
-            return; // Message already exists, don't add it again
-        }
-        
-        const messageContainer = document.getElementById('message-container');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `mb-3 ${data.sender_id == {{ Auth::id() }} ? 'text-end' : 'text-start'} message`;
-        messageDiv.setAttribute('data-message-id', data.id);
-        
-        const bgColorClass = data.sender_id == {{ Auth::id() }} ? 
-            ("{{ Auth::user()->role }}" === "vet" ? 'bg-vet-green text-white' : 'bg-purple text-white') : 
-            'bg-light';
-        
-        const messageContent = document.createElement('div');
-        messageContent.className = `d-inline-block p-3 rounded-3 shadow-sm ${bgColorClass}`;
-        messageContent.style.maxWidth = '80%';
-        messageContent.style.wordWrap = 'break-word';
-        
-        // Format the timestamp from server data
-        const timestamp = formatTimestamp(data.created_at);
-        
-        messageContent.innerHTML = `
-            ${data.message}
-            <div class="small mt-1">
-                <em>${timestamp}</em>
-            </div>
-        `;
-        
-        messageDiv.appendChild(messageContent);
-        messageContainer.appendChild(messageDiv);
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-        
-        // If this is a new message from the selected user, mark it as read
-        if (data.sender_id == selectedUserId) {
-            markMessagesAsRead(selectedUserId);
+        try {
+            // Check if message already exists to prevent duplicates
+            const existingMessage = document.querySelector(`.message[data-message-id="${data.id}"]`);
+            if (existingMessage) {
+                return; // Message already exists, don't add it again
+            }
+            
+            const messageContainer = document.getElementById('message-container');
+            if (!messageContainer) {
+                console.warn('Message container not found');
+                return;
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `mb-3 ${data.sender_id == {{ Auth::id() }} ? 'text-end' : 'text-start'} message`;
+            messageDiv.setAttribute('data-message-id', data.id);
+            
+            const bgColorClass = data.sender_id == {{ Auth::id() }} ? 
+                ("{{ Auth::user()->role }}" === "vet" ? 'bg-vet-green text-white' : 'bg-purple text-white') : 
+                'bg-light';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = `d-inline-block p-3 rounded-3 shadow-sm ${bgColorClass}`;
+            messageContent.style.maxWidth = '80%';
+            messageContent.style.wordWrap = 'break-word';
+            
+            // Format the timestamp from server data
+            const timestamp = formatTimestamp(data.created_at);
+            
+            messageContent.innerHTML = `
+                ${data.message}
+                <div class="small mt-1">
+                    <em>${timestamp}</em>
+                </div>
+            `;
+            
+            messageDiv.appendChild(messageContent);
+            messageContainer.appendChild(messageDiv);
+            
+            // Force scroll to bottom with a small delay to ensure DOM is updated
+            setTimeout(() => {
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }, 100);
+            
+            // If this is a new message from the selected user, mark it as read
+            if (data.sender_id == selectedUserId) {
+                // Small delay to ensure the message is rendered before marking as read
+                setTimeout(() => {
+                    markMessagesAsRead(selectedUserId);
+                }, 500);
+            }
+            
+            // Trigger a custom event for mobile devices to ensure UI updates
+            const event = new CustomEvent('messageAdded', { detail: data });
+            document.dispatchEvent(event);
+        } catch (error) {
+            console.error('Error adding message to chat:', error);
         }
     }
     
@@ -503,13 +523,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateNavigationUnreadCount();
             });
             
-            // Periodic connection check every 2 minutes
+            // Handle mobile app going to background/foreground with more robust approach
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible') {
+                    console.log('Mobile app became visible, resubscribing to channels');
+                    // Small delay to ensure DOM is ready
+                    setTimeout(() => {
+                        subscribeToChannels();
+                        
+                        // Also update unread counts when returning to the app
+                        if (selectedUserId) {
+                            updateContactUnreadCount(selectedUserId, null);
+                        }
+                        updateNavigationUnreadCount();
+                    }, 500);
+                }
+            });
+            
+            // Periodic connection check every 1 minute (more frequent for mobile)
             setInterval(function() {
                 if (document.visibilityState === 'visible') {
                     console.log('Performing periodic mobile connection check');
                     subscribeToChannels();
                 }
-            }, 120000); // 2 minutes
+            }, 60000); // 1 minute
+            
+            // Additional handling for mobile page lifecycle
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    console.log('Mobile page restored from cache, resubscribing to channels');
+                    setTimeout(() => {
+                        subscribeToChannels();
+                        
+                        // Also update unread counts
+                        if (selectedUserId) {
+                            updateContactUnreadCount(selectedUserId, null);
+                        }
+                        updateNavigationUnreadCount();
+                    }, 500);
+                }
+            });
         }
     }
     
@@ -548,6 +601,25 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up mobile enhancements
     setupMobileMessagingEnhancements();
+    
+    // Mobile-specific event listener for message updates
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+        document.addEventListener('messageAdded', function(event) {
+            console.log('Mobile: Message added event received', event.detail);
+            // Ensure UI updates on mobile devices
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                // Force reflow to ensure mobile browsers update the UI
+                messageContainer.style.display = 'block';
+                
+                // Scroll to bottom again after a short delay
+                setTimeout(() => {
+                    messageContainer.scrollTop = messageContainer.scrollHeight;
+                }, 200);
+            }
+        });
+    }
     
     // Handle form submission
     const messageForm = document.getElementById('message-form');

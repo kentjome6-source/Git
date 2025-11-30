@@ -2,6 +2,62 @@
 window.Messaging = (function() {
     'use strict';
     
+    // Add mobile-specific event listeners
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+        document.addEventListener('mobileMessageAdded', function(event) {
+            console.log('Mobile message added:', event.detail);
+            // Ensure UI is updated on mobile devices
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                // Force repaint on mobile
+                messageContainer.style.transform = 'translateZ(0)';
+                setTimeout(() => {
+                    messageContainer.style.transform = '';
+                }, 50);
+            }
+        });
+        
+        document.addEventListener('mobileMessageReceived', function(event) {
+            console.log('Mobile message received:', event.detail);
+            // Ensure UI is updated on mobile devices
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                // Force repaint on mobile
+                messageContainer.style.transform = 'translateZ(0)';
+                setTimeout(() => {
+                    messageContainer.style.transform = '';
+                }, 100);
+            }
+        });
+        
+        document.addEventListener('mobileUnreadCountUpdated', function(event) {
+            console.log('Mobile unread count updated:', event.detail);
+            // Ensure UI is updated on mobile devices
+            const unreadCountElement = document.getElementById('unread-message-count');
+            if (unreadCountElement) {
+                // Force repaint on mobile
+                unreadCountElement.style.transform = 'translateZ(0)';
+                setTimeout(() => {
+                    unreadCountElement.style.transform = '';
+                }, 100);
+            }
+        });
+        
+        document.addEventListener('mobileChatMessageReceived', function(event) {
+            console.log('Mobile chat message received:', event.detail);
+            // Ensure UI is updated on mobile devices
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                // Force repaint on mobile
+                messageContainer.style.transform = 'translateZ(0)';
+                setTimeout(() => {
+                    messageContainer.style.transform = '';
+                }, 100);
+            }
+        });
+    }
+    
     // Format timestamp for messages
     function formatTimestamp(timestamp) {
         try {
@@ -65,12 +121,32 @@ window.Messaging = (function() {
             messageDiv.appendChild(messageContent);
             messageContainer.appendChild(messageDiv);
             
-            // Scroll to bottom
-            messageContainer.scrollTop = messageContainer.scrollHeight;
+            // Scroll to bottom with enhanced mobile support
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile) {
+                // On mobile, use a small delay to ensure DOM is updated before scrolling
+                setTimeout(() => {
+                    messageContainer.scrollTop = messageContainer.scrollHeight;
+                    
+                    // Force a reflow to ensure mobile browsers update the UI
+                    messageContainer.style.overflow = 'hidden';
+                    void messageContainer.offsetWidth; // Trigger reflow
+                    messageContainer.style.overflow = 'auto';
+                }, 150);
+            } else {
+                // Desktop behavior
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
             
             // Update unread count for the sender if they're not the current user
             if (!isCurrentUser && data.sender_id != selectedUserId) {
                 updateContactUnreadCount(data.sender_id, null);
+            }
+            
+            // Dispatch a custom event for mobile devices
+            if (isMobile) {
+                const event = new CustomEvent('mobileMessageAdded', { detail: { data, selectedUserId } });
+                document.dispatchEvent(event);
             }
         } catch (error) {
             console.error('Error adding message to chat:', error);
@@ -258,6 +334,16 @@ window.Messaging = (function() {
                 if (selectedUserId && (data.sender_id == selectedUserId || data.receiver_id == selectedUserId)) {
                     // We're in the right conversation, add the message to the chat
                     addMessageToChat(data, selectedUserId);
+                    
+                    // Mobile-specific handling
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    if (isMobile) {
+                        // Ensure the UI updates on mobile devices
+                        setTimeout(() => {
+                            const event = new CustomEvent('mobileMessageReceived', { detail: data });
+                            document.dispatchEvent(event);
+                        }, 100);
+                    }
                 } else {
                     // Not in the conversation, just update the unread counts
                     updateContactUnreadCount(data.sender_id, null);
@@ -274,6 +360,16 @@ window.Messaging = (function() {
                 // If we're viewing a conversation with this user, update that count too
                 if (selectedUserId && data.userId == selectedUserId) {
                     updateContactUnreadCount(selectedUserId, data.unread_count);
+                }
+                
+                // Mobile-specific handling
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                if (isMobile) {
+                    // Ensure the UI updates on mobile devices
+                    setTimeout(() => {
+                        const event = new CustomEvent('mobileUnreadCountUpdated', { detail: data });
+                        document.dispatchEvent(event);
+                    }, 100);
                 }
             });
         } catch (error) {
@@ -292,6 +388,16 @@ window.Messaging = (function() {
                 // Add message to chat if it's from the selected user
                 if (selectedUserId && (data.sender_id == selectedUserId || data.receiver_id == selectedUserId)) {
                     addMessageToChat(data, selectedUserId);
+                    
+                    // Mobile-specific handling
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    if (isMobile) {
+                        // Ensure the UI updates on mobile devices
+                        setTimeout(() => {
+                            const event = new CustomEvent('mobileChatMessageReceived', { detail: data });
+                            document.dispatchEvent(event);
+                        }, 100);
+                    }
                 } else {
                     // Update unread count for the sender if they're not the selected user
                     updateContactUnreadCount(data.sender_id, null);

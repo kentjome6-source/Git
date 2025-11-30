@@ -4,20 +4,28 @@ import Pusher from 'pusher-js';
 // Attach Pusher to the window object for global access
 window.Pusher = Pusher;
 
-// Configure Pusher for desktop
+// Configure Pusher with enhanced mobile support
 window.Pusher.prototype.originalConnection = window.Pusher.prototype.connect;
 window.Pusher.prototype.connect = function(options) {
-    // Simplified connection handling for desktop
-    const desktopOptions = {
+    // Enhanced connection handling for both desktop and mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    const enhancedOptions = {
         ...options,
         enabledTransports: ['ws', 'wss'],
-        activityTimeout: 30000, // 30 seconds
-        pongTimeout: 15000, // 15 seconds
-        maxReconnectionAttempts: 5,
-        reconnectInterval: 1000 // 1 second
+        activityTimeout: isMobile ? 20000 : 30000, // Shorter timeout for mobile
+        pongTimeout: isMobile ? 10000 : 15000, // Shorter pong timeout for mobile
+        maxReconnectionAttempts: 10, // More attempts for mobile
+        reconnectInterval: 1000, // Consistent reconnect interval
+        // Mobile-specific options
+        ...(isMobile && {
+            disableStats: true,
+            forceTLS: true,
+            encrypted: true
+        })
     };
     
-    return this.originalConnection(desktopOptions);
+    return this.originalConnection(enhancedOptions);
 };
 
 // Initialize Laravel Echo with Pusher configuration
@@ -177,7 +185,7 @@ function setupMobileConnectionHandling() {
     if (isMobile) {
         console.log('Setting up mobile-specific connection handling');
         
-        // Force reconnection every 2 minutes to prevent mobile connection issues
+        // More frequent connection checks for mobile (every 60 seconds)
         setInterval(function() {
             if (window.Echo && window.Echo.connector && window.Echo.connector.pusher) {
                 const state = window.Echo.connector.pusher.connection.state;
@@ -189,7 +197,7 @@ function setupMobileConnectionHandling() {
                     window.Echo.connector.pusher.connect();
                 }
             }
-        }, 120000); // 2 minutes
+        }, 60000); // 1 minute (more frequent than before)
         
         // Additional handling for mobile page lifecycle events
         let hiddenTime = null;
@@ -204,11 +212,13 @@ function setupMobileConnectionHandling() {
                     const timeHidden = Date.now() - hiddenTime;
                     console.log('Page was hidden for', timeHidden, 'ms');
                     
-                    // If page was hidden for more than 15 seconds, force reconnection
-                    if (timeHidden > 15000) {
-                        console.log('Page was hidden for >15s, forcing reconnection');
+                    // If page was hidden for more than 5 seconds, force reconnection (shorter threshold for mobile)
+                    if (timeHidden > 5000) {
+                        console.log('Page was hidden for >5s, forcing reconnection');
                         if (window.Echo && window.Echo.connector && window.Echo.connector.pusher) {
                             window.Echo.connector.pusher.connect();
+                            // Also resubscribe to channels
+                            window.resubscribeToChannels();
                         }
                     }
                 }
@@ -220,9 +230,23 @@ function setupMobileConnectionHandling() {
             console.log('Window focused, checking connection');
             if (window.Echo && window.Echo.connector && window.Echo.connector.pusher) {
                 const state = window.Echo.connector.pusher.connection.state;
-                if (state !== 'connected') {
-                    window.Echo.connector.pusher.connect();
-                }
+                window.Echo.connector.pusher.connect(); // Always try to connect on focus
+                // Also resubscribe to channels
+                setTimeout(() => {
+                    window.resubscribeToChannels();
+                }, 1000); // Small delay to ensure connection is established
+            }
+        });
+        
+        // Handle page resume from background
+        document.addEventListener('resume', function() {
+            console.log('App resumed, reconnecting Pusher');
+            if (window.Echo && window.Echo.connector && window.Echo.connector.pusher) {
+                window.Echo.connector.pusher.connect();
+                // Also resubscribe to channels
+                setTimeout(() => {
+                    window.resubscribeToChannels();
+                }, 1000); // Small delay to ensure connection is established
             }
         });
     }
