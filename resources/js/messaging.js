@@ -186,6 +186,9 @@ window.Messaging = (function() {
         })
         .then(data => {
             if (data.success) {
+                // Add the sent message to the chat UI immediately
+                addMessageToChat(data.message, receiverId);
+                
                 // Clear the input field after successful send
                 const messageInput = document.getElementById('message-input');
                 if (messageInput) {
@@ -408,6 +411,80 @@ window.Messaging = (function() {
         }
     }
     
+    // Initialize the messaging system
+    function initialize(selectedUserId) {
+        // Store selectedUserId for use in other functions
+        window.selectedUserId = selectedUserId;
+        
+        // Set up channel subscriptions
+        let userChannel = null;
+        let chatChannel = null;
+        
+        // Subscribe to user channel for general notifications
+        if (typeof window.subscribeUserChannel === 'function') {
+            try {
+                userChannel = window.subscribeUserChannel();
+                if (userChannel) {
+                    setupUserChannelListeners(userChannel, selectedUserId);
+                }
+            } catch (error) {
+                console.error('Error subscribing to user channel:', error);
+            }
+        }
+        
+        // Subscribe to chat channel if we have a selected user
+        if (selectedUserId && typeof window.subscribeChatChannel === 'function') {
+            try {
+                chatChannel = window.subscribeChatChannel(window.userId, selectedUserId);
+                if (chatChannel) {
+                    setupChatChannelListeners(chatChannel, selectedUserId);
+                }
+            } catch (error) {
+                console.error('Error subscribing to chat channel:', error);
+            }
+        }
+        
+        // Mark messages as read when conversation is opened
+        if (selectedUserId) {
+            markMessagesAsRead(selectedUserId);
+            
+            // Scroll to bottom of message container
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                setTimeout(() => {
+                    messageContainer.scrollTop = messageContainer.scrollHeight;
+                }, 100);
+            }
+        }
+        
+        // Set up form submission handler
+        const messageForm = document.getElementById('message-form');
+        if (messageForm) {
+            messageForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const messageInput = document.getElementById('message-input');
+                const receiverId = document.getElementById('receiver-id').value;
+                const message = messageInput.value.trim();
+                
+                if (message && receiverId) {
+                    sendMessage(receiverId, message, function(sentMessage) {
+                        // Message was sent successfully, the module handles UI updates
+                        console.log('Message sent successfully:', sentMessage);
+                    });
+                }
+            });
+        }
+        
+        // Update unread count every 30 seconds as a fallback
+        setInterval(updateNavigationUnreadCount, 30000);
+        
+        return {
+            userChannel: userChannel,
+            chatChannel: chatChannel
+        };
+    }
+    
     // Expose public methods
     return {
         formatTimestamp: formatTimestamp,
@@ -417,6 +494,7 @@ window.Messaging = (function() {
         updateNavigationUnreadCount: updateNavigationUnreadCount,
         markMessagesAsRead: markMessagesAsRead,
         setupUserChannelListeners: setupUserChannelListeners,
-        setupChatChannelListeners: setupChatChannelListeners
+        setupChatChannelListeners: setupChatChannelListeners,
+        initialize: initialize
     };
 })();
