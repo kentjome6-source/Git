@@ -2,6 +2,10 @@
 
 @section('title', 'Messages')
 
+@section('styles')
+<meta name="current-user-role" content="{{ Auth::user()->role }}">
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="row">

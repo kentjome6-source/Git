@@ -9,6 +9,10 @@ window.SharedMap = SharedMap;
 const userIdMeta = document.querySelector('meta[name="current-user-id"]');
 window.userId = userIdMeta ? userIdMeta.getAttribute('content') : null;
 
+// Get the current user role from meta tag
+const userRoleMeta = document.querySelector('meta[name="current-user-role"]');
+window.userRole = userRoleMeta ? userRoleMeta.getAttribute('content') : null;
+
 // Initialize sidebar based on screen size
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing sidebar');
