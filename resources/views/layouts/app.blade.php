@@ -366,31 +366,6 @@
                     <span class="menu-text">Lost & Found</span>
                 </a>
             </div>
-            <div class="menu-item">
-                <a href="{{ route('user.messages.index') }}" class="menu-link {{ request()->routeIs('user.messages.*') ? 'active' : '' }}" id="messages-menu-link">
-                    <i class="fas fa-envelope menu-icon" aria-hidden="true"></i>
-                    <span class="menu-text">Messages</span>
-                    @php
-                        // For users, count messages from other users and verified vets
-                        $validSenderIds = App\Models\User::where(function($query) {
-                            $query->where('role', 'user')
-                                  ->orWhere(function($subQuery) {
-                                      $subQuery->where('role', 'vet')
-                                               ->where('is_verified_vet', true);
-                                  });
-                        })->legitimate()->pluck('id');
-                        $unreadCount = Auth::check() ? App\Models\ChatMessage::where('receiver_id', Auth::id())
-                            ->whereIn('sender_id', $validSenderIds)
-                            ->where('is_read', false)
-                            ->count() : 0;
-                    @endphp
-                    @if($unreadCount > 0)
-                        <span class="badge bg-danger ms-2" id="unread-message-count">{{ $unreadCount }}</span>
-                    @else
-                        <span class="badge bg-danger ms-2" id="unread-message-count" style="display: none;">0</span>
-                    @endif
-                </a>
-            </div>
         </div>
 
         <div class="profile-section">
@@ -430,90 +405,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Helper function to update unread message count display
-    function updateUnreadMessageCount(count) {
-        const unreadCountElements = document.querySelectorAll('#unread-message-count');
-        unreadCountElements.forEach(element => {
-            if (count > 0) {
-                element.textContent = count;
-                element.style.display = 'inline-block';
-            } else {
-                element.style.display = 'none';
-            }
-        });
-    }
-    
-    // Function to fetch and update unread count
-    function fetchAndUpdateUnreadCount() {
-        // Only fetch if we're on a page that displays the count
-        const unreadCountElement = document.getElementById('unread-message-count');
-        if (unreadCountElement) {
-            fetch('{{ route("user.messages.unread-count") }}')
-                .then(response => response.json())
-                .then(data => {
-                    updateUnreadMessageCount(data.unread_count);
-                })
-                .catch(error => console.error('Error fetching unread count:', error));
-        }
-    }
-    
-    // Set up real-time updates for messages
-    function setupRealTimeMessageUpdates() {
-        // Subscribe to user's private channel for real-time notifications
-        if (window.userId && typeof window.subscribeUserChannel === 'function') {
-            console.log('Subscribing to user channel for real-time message updates:', window.userId);
-            try {
-                const userChannel = window.subscribeUserChannel();
-                if (userChannel) {
-                    // Listen for new messages
-                    userChannel.listen('.message.sent', function (data) {
-                        console.log('Received new message notification:', data);
-                        // Update the navigation unread count
-                        fetchAndUpdateUnreadCount();
-                        
-                        // Dispatch a custom event so other parts of the app can react
-                        const event = new CustomEvent('realtime-message-received', { detail: data });
-                        window.dispatchEvent(event);
-                    });
-                    
-                    // Listen for unread message count updates
-                    userChannel.listen('.unread.message.count.updated', function (data) {
-                        console.log('Received unread count update:', data);
-                        // Check if this update is for the current user
-                        if (data.userId == window.userId) {
-                            updateUnreadMessageCount(data.unread_count);
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error('Error subscribing to user channel for real-time updates:', error);
-            }
-        }
-    }
-    
-    // Mobile-specific enhancements for sidebar message count updates
-    function setupMobileSidebarEnhancements() {
-        // Check if we're on a mobile device
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        
-        if (isMobile) {
-            console.log('Setting up mobile sidebar enhancements');
-            
-            // Force update when window gains focus
-            window.addEventListener('focus', function() {
-                console.log('Mobile window focused, updating message count');
-                fetchAndUpdateUnreadCount();
-            });
-            
-            // Periodic update every 60 seconds to ensure accuracy
-            setInterval(function() {
-                if (document.visibilityState === 'visible') {
-                    fetchAndUpdateUnreadCount();
-                }
-            }, 60000); // 1 minute
-        }
-    }
-    
     document.addEventListener('DOMContentLoaded', function() {
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('sidebar');
@@ -565,17 +456,6 @@
             }
         });
         
-        // Set up real-time message updates
-        setupRealTimeMessageUpdates();
-        
-        // Set up mobile sidebar enhancements
-        setupMobileSidebarEnhancements();
-        
-        // Fetch initial unread count when page loads
-        fetchAndUpdateUnreadCount();
-        
-        // Update unread count periodically as a fallback (every 30 seconds)
-        setInterval(fetchAndUpdateUnreadCount, 30000);
     });
 </script>
 

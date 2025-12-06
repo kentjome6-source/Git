@@ -3,14 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Appointment')</title>
+    <title>@yield('title', 'PawPortal')</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @auth
         <meta name="current-user-id" content="{{ Auth::id() }}">
     @endauth
+    {{-- FontAwesome --}}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    {{-- ✅ Bootstrap CSS --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- Vite --}}
+    @vite(['resources/js/app.js'])
+
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #f4f6f8; color: #333; }
@@ -48,7 +53,7 @@
         }
         
         .sidebar-header { text-align:center; margin-bottom:30px; }
-        .sidebar-header .logo { font-size:1.8rem; font-weight:bold; color: #27ae60; }
+        .sidebar-header .logo { font-size:1.8rem; font-weight:bold; color:#5b4b9b; }
         .sidebar-header .subtitle { font-size:0.85rem; color:#888; }
 
         .menu { flex:1; }
@@ -59,8 +64,8 @@
             font-size: 0.95rem;
         }
         .menu-link:hover { background:#f0f0f0; }
-        .menu-link.active { background:#27ae60; color:#fff; }
-        .menu-icon { width:25px; text-align:center; margin-right:12px; color:#27ae60; }
+        .menu-link.active { background:#5b4b9b; color:#fff; }
+        .menu-icon { width:25px; text-align:center; margin-right:12px; color:#5b4b9b; }
         .menu-link.active .menu-icon { color:#fff; }
         .menu-text { font-weight:500; font-size:0.95rem; }
 
@@ -69,7 +74,7 @@
         .profile-info { display:flex; align-items:center; margin-bottom:15px; }
         .profile-avatar {
             width:45px; height:45px; border-radius:50%;
-            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); 
+            background: linear-gradient(135deg, #5b4b9b 0%, #6a5fac 100%); 
             color:#fff; display:flex; align-items:center; justify-content:center; 
             font-weight:bold; margin-right:12px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -83,7 +88,7 @@
             transition: all 0.2s ease;
         }
         .profile-btn.edit { 
-            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            background: linear-gradient(135deg, #5b4b9b 0%, #6a5fac 100%);
             color:#fff; 
         }
         .profile-btn.logout { 
@@ -95,7 +100,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .profile-btn.edit:hover { 
-            background: linear-gradient(135deg, #219653 0%, #27ae60 100%);
+            background: linear-gradient(135deg, #4a3d82 0%, #5b4b9b 100%);
         }
         .profile-btn.logout:hover { 
             background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
@@ -107,7 +112,7 @@
         /* Mobile Header */
         .mobile-header {
             display: none;
-            background: #27ae60;
+            background: #5b4b9b;
             color: white;
             padding: 15px 20px;
             position: fixed;
@@ -149,16 +154,16 @@
         .profile-btn:focus, 
         a:focus, 
         button:focus {
-            outline: 2px solid #27ae60;
+            outline: 2px solid #5b4b9b;
             outline-offset: 2px;
         }
-        
+
         /* Skip to main content link for screen readers */
         .skip-link {
             position: absolute;
             top: -40px;
             left: 6px;
-            background: #27ae60;
+            background: #5b4b9b;
             color: white;
             padding: 8px;
             z-index: 1000;
@@ -168,7 +173,7 @@
         .skip-link:focus {
             top: 6px;
         }
-        
+
         /* Screen reader only class */
         .sr-only {
             position: absolute;
@@ -181,7 +186,23 @@
             white-space: nowrap;
             border: 0;
         }
-        
+
+        /* Social Media Post Image */
+        .post-image-container {
+            max-height: 400px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    
+        .post-image {
+            max-height: 400px;
+            width: auto;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+    
         /* Profile picture in sidebar */
         .sidebar-profile-picture {
             width: 45px;
@@ -189,7 +210,7 @@
             border-radius: 50%;
             object-fit: cover;
             margin-right: 12px;
-            border: 2px solid #27ae60;
+            border: 2px solid #5b4b9b;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
         
@@ -268,8 +289,10 @@
             h5, .h5 { font-size: 1.1rem; }
             h6, .h6 { font-size: 1rem; }
         }
+
     </style>
-    @yield('styles')
+
+@yield('styles')
 </head>
 <body>
     <!-- Skip to main content link for accessibility -->
@@ -279,7 +302,7 @@
     <div class="mobile-header">
         <div class="logo d-flex align-items-center">
             <img src="{{ asset('images/logo/logo.png') }}" alt="PawPortal Logo" class="img-fluid" style="width: 30px; height: 30px; padding: 0; margin: 0;">
-            <span style="width: 99.94px; height: 33.59px; display: inline-block; line-height: 33.59px; padding: 0; margin: 0;">Vet Portal</span>
+            <span style="width: 99.94px; height: 33.59px; display: inline-block; line-height: 33.59px; padding: 0; margin: 0;">PawPortal</span>
         </div>
         <button class="menu-toggle" id="menu-toggle">
             <i class="fas fa-bars" style="width: 18.38px; height: 21px;"></i>
@@ -288,61 +311,109 @@
     
     <!-- Overlay for mobile -->
     <div class="overlay" id="overlay"></div>
-    
+
 <div class="dashboard-container">
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
         <div class="sidebar-header">
             <div class="logo d-flex align-items-center justify-content-center mb-2">
                 <img src="{{ asset('images/logo/logo.png') }}" alt="PawPortal Logo" class="img-fluid me-2" style="max-height: 40px; width: auto;">
-                <span class="fs-5 fw-bold">Vet Portal</span>
+                <span class="fs-5 fw-bold">PawPortal</span>
             </div>
-            <div class="subtitle text-center">For Veterinarians</div>
+            <div class="subtitle text-center">Your Pet's Digital Home</div>
         </div>
 
         <div class="menu">
             <div class="menu-item">
-                <a href="{{ route('vet.appointments') }}" class="menu-link {{ request()->routeIs('vet.appointments') || request()->routeIs('vet.appointments.show') ? 'active' : '' }}">
-                    <i class="fas fa-stethoscope menu-icon"></i>
-                    <span class="menu-text">Appointment Management</span>
+                <a href="{{ route('pet.multipet.index') }}" class="menu-link {{ request()->routeIs('pet.multipet.*') ? 'active' : '' }}">
+                    <i class="fas fa-dog menu-icon" aria-hidden="true"></i>
+                    <span class="menu-text">Multi-Pet Dashboard</span>
                 </a>
             </div>
             <div class="menu-item">
-                <a href="{{ route('vet.appointment.records') }}" class="menu-link {{ request()->routeIs('vet.appointment.records') || request()->routeIs('vet.appointment.records.show') ? 'active' : '' }}">
-                    <i class="fas fa-file-medical menu-icon"></i>
-                    <span class="menu-text">Appointment Records</span>
+                <a href="{{ route('adoptions.index') }}" class="menu-link {{ request()->routeIs('adoptions.*') ? 'active' : '' }}">
+                    <i class="fas fa-heart menu-icon" aria-hidden="true"></i>
+                    <span class="menu-text">Adoption Center</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="{{ route('view.map') }}" class="menu-link {{ request()->routeIs('view.map*') || request()->routeIs('view-map.show') ? 'active' : '' }}">
+                    <i class="fas fa-paw menu-icon" aria-hidden="true"></i>
+                    <span class="menu-text">Map</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="{{ route('social-media.index') }}" class="menu-link {{ request()->routeIs('social-media.*') ? 'active' : '' }}">
+                    <i class="fas fa-users menu-icon" aria-hidden="true"></i>
+                    <span class="menu-text">Furparent Social Media</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="{{ route('appointments.index') }}" class="menu-link {{ request()->routeIs('appointments.*') && !request()->routeIs('appointments.history') && !request()->routeIs('appointments.history.show') ? 'active' : '' }}">
+                    <i class="fas fa-stethoscope menu-icon" aria-hidden="true"></i>
+                    <span class="menu-text">Appointment</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="{{ route('appointments.history') }}" class="menu-link {{ request()->routeIs('appointments.history') || request()->routeIs('appointments.history.show') ? 'active' : '' }}">
+                    <i class="fas fa-history menu-icon" aria-hidden="true"></i>
+                    <span class="menu-text">Appointment History</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="{{ route('pet.lostfound') }}" class="menu-link {{ request()->routeIs('pet.lostfound') || request()->routeIs('lost-found.*') ? 'active' : '' }}">
+                    <i class="fas fa-search-location menu-icon" aria-hidden="true"></i>
+                    <span class="menu-text">Lost & Found</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="{{ route('user.messages.index') }}" class="menu-link {{ request()->routeIs('user.messages.*') ? 'active' : '' }}" id="messages-menu-link">
+                    <i class="fas fa-envelope menu-icon" aria-hidden="true"></i>
+                    <span class="menu-text">Messages</span>
+                    @php
+                        // For users, count messages from other users and verified vets
+                        $validSenderIds = App\Models\User::where(function($query) {
+                            $query->where('role', 'user')
+                                  ->orWhere(function($subQuery) {
+                                      $subQuery->where('role', 'vet')
+                                               ->where('is_verified_vet', true);
+                                  });
+                        })->legitimate()->pluck('id');
+                        $unreadCount = Auth::check() ? App\Models\ChatMessage::where('receiver_id', Auth::id())
+                            ->whereIn('sender_id', $validSenderIds)
+                            ->where('is_read', false)
+                            ->count() : 0;
+                    @endphp
+                    @if($unreadCount > 0)
+                        <span class="badge bg-danger ms-2" id="unread-message-count">{{ $unreadCount }}</span>
+                    @else
+                        <span class="badge bg-danger ms-2" id="unread-message-count" style="display: none;">0</span>
+                    @endif
                 </a>
             </div>
         </div>
 
-        {{-- Profile Section --}}
         <div class="profile-section">
             <div class="profile-info">
                 @if(Auth::user()->profile_picture_path)
                     <img src="{{ asset('storage/' . Auth::user()->profile_picture_path) }}" alt="Profile Picture" class="sidebar-profile-picture">
                 @else
-                    <div class="profile-avatar">
-                        @if(Auth::user()->role === 'vet')
-                            {{ 'Vet' }}
-                        @else
-                            {{ substr(Auth::user()->name,0,2) }}
-                        @endif
-                    </div>
+                    <div class="profile-avatar" aria-label="User avatar">{{ substr(Auth::user()->name,0,2) }}</div>
                 @endif
                 <div class="profile-details">
                     <h4>{{ Auth::user()->name }}</h4>
-                    <p>Veterinarian</p>
+                    <p>Pet Parent</p>
                 </div>
             </div>
 
             <div class="profile-links">
-                <a href="{{ route('vet.profile.edit') }}" class="profile-btn edit">
-                    <i class="fas fa-user-edit"></i> Profile
+                <a href="{{ route('user.profile.edit') }}" class="profile-btn edit" aria-label="Edit profile">
+                    <i class="fas fa-user-edit" aria-hidden="true"></i> Profile
                 </a>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="profile-btn logout">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+                    <button type="submit" class="profile-btn logout" aria-label="Logout">
+                        <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
                     </button>
                 </form>
             </div>
@@ -350,15 +421,99 @@
     </div>
 
     <!-- Main Content -->
-    <div class="main-content" id="main-content">
+    <div class="main-content" id="main-content" tabindex="-1">
         @yield('content')
     </div>
 </div>
 
-{{-- Bootstrap JS --}}
+{{-- ✅ Bootstrap JS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // Helper function to update unread message count display
+    function updateUnreadMessageCount(count) {
+        const unreadCountElements = document.querySelectorAll('#unread-message-count');
+        unreadCountElements.forEach(element => {
+            if (count > 0) {
+                element.textContent = count;
+                element.style.display = 'inline-block';
+            } else {
+                element.style.display = 'none';
+            }
+        });
+    }
+    
+    // Function to fetch and update unread count
+    function fetchAndUpdateUnreadCount() {
+        // Only fetch if we're on a page that displays the count
+        const unreadCountElement = document.getElementById('unread-message-count');
+        if (unreadCountElement) {
+            fetch('{{ route("user.messages.unread-count") }}')
+                .then(response => response.json())
+                .then(data => {
+                    updateUnreadMessageCount(data.unread_count);
+                })
+                .catch(error => console.error('Error fetching unread count:', error));
+        }
+    }
+    
+    // Set up real-time updates for messages
+    function setupRealTimeMessageUpdates() {
+        // Subscribe to user's private channel for real-time notifications
+        if (window.userId && typeof window.subscribeUserChannel === 'function') {
+            console.log('Subscribing to user channel for real-time message updates:', window.userId);
+            try {
+                const userChannel = window.subscribeUserChannel();
+                if (userChannel) {
+                    // Listen for new messages
+                    userChannel.listen('.message.sent', function (data) {
+                        console.log('Received new message notification:', data);
+                        // Update the navigation unread count
+                        fetchAndUpdateUnreadCount();
+                        
+                        // Dispatch a custom event so other parts of the app can react
+                        const event = new CustomEvent('realtime-message-received', { detail: data });
+                        window.dispatchEvent(event);
+                    });
+                    
+                    // Listen for unread message count updates
+                    userChannel.listen('.unread.message.count.updated', function (data) {
+                        console.log('Received unread count update:', data);
+                        // Check if this update is for the current user
+                        if (data.userId == window.userId) {
+                            updateUnreadMessageCount(data.unread_count);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error subscribing to user channel for real-time updates:', error);
+            }
+        }
+    }
+    
+    // Mobile-specific enhancements for sidebar message count updates
+    function setupMobileSidebarEnhancements() {
+        // Check if we're on a mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            console.log('Setting up mobile sidebar enhancements');
+            
+            // Force update when window gains focus
+            window.addEventListener('focus', function() {
+                console.log('Mobile window focused, updating message count');
+                fetchAndUpdateUnreadCount();
+            });
+            
+            // Periodic update every 60 seconds to ensure accuracy
+            setInterval(function() {
+                if (document.visibilityState === 'visible') {
+                    fetchAndUpdateUnreadCount();
+                }
+            }, 60000); // 1 minute
+        }
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
         const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('sidebar');
@@ -410,6 +565,17 @@
             }
         });
         
+        // Set up real-time message updates
+        setupRealTimeMessageUpdates();
+        
+        // Set up mobile sidebar enhancements
+        setupMobileSidebarEnhancements();
+        
+        // Fetch initial unread count when page loads
+        fetchAndUpdateUnreadCount();
+        
+        // Update unread count periodically as a fallback (every 30 seconds)
+        setInterval(fetchAndUpdateUnreadCount, 30000);
     });
 </script>
 

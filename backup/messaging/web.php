@@ -10,6 +10,7 @@ use App\Http\Controllers\AdoptionController as UserAdoptionController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PetController;
@@ -52,6 +53,14 @@ Route::prefix('vet')->name('vet.')->middleware(['can:isVet', 'vet.verified'])->g
     Route::post('/appointments/{appointment}/accept', [AppointmentController::class, 'accept'])->name('appointments.accept');
     Route::post('/appointments/{appointment}/reject', [AppointmentController::class, 'reject'])->name('appointments.reject');
     Route::put('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.status.update');
+    
+    // Chat Routes for Vets
+    Route::get('messages', [ChatController::class, 'vetIndex'])->name('messages.index');
+    Route::post('/messages/send', [ChatController::class, 'send'])->name('messages.send');
+    Route::get('/messages/fetch', [ChatController::class, 'fetchMessages'])->name('messages.fetch');
+    Route::get('/messages/unread-count', [ChatController::class, 'getUnreadCount'])->name('messages.unread-count');
+    Route::post('/messages/mark-as-read', [ChatController::class, 'markAsRead'])->name('messages.mark-as-read');
+    Route::get('/messages/contact-unread-count', [ChatController::class, 'getContactUnreadCount'])->name('messages.contact-unread-count');
     
     // Vet Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -178,6 +187,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('social-media/my-posts', [PostController::class, 'myPosts'])->name('social-media.my-posts');
     Route::post('social-media/{post}/comments', [CommentController::class, 'store'])->name('comments.store')->where('post', '[0-9]+');
     Route::post('social-media/{post}/toggle-like', [PostController::class, 'toggleLike'])->name('social-media.toggle-like')->where('post', '[0-9]+');
+    
+    // Chat Routes
+    Route::get('/messages', [ChatController::class, 'index'])->name('messages.index');
+    // User Messages Routes
+    Route::get('/user/messages', [ChatController::class, 'index'])->name('user.messages.index');
+    Route::post('/user/messages/send', [ChatController::class, 'send'])->name('user.messages.send');
+    Route::get('/user/messages/fetch', [ChatController::class, 'fetchMessages'])->name('user.messages.fetch');
+    Route::get('/user/messages/unread-count', [ChatController::class, 'getUnreadCount'])->name('user.messages.unread-count');
+    Route::post('/user/messages/mark-as-read', [ChatController::class, 'markAsRead'])->name('user.messages.mark-as-read');
+    Route::get('/user/messages/contact-unread-count', [ChatController::class, 'getContactUnreadCount'])->name('user.messages.contact-unread-count');
     
     // Map Routes
     Route::get('/view-map', [ViewMapController::class, 'index'])->name('view.map');
