@@ -201,6 +201,59 @@ class AdoptionController extends Controller
     }
 
     /**
+     * Show the form for editing the specified adoption listing.
+     */
+    public function edit(Adoption $adoption)
+    {
+        // Check if the current user is the owner of the adoption post
+        if ($adoption->user_id != Auth::id()) {
+            return redirect()->back()->with('error', 'You are not authorized to edit this adoption post.');
+        }
+        
+        return view('user.adoptions.edit', compact('adoption'));
+    }
+
+    /**
+     * Update the specified adoption listing in storage.
+     */
+    public function update(Request $request, Adoption $adoption)
+    {
+        // Check if the current user is the owner of the adoption post
+        if ($adoption->user_id != Auth::id()) {
+            return redirect()->back()->with('error', 'You are not authorized to update this adoption post.');
+        }
+        
+        $request->validate([
+            'pet_name' => 'required|string|max:255',
+            'breed' => 'nullable|string|max:255',
+            'age' => 'nullable|integer|min:0',
+            'gender' => 'nullable|string|in:male,female',
+            'description' => 'nullable|string|max:1000',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if it exists
+            if ($adoption->image_path) {
+                Storage::disk('public')->delete($adoption->image_path);
+            }
+            
+            $imagePath = $request->file('image')->store('adoption-images', 'public');
+            $adoption->image_path = $imagePath;
+        }
+
+        $adoption->pet_name = $request->pet_name;
+        $adoption->breed = $request->breed;
+        $adoption->age = $request->age;
+        $adoption->gender = $request->gender;
+        $adoption->description = $request->description;
+        $adoption->save();
+
+        return redirect()->route('adoptions.show', $adoption)->with('success', 'Adoption post updated successfully!');
+    }
+
+    /**
      * Display adoption history for the authenticated user.
      */
     public function history()
@@ -227,27 +280,23 @@ class AdoptionController extends Controller
     }
 
     /**
-     * Remove the adoption listing from storage.
+     * Remove the specified adoption post from storage.
      */
     public function destroy(Adoption $adoption)
     {
-        // Ensure the adoption listing belongs to the authenticated user
-        if ($adoption->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized access to adoption listing.');
+        // Check if the current user is the owner of the adoption post
+        if ($adoption->user_id != Auth::id()) {
+            return redirect()->back()->with('error', 'You are not authorized to delete this adoption post.');
         }
         
-        // Check if the pet has already been adopted
-        if ($adoption->is_adopted) {
-            return redirect()->back()->with('error', 'Cannot remove adoption listing for an already adopted pet.');
+        // Check if there are any pending or approved adoption requests
+        if ($adoption->adoptionRequests()->whereIn('status', ['pending', 'approved'])->exists()) {
+            return redirect()->back()->with('error', 'Cannot delete adoption post with pending or approved requests.');
         }
-
-        // Delete image if it exists
-        if ($adoption->image_path) {
-            Storage::disk('public')->delete($adoption->image_path);
-        }
-
+        
+        // Delete the adoption post
         $adoption->delete();
-
-        return redirect()->route('adoptions.index')->with('success', 'Adoption listing removed successfully!');
+        
+        return redirect()->route('adoptions.index')->with('success', 'Adoption post deleted successfully!');
     }
 }

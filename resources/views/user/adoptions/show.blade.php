@@ -83,55 +83,29 @@
                     <!-- Action Buttons at Bottom -->
                     @if(!$adoption->is_adopted)
                         @if($adoption->user_id == auth()->id())
-                            <!-- Pet owner actions -->
-                            @if($adoption->hasPendingRequest())
-                                <!-- Display adopter information -->
-                                @php
-                                    $pendingRequest = $adoption->pendingRequest();
-                                @endphp
-                                @if($pendingRequest && $pendingRequest->adopter)
-                                <div class="alert alert-info mt-3" role="alert">
-                                    <strong>Pending Adoption Request:</strong> 
-                                    {{ $pendingRequest->adopter->name }} ({{ $pendingRequest->adopter->email }}) has requested to adopt this pet.
-                                    <br>
-                                    <small>Requested on: {{ $pendingRequest->requested_at->format('M d, Y h:i A') }}</small>
-                                </div>
-                                @endif
-                                
-                                <div class="d-flex gap-2 flex-wrap mt-3 adoption-detail-buttons">
-                                    <form action="{{ route('adoptions.approve', $adoption) }}" method="POST" class="d-inline">
+                            <div class="mt-3">
+                                <div class="d-flex gap-2 flex-wrap adoption-detail-buttons">
+                                    <!-- Edit button -->
+                                    <a href="{{ route('adoptions.edit', $adoption) }}" class="btn btn-warning edit-btn" role="button" aria-label="Edit adoption post for {{ $adoption->pet_name }}">
+                                        <i class="fas fa-edit me-2" aria-hidden="true"></i>Edit
+                                    </a>
+                                    
+                                    <!-- Delete button -->
+                                    <form action="{{ route('adoptions.destroy', $adoption) }}" method="POST" class="d-inline">
                                         @csrf
-                                        <button type="submit" class="btn btn-success btn-lg approve-btn" 
-                                                onclick="return confirm('Are you sure you want to approve the adoption request for {{ $adoption->pet_name }}?')"
-                                                aria-label="Approve adoption request for {{ $adoption->pet_name }}">
-                                            <i class="fas fa-check me-2" aria-hidden="true"></i>Approve Request
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger delete-btn" 
+                                                onclick="return confirm('Are you sure you want to delete the adoption post for {{ $adoption->pet_name }}? This action cannot be undone.')"
+                                                aria-label="Delete adoption post for {{ $adoption->pet_name }}">
+                                            <i class="fas fa-trash me-2" aria-hidden="true"></i>Delete
                                         </button>
                                     </form>
-                                    <form action="{{ route('adoptions.reject', $adoption) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-danger btn-lg reject-btn" 
-                                                onclick="return confirm('Are you sure you want to reject the adoption request for {{ $adoption->pet_name }}?')"
-                                                aria-label="Reject adoption request for {{ $adoption->pet_name }}">
-                                            <i class="fas fa-times me-2" aria-hidden="true"></i>Reject Request
-                                        </button>
-                                    </form>
-                                    <a href="{{ route('adoptions.index') }}" class="btn btn-secondary btn-lg ms-auto back-btn" role="button" aria-label="Back to Adoptions">
+                                    
+                                    <a href="{{ route('adoptions.index') }}" class="btn btn-secondary ms-auto back-btn" role="button" aria-label="Back to Adoptions">
                                         Back to Adoptions
                                     </a>
                                 </div>
-                            @elseif($adoption->hasApprovedRequest())
-                                <div class="alert alert-success mt-3" role="alert">
-                                    <i class="fas fa-check-circle me-1"></i>
-                                    This pet has been approved for adoption.
-                                </div>
-                                <div class="mt-3">
-                                    <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">Back to Adoptions</a>
-                                </div>
-                            @else
-                                <div class="mt-3">
-                                    <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">Back to Adoptions</a>
-                                </div>
-                            @endif
+                            </div>
                         @elseif($adoption->hasPendingRequest() && $adoption->pendingRequest()->adopter_id == auth()->id())
                             <!-- Adopter actions for pending request -->
                             <div class="mt-3">
@@ -142,13 +116,13 @@
                             <div class="d-flex gap-2 flex-wrap mt-3 adoption-detail-buttons">
                                 <form action="{{ route('adoptions.complete', $adoption) }}" method="POST" class="d-inline">
                                     @csrf
-                                    <button type="submit" class="btn btn-success btn-lg adopt-btn" 
+                                    <button type="submit" class="btn btn-success adopt-btn" 
                                             onclick="return confirm('Are you sure you want to complete the adoption of {{ $adoption->pet_name }}?')"
                                             aria-label="Complete adoption of {{ $adoption->pet_name }}">
                                         <i class="fas fa-paw me-2" aria-hidden="true"></i>Complete Adoption
                                     </button>
                                 </form>
-                                <a href="{{ route('adoptions.index') }}" class="btn btn-secondary btn-lg back-btn" role="button" aria-label="Back to Adoptions">
+                                <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">
                                     Back to Adoptions
                                 </a>
                             </div>
@@ -165,13 +139,13 @@
                             <div class="d-flex gap-2 flex-wrap mt-3 adoption-detail-buttons">
                                 <form action="{{ route('adoptions.adopt', $adoption) }}" method="POST" class="d-inline">
                                     @csrf
-                                    <button type="submit" class="btn btn-success btn-lg adopt-btn" 
+                                    <button type="submit" class="btn btn-success adopt-btn" 
                                             onclick="return confirm('Are you sure you want to re-request adoption of {{ $adoption->pet_name }}?')"
                                             aria-label="Re-request adoption of {{ $adoption->pet_name }}">
                                         <i class="fas fa-paw me-2" aria-hidden="true"></i>Re-request Adoption
                                     </button>
                                 </form>
-                                <a href="{{ route('adoptions.index') }}" class="btn btn-secondary btn-lg back-btn" role="button" aria-label="Back to Adoptions">
+                                <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">
                                     Back to Adoptions
                                 </a>
                             </div>
@@ -180,13 +154,13 @@
                             <div class="d-flex gap-2 flex-wrap mt-3 adoption-detail-buttons">
                                 <form action="{{ route('adoptions.adopt', $adoption) }}" method="POST" class="d-inline">
                                     @csrf
-                                    <button type="submit" class="btn btn-success btn-lg adopt-btn" 
+                                    <button type="submit" class="btn btn-success adopt-btn" 
                                             onclick="return confirm('Are you sure you want to adopt {{ $adoption->pet_name }}?')"
                                             aria-label="Adopt {{ $adoption->pet_name }}">
                                         <i class="fas fa-paw me-2" aria-hidden="true"></i>Adopt Pet
                                     </button>
                                 </form>
-                                <a href="{{ route('adoptions.index') }}" class="btn btn-secondary btn-lg back-btn" role="button" aria-label="Back to Adoptions">
+                                <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">
                                     Back to Adoptions
                                 </a>
                             </div>
@@ -245,13 +219,14 @@
 </div>
 
 <style>
-
 @media (min-width: 768px) {
     /* Desktop button size reduction */
     .adopt-btn,
     .approve-btn,
     .reject-btn,
-    .back-btn {
+    .back-btn,
+    .edit-btn,
+    .delete-btn {
         padding: 0.375rem 0.75rem;
         font-size: 0.875rem;
         min-height: 36px;
@@ -272,7 +247,9 @@
     .adopt-btn,
     .approve-btn,
     .reject-btn,
-    .back-btn {
+    .back-btn,
+    .edit-btn,
+    .delete-btn {
         padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
         min-height: 32px;
@@ -286,7 +263,9 @@
     
     .approve-btn,
     .reject-btn,
-    .back-btn {
+    .back-btn,
+    .edit-btn,
+    .delete-btn {
         width: 100%;
     }
 }

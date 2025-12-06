@@ -161,7 +161,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/adoptions/{adoption}/approve', [UserAdoptionController::class, 'approveAdoption'])->name('adoptions.approve');
     Route::post('/adoptions/{adoption}/reject', [UserAdoptionController::class, 'rejectAdoption'])->name('adoptions.reject');
     Route::post('/adoptions/{adoption}/complete', [UserAdoptionController::class, 'completeAdoption'])->name('adoptions.complete');
-    
+    Route::delete('/adoptions/{adoption}', [UserAdoptionController::class, 'destroy'])->name('adoptions.destroy');
+
     // Lost & Found Routes
     Route::get('pet/lostfound', [LostFoundController::class, 'index'])->name('pet.lostfound');
     Route::resource('lost-found', LostFoundController::class);
