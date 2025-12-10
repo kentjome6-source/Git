@@ -8,7 +8,7 @@ window.SharedMap = SharedMap;
 const userIdMeta = document.querySelector('meta[name="current-user-id"]');
 window.userId = userIdMeta ? userIdMeta.getAttribute('content') : null;
 
-// Initialize sidebar based on screen size
+// Initialize sidebar based on screen sizes
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing sidebar');
     
