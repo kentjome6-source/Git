@@ -76,13 +76,15 @@ class ChatMessageController extends Controller
                   ->where('recipient_id', $currentUser->id);
         })->orderBy('created_at', 'asc')->get();
         
+        // Set selected user ID for the view
+        $selectedUserId = $user->id;
+        
         // Use veterinarian-specific view if user is a vet
         if ($currentUser->role === 'vet') {
-            $selectedUserId = $user->id;
             return view('vet.messages.index', compact('users', 'selectedUserId', 'messages'));
         }
         
-        return view('messages.index', compact('users', 'user', 'messages'));
+        return view('messages.index', compact('users', 'selectedUserId', 'messages'));
     }
     
     /**
