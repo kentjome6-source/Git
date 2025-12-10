@@ -73,6 +73,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the appointments for the user.
+     */
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'user_id');
+    }
+
+    /**
+     * Get the appointments handled by the veterinarian.
+     */
+    public function vetAppointments()
+    {
+        return $this->hasMany(Appointment::class, 'vet_id');
+    }
+
+    /**
      * Get the comments made by the user.
      */
     public function comments()
@@ -94,6 +110,22 @@ class User extends Authenticatable
     public function likes()
     {
         return $this->hasMany(Like::class);
+    }
+
+    /**
+     * Get the messages sent by the user.
+     */
+    public function sentMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'sender_id');
+    }
+
+    /**
+     * Get the messages received by the user.
+     */
+    public function receivedMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'recipient_id');
     }
 
     /**

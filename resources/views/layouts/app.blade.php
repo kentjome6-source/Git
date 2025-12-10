@@ -366,6 +366,13 @@
                     <span class="menu-text">Lost & Found</span>
                 </a>
             </div>
+            <div class="menu-item">
+                <a href="{{ route('messages.index') }}" class="menu-link {{ request()->routeIs('messages.*') ? 'active' : '' }}">
+                    <i class="fas fa-comments menu-icon" aria-hidden="true"></i>
+                    <span class="menu-text">Messages</span>
+                    <span id="unread-message-count" class="badge bg-danger ms-2" style="display: none;">0</span>
+                </a>
+            </div>
         </div>
 
         <div class="profile-section">

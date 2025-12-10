@@ -18,6 +18,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VetController;
 use App\Http\Controllers\ViewMapController;
 use App\Http\Controllers\LostFoundController;
+use App\Http\Controllers\ChatMessageController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -137,6 +138,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/profile', [ProfileController::class, 'edit'])->name('user.profile.edit');
     Route::match(['PUT', 'PATCH'], '/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Messages Routes
+    Route::get('/messages', [ChatMessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{user}', [ChatMessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/send', [ChatMessageController::class, 'sendMessage'])->name('messages.send');
+    Route::post('/messages/mark-as-read', [ChatMessageController::class, 'markAsRead'])->name('messages.mark-as-read');
+    Route::get('/messages/unread-count', [ChatMessageController::class, 'getUnreadCount'])->name('messages.unread-count');
+    Route::get('/messages/contact-unread-count', [ChatMessageController::class, 'getContactUnreadCount'])->name('messages.contact-unread-count');
     
     // Pet Routes
     Route::resource('pets', PetController::class)->names([
