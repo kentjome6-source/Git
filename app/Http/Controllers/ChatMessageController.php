@@ -108,8 +108,16 @@ class ChatMessageController extends Controller
         $message->message = $messageText;
         $message->save();
         
-        // Dispatch the job to send the message
-        SendMessageJob::dispatch($message->id);
+        try {
+            broadcast(new MessageSent($message))->toOthers();
+            
+            $unreadCount = ChatMessage::where('recipient_id', $message->recipient_id)
+                                      ->whereNull('read_at')
+                                      ->count();
+            
+            broadcast(new UnreadMessageCountUpdated($message->recipient_id, $unreadCount))->toOthers();
+        } catch (\Exception $e) {
+        }
         
         return response()->json([
             'success' => true,
@@ -183,6 +191,37 @@ class ChatMessageController extends Controller
         
         return response()->json([
             'unread_count' => $unreadCount
+        ]);
+    }
+    
+    public function pollMessages(Request $request, User $user)
+    {
+        $currentUser = Auth::user();
+        $lastMessageId = $request->query('last_message_id', 0);
+
+        $messages = ChatMessage::where(function ($query) use ($currentUser, $user) {
+            $query->where('sender_id', $currentUser->id)
+                  ->where('recipient_id', $user->id);
+        })->orWhere(function ($query) use ($currentUser, $user) {
+            $query->where('sender_id', $user->id)
+                  ->where('recipient_id', $currentUser->id);
+        })
+        ->where('id', '>', $lastMessageId)
+        ->orderBy('created_at', 'asc')
+        ->get();
+        
+        return response()->json([
+            'success' => true,
+            'messages' => $messages->map(function($message) use ($currentUser) {
+                return [
+                    'id' => $message->id,
+                    'sender_id' => $message->sender_id,
+                    'recipient_id' => $message->recipient_id,
+                    'message' => $message->message,
+                    'created_at' => $message->created_at->timezone('Asia/Manila')->toISOString(),
+                    'is_sender' => $message->sender_id == $currentUser->id
+                ];
+            })
         ]);
     }
     

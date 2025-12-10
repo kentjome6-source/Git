@@ -146,6 +146,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/messages/mark-as-read', [ChatMessageController::class, 'markAsRead'])->name('messages.mark-as-read');
     Route::get('/messages/unread-count', [ChatMessageController::class, 'getUnreadCount'])->name('messages.unread-count');
     Route::get('/messages/contact-unread-count', [ChatMessageController::class, 'getContactUnreadCount'])->name('messages.contact-unread-count');
+    Route::get('/messages/poll/{user}', [ChatMessageController::class, 'pollMessages'])->name('messages.poll');
     
     // Pet Routes
     Route::resource('pets', PetController::class)->names([

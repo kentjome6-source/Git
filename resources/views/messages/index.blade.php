@@ -83,7 +83,7 @@
                                 </div>
                             @else
                                 @foreach($messages as $message)
-                                    <div class="mb-3 {{ $message->sender_id == Auth::id() ? 'text-end' : 'text-start' }}">
+                                    <div class="mb-3 {{ $message->sender_id == Auth::id() ? 'text-end' : 'text-start' }} message" data-message-id="{{ $message->id }}">
                                         <div class="d-inline-block p-3 rounded-3 shadow-sm 
                                             {{ $message->sender_id == Auth::id() ? 'bg-primary text-white' : 'bg-light' }}" 
                                             style="max-width: 80%; word-wrap: break-word;">
@@ -176,6 +176,8 @@
 let selectedUserId = {{ $selectedUserId ?? 'null' }};
 let userChannel = null;
 let chatChannel = null;
+let pollingInterval = null;
+let lastMessageId = {{ $messages->last()->id ?? 0 }};
 
 document.addEventListener('DOMContentLoaded', function() {
     // Function to format timestamps
@@ -189,6 +191,78 @@ document.addEventListener('DOMContentLoaded', function() {
             minute: '2-digit',
             hour12: true
         });
+    }
+
+    function pollForNewMessages() {
+        if (!selectedUserId) return;
+        
+        fetch(`{{ url('/messages/poll') }}/${selectedUserId}?last_message_id=${lastMessageId}`, {
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.messages && data.messages.length > 0) {
+                const messageContainer = document.getElementById('message-container');
+                
+                data.messages.forEach(msg => {
+                    const existingMessage = document.querySelector(`.message[data-message-id="${msg.id}"]`);
+                    if (!existingMessage) {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `mb-3 ${msg.is_sender ? 'text-end' : 'text-start'} message`;
+                        messageDiv.setAttribute('data-message-id', msg.id);
+                        
+                        const messageContent = document.createElement('div');
+                        messageContent.className = msg.is_sender ? 
+                            'd-inline-block p-3 rounded-3 shadow-sm bg-primary text-white' : 
+                            'd-inline-block p-3 rounded-3 shadow-sm bg-light';
+                        messageContent.style.maxWidth = '80%';
+                        messageContent.style.wordWrap = 'break-word';
+                        
+                        const timestamp = formatTimestamp(msg.created_at);
+                        
+                        messageContent.innerHTML = `
+                            ${msg.message}
+                            <div class="small mt-1">
+                                <em>${timestamp}</em>
+                            </div>
+                        `;
+                        
+                        messageDiv.appendChild(messageContent);
+                        messageContainer.appendChild(messageDiv);
+                        messageContainer.scrollTop = messageContainer.scrollHeight;
+                        
+                        if (msg.id > lastMessageId) {
+                            lastMessageId = msg.id;
+                        }
+                        
+                        if (!msg.is_sender) {
+                            markMessagesAsRead(selectedUserId);
+                        }
+                    }
+                });
+            }
+        })
+        .catch(error => console.error('Error polling for messages:', error));
+    }
+
+    function startPolling() {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+        }
+        
+        if (selectedUserId) {
+            pollingInterval = setInterval(pollForNewMessages, 2000);
+        }
+    }
+    
+    function stopPolling() {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+        }
     }
     
     // Function to update contact unread count
@@ -515,8 +589,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update unread count every 30 seconds as a fallback
     setInterval(updateNavigationUnreadCount, 30000);
     
+    startPolling();
+    
     // Clean up on page unload
     window.addEventListener('beforeunload', function() {
+        stopPolling();
         unsubscribeFromChannels();
     });
 });

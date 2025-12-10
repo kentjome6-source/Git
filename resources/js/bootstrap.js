@@ -171,6 +171,12 @@ window.addEventListener('offline', function() {
 
 // Automatically subscribe to user channel on all pages if user is logged in
 document.addEventListener('DOMContentLoaded', function() {
+    const userIdMeta = document.querySelector('meta[name="current-user-id"]');
+    if (userIdMeta) {
+        window.userId = parseInt(userIdMeta.getAttribute('content'));
+        console.log('User ID set:', window.userId);
+    }
+    
     if (window.userId && typeof window.subscribeUserChannel === 'function') {
         console.log('Subscribing to user channel for user:', window.userId);
         try {
