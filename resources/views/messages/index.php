@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to update navigation unread count
     function updateNavigationUnreadCount() {
-        fetch('{{ route("user.messages.unread-count") }}', {
+        fetch('{{ route("messages.unread-count") }}', {
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to mark messages as read
     function markMessagesAsRead(contactId) {
-        fetch('{{ route("user.messages.mark-as-read") }}', {
+        fetch('{{ route("messages.mark-as-read") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -442,7 +442,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (message && receiverId) {
                 // Send message via AJAX
-                fetch('{{ route("user.messages.send") }}', {
+                fetch('{{ route("messages.send") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
