@@ -8,7 +8,7 @@
         <!-- Contacts Panel -->
         <div class="col-lg-4 col-md-5 mb-4 mb-md-0" id="contacts-panel">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #27ae60;">
                     <h5 class="mb-0"><i class="fas fa-users me-2"></i>Contacts</h5>
                     <span class="badge bg-light text-dark">{{ $users->count() }}</span>
                 </div>
@@ -152,14 +152,19 @@
 }
 
 .contact-item.active {
-    background-color: #e8f5e9;
-    border-left: 3px solid #27ae60;
+    background-color: #d4f5d9; /* Lighter green for better visibility */
+    border-left: 4px solid #27ae60; /* Thicker green border */
 }
 
 .unread-count-badge {
     font-size: 0.75rem;
     min-width: 20px;
     padding: 0.25em 0.4em;
+}
+
+/* Veterinarian contact list background to match sidebar */
+#contact-list {
+    background-color: #fff; /* Match the sidebar background color */
 }
 
 /* Responsive adjustments */
@@ -315,15 +320,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to mark messages as read
     function markMessagesAsRead(contactId) {
-        fetch('{{ route("messages.mark-as-read") }}', {
+        fetch(`/messages/mark-as-read/${contactId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({
-                contact_id: contactId
-            })
+            }
         })
         .then(response => response.json())
         .then(data => {

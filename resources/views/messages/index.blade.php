@@ -8,7 +8,7 @@
         <!-- Contacts Panel -->
         <div class="col-lg-4 col-md-5 mb-4 mb-md-0" id="contacts-panel">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #5b4b9b;">
                     <h5 class="mb-0"><i class="fas fa-users me-2"></i>Contacts</h5>
                     <span class="badge bg-light text-dark">{{ $users->count() }}</span>
                 </div>
@@ -101,7 +101,7 @@
                             <input type="hidden" id="receiver-id" value="{{ $selectedUserId }}">
                             <div class="input-group">
                                 <input type="text" id="message-input" class="form-control" placeholder="Type your message..." required>
-                                <button class="btn btn-primary" type="submit">
+                                <button class="btn text-white" type="submit" style="background-color: #5b4b9b;">
                                     <i class="fas fa-paper-plane"></i>
                                     <span class="d-none d-sm-inline ms-1">Send</span>
                                 </button>
@@ -152,14 +152,19 @@
 }
 
 .contact-item.active {
-    background-color: #e9f7fe;
-    border-left: 3px solid #0d6efd;
+    background-color: #e6d9ff; /* Lighter purple for better visibility */
+    border-left: 4px solid #5b4b9b; /* Thicker purple border */
 }
 
 .unread-count-badge {
     font-size: 0.75rem;
     min-width: 20px;
     padding: 0.25em 0.4em;
+}
+
+/* Pet parent contact list background to match sidebar */
+#contact-list {
+    background-color: #fff; /* Match the sidebar background color */
 }
 
 /* Responsive adjustments */
@@ -315,15 +320,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to mark messages as read
     function markMessagesAsRead(contactId) {
-        fetch('{{ route("messages.mark-as-read") }}', {
+        fetch(`/messages/mark-as-read/${contactId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({
-                contact_id: contactId
-            })
+            }
         })
         .then(response => response.json())
         .then(data => {
