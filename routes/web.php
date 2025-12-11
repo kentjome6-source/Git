@@ -141,9 +141,9 @@ Route::middleware(['auth'])->group(function () {
     
     // Messages Routes
     Route::get('/messages', [ChatMessageController::class, 'index'])->name('messages.index');
-    Route::get('/messages/{user}', [ChatMessageController::class, 'show'])->name('messages.show');
+    Route::get('/messages/conversation/{user}', [ChatMessageController::class, 'conversation'])->name('messages.conversation');
     Route::post('/messages/send', [ChatMessageController::class, 'sendMessage'])->name('messages.send');
-    Route::post('/messages/mark-as-read', [ChatMessageController::class, 'markAsRead'])->name('messages.mark-as-read');
+    Route::post('/messages/mark-as-read/{userId}', [ChatMessageController::class, 'markAsRead'])->name('messages.mark-as-read');
     Route::get('/messages/unread-count', [ChatMessageController::class, 'getUnreadCount'])->name('messages.unread-count');
     Route::get('/messages/contact-unread-count', [ChatMessageController::class, 'getContactUnreadCount'])->name('messages.contact-unread-count');
     Route::get('/messages/poll/{user}', [ChatMessageController::class, 'pollMessages'])->name('messages.poll');

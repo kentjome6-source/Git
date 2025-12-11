@@ -53,7 +53,7 @@
                             @error('image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <div class="form-text">Upload a new image to replace the current one (JPG, PNG, GIF - max 2MB)</div>
+                            <div class="form-text">Upload a new image to replace the current one (JPG, PNG, GIF)</div>
                         </div>
 
                         <div class="mb-3">

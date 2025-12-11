@@ -37,7 +37,7 @@
                             <label for="image" class="form-label fw-bold">Image (Optional)</label>
                             <input type="file" class="form-control rounded-3 @error('image') is-invalid @enderror" 
                                    id="image" name="image" accept="image/*">
-                            <div class="form-text">Upload an image of your pet (max 2MB)</div>
+                            <div class="form-text">Upload an image of your pet</div>
                             @error('image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

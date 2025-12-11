@@ -38,7 +38,7 @@ class PostController extends Controller
     {
         $request->validate([
             'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
         ]);
 
         $postData = [
