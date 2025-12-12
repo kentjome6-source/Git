@@ -12,7 +12,7 @@
     .page-subtitle { font-size: 1.1rem; color: white; opacity: 0.9; }
     
     .stats-grid {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 20px; margin-bottom: 30px;
     }
     .stat-card {
@@ -338,24 +338,20 @@
             margin-top: 10px;
             padding-top: 10px;
             border-top: 1px solid #eee;
+            justify-content: center; /* Center the buttons for all user roles */
         }
         
         /* Pet parent specific mobile view adjustments */
-        .user-card-actions.pet-parent-actions {
-            justify-content: space-between; /* Space between buttons */
-        }
         
-        .user-card-actions.pet-parent-actions .btn-view-mobile {
-            flex: 0 0 auto;
-            min-width: 100px; /* Reduced width */
-            max-width: fit-content;
-        }
+        /* Removed specific width styling for pet parents to ensure consistency across all roles */
         
         .user-card-actions.pet-parent-actions .btn-delete-mobile {
             flex: 0 0 auto;
             min-width: 80px;
             max-width: fit-content;
         }
+        
+        /* Removed specific width styling for pet parents view button to ensure consistency across all roles */
         
         /* Vet-specific mobile improvements */
         .user-card-header.vet-header .user-card-info,
@@ -450,8 +446,14 @@
         .user-card-actions.pet-parent-actions,
         .user-card-actions.vet-actions {
             flex-direction: row;
-            justify-content: space-between; /* Space between buttons */
+            justify-content: center; /* Changed from space-between to center for consistency */
             gap: 10px; /* Add some spacing between buttons */
+        }
+        
+        /* Center the View Details button for all accounts on small screens */
+        .user-card-actions {
+            flex-direction: row;
+            justify-content: center;
         }
         
         .user-card-btn {
@@ -465,12 +467,7 @@
             margin-bottom: 0;
         }
         
-        .user-card-actions.pet-parent-actions .btn-view-mobile,
-        .user-card-actions.vet-actions .btn-view-mobile {
-            flex: 0 0 auto;
-            min-width: 100px; /* Reduced width */
-            max-width: fit-content;
-        }
+        /* Removed specific width styling for pet parents and vets to ensure consistency across all roles */
         
         .user-card-actions.pet-parent-actions .btn-delete-mobile,
         .user-card-actions.vet-actions .btn-delete-mobile {
@@ -643,17 +640,6 @@
                             <a href="{{ route('admin.users.show', $user) }}" class="action-btn btn-view">
                                 👁️ View
                             </a>
-                            @if($user->id !== auth()->id())
-                                <form method="POST" action="{{ route('admin.users.destroy', $user) }}" 
-                                      style="display: inline;" 
-                                      onsubmit="return confirm('Are you sure you want to delete this user?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="action-btn btn-delete">
-                                        🗑️ Delete
-                                    </button>
-                                </form>
-                            @endif
                         </div>
                     </td>
                 </tr>
@@ -746,17 +732,6 @@
             <a href="{{ route('admin.users.show', $user) }}" class="user-card-btn btn-view-mobile {{ $user->role === 'vet' ? 'vet-view' : ($user->role === 'user' ? 'user-view' : '') }}">
                 👁️ View Details
             </a>
-            @if($user->id !== auth()->id())
-                <form method="POST" action="{{ route('admin.users.destroy', $user) }}" 
-                      style="display: inline;" 
-                      onsubmit="return confirm('Are you sure you want to delete this user?')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="user-card-btn btn-delete-mobile">
-                        🗑️ Delete
-                    </button>
-                </form>
-            @endif
             @if($user->role === 'vet' && !$user->is_verified_vet)
                 <form method="POST" action="{{ route('admin.users.verify-vet', $user) }}" 
                       style="display: inline;" 

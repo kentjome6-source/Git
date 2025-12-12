@@ -196,33 +196,6 @@ class UserController extends Controller
     }
     
     /**
-     * Delete user
-     */
-    public function destroy(User $user)
-    {
-        // Prevent deletion of the current admin user
-        if ($user->id === auth()->id()) {
-            return redirect()->route('admin.users.index')
-                           ->with('error', 'You cannot delete your own account!');
-        }
-        
-        // Ensure we're only deleting legitimate users
-        if (!$user->legitimate()->exists()) {
-            return redirect()->route('admin.users.index')
-                           ->with('error', 'User not found.');
-        }
-        
-        // Delete user's pets first to maintain referential integrity
-        $user->pets()->delete();
-        
-        // Delete the user
-        $user->delete();
-        
-        return redirect()->route('admin.users.index')
-                        ->with('success', 'User and associated pets deleted successfully!');
-    }
-    
-    /**
      * Verify a veterinarian
      */
     public function verifyVet($id)

@@ -88,7 +88,6 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
         'show' => 'admin.users.show',
         'edit' => 'admin.users.edit',
         'update' => 'admin.users.update',
-        'destroy' => 'admin.users.destroy',
     ]);
     
     Route::post('admin/users/{user}/verify-vet', [UserController::class, 'verifyVet'])->name('admin.users.verify-vet');
