@@ -406,7 +406,7 @@
             <div class="profile-section">
                 <div class="profile-info">
                     @if(Auth::user()->profile_picture_path)
-                        <img src="{{ asset('storage/' . Auth::user()->profile_picture_path) }}" alt="Admin Profile Picture" class="sidebar-profile-picture admin-avatar" width="45" height="45">
+                        <img src="{{ Auth::user()->profile_picture_url }}" alt="Admin Profile Picture" class="sidebar-profile-picture admin-avatar" width="45" height="45">
                     @else
                         <div class="profile-avatar admin-avatar" aria-label="Admin avatar">AD</div>
                     @endif

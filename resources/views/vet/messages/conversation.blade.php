@@ -19,7 +19,7 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             @if($selectedUser->profile_picture_path)
-                                <img src="{{ asset('storage/' . $selectedUser->profile_picture_path) }}" alt="{{ $selectedUser->name }} Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                <img src="{{ $selectedUser->profile_picture_url }}" alt="{{ $selectedUser->name }} Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
                             @else
                                 <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-weight: 600; font-size: 1.2rem;">
                                     {{ substr($selectedUser->name, 0, 1) }}

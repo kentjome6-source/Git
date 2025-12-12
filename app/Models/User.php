@@ -147,7 +147,13 @@ class User extends Authenticatable
      */
     public function getProfilePictureUrlAttribute()
     {
+        // Check if profile_picture_path contains a URL (external image)
         if ($this->profile_picture_path) {
+            // If it's already a full URL (like Google avatar), return it directly
+            if (filter_var($this->profile_picture_path, FILTER_VALIDATE_URL)) {
+                return $this->profile_picture_path;
+            }
+            // Otherwise, treat it as a local storage path
             return asset('storage/' . $this->profile_picture_path);
         }
         

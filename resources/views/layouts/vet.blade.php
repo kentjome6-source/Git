@@ -326,7 +326,7 @@
         <div class="profile-section">
             <div class="profile-info">
                 @if(Auth::user()->profile_picture_path)
-                    <img src="{{ asset('storage/' . Auth::user()->profile_picture_path) }}" alt="Profile Picture" class="sidebar-profile-picture">
+                    <img src="{{ Auth::user()->profile_picture_url }}" alt="Profile Picture" class="sidebar-profile-picture">
                 @else
                     <div class="profile-avatar">
                         @if(Auth::user()->role === 'vet')

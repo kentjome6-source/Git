@@ -25,7 +25,7 @@
                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center contact-item">
                                     <div class="d-flex align-items-center">
                                         @if($user->profile_picture_path)
-                                            <img src="{{ asset('storage/' . $user->profile_picture_path) }}" alt="{{ $user->name }} Profile Picture" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <img src="{{ $user->profile_picture_url }}" alt="{{ $user->name }} Profile Picture" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
                                         @else
                                             <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-weight: 600; font-size: 0.9rem;">
                                                 {{ substr($user->name, 0, 1) }}

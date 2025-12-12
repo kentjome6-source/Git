@@ -615,7 +615,7 @@
                         <div class="user-info">
                             <div class="user-avatar" style="background: {{ (isset($user) && isset($user->role) && strtolower($user->role) === 'admin') ? '#e74c3c' : ($user->role === 'vet' ? '#27ae60' : '#3498db') }};">
                                 @if($user->profile_picture_path)
-                                    <img src="{{ asset('storage/' . $user->profile_picture_path) }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                    <img src="{{ $user->profile_picture_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                                 @else
                                     @if(isset($user) && isset($user->role) && strtolower($user->role) === 'admin')
                                         AD
@@ -693,7 +693,7 @@
         <div class="user-card-header {{ $user->role === 'vet' ? 'vet-header' : ($user->role === 'user' ? 'user-header' : '') }}">
             <div class="user-card-avatar" style="background: {{ (isset($user) && isset($user->role) && strtolower($user->role) === 'admin') ? '#e74c3c' : ($user->role === 'vet' ? '#27ae60' : '#3498db') }};">
                 @if($user->profile_picture_path)
-                    <img src="{{ asset('storage/' . $user->profile_picture_path) }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                    <img src="{{ $user->profile_picture_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                 @else
                     @if(isset($user) && isset($user->role) && strtolower($user->role) === 'admin')
                         AD
@@ -704,6 +704,7 @@
                     @endif
                 @endif
             </div>
+
             <div class="user-card-info">
                 <h4 class="user-card-name">{{ $user->role === 'vet' ? 'Dr. ' : '' }}{{ $user->name }}</h4>
                 <p class="user-card-email">{{ $user->email }}</p>
