@@ -90,7 +90,7 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
         'update' => 'admin.users.update',
         'destroy' => 'admin.users.destroy',
     ]);
-    Route::post('admin/users/bulk-action', [UserController::class, 'bulkAction'])->name('admin.users.bulk-action');
+    
     Route::post('admin/users/{user}/verify-vet', [UserController::class, 'verifyVet'])->name('admin.users.verify-vet');
     Route::post('admin/users/{user}/reject-vet', [UserController::class, 'rejectVet'])->name('admin.users.reject-vet');
     
