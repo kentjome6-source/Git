@@ -40,18 +40,26 @@
             z-index: 1001; /* Increased to overlay Leaflet map elements */
             box-shadow: 2px 0 10px rgba(0,0,0,0.05);
             transition: transform 0.3s ease;
-            overflow-y: auto; /* Allow vertical scrolling */
+            overflow-y: hidden; /* Changed from auto to hidden to control scrolling manually */
         }
-        
+
+        /* Added scrollable container for menu items */
+        .sidebar-menu-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
         .sidebar.collapsed {
             transform: translateX(-100%);
         }
-        
-        .sidebar-header { text-align:center; margin-bottom:30px; }
+
+        .sidebar-header { text-align:center; margin-bottom:30px; padding: 0 20px; }
         .sidebar-header .logo { font-size:1.8rem; font-weight:bold; color: #27ae60; }
         .sidebar-header .subtitle { font-size:0.85rem; color:#888; }
 
-        .menu { flex:1; }
+        .menu { }
         .menu-item { margin:10px 0; }
         .menu-link {
             display:flex; align-items:center; padding:12px 20px;
@@ -300,25 +308,28 @@
             <div class="subtitle text-center">For Veterinarians</div>
         </div>
 
-        <div class="menu">
-            <div class="menu-item">
-                <a href="{{ route('vet.appointments') }}" class="menu-link {{ request()->routeIs('vet.appointments') || request()->routeIs('vet.appointments.show') ? 'active' : '' }}">
-                    <i class="fas fa-stethoscope menu-icon"></i>
-                    <span class="menu-text">Appointment Management</span>
-                </a>
-            </div>
-            <div class="menu-item">
-                <a href="{{ route('vet.appointment.records') }}" class="menu-link {{ request()->routeIs('vet.appointment.records') || request()->routeIs('vet.appointment.records.show') ? 'active' : '' }}">
-                    <i class="fas fa-file-medical menu-icon"></i>
-                    <span class="menu-text">Appointment Records</span>
-                </a>
-            </div>
-            <div class="menu-item">
-                <a href="{{ route('messages.index') }}" class="menu-link {{ request()->routeIs('messages.*') ? 'active' : '' }}">
-                    <i class="fas fa-comments menu-icon"></i>
-                    <span class="menu-text">Messages</span>
-                    <span id="unread-message-count" class="badge bg-danger ms-2" style="display: none;">0</span>
-                </a>
+        <!-- Scrollable container for menu items -->
+        <div class="sidebar-menu-container">
+            <div class="menu">
+                <div class="menu-item">
+                    <a href="{{ route('vet.appointments') }}" class="menu-link {{ request()->routeIs('vet.appointments') || request()->routeIs('vet.appointments.show') ? 'active' : '' }}">
+                        <i class="fas fa-stethoscope menu-icon"></i>
+                        <span class="menu-text">Appointment Management</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="{{ route('vet.appointment.records') }}" class="menu-link {{ request()->routeIs('vet.appointment.records') || request()->routeIs('vet.appointment.records.show') ? 'active' : '' }}">
+                        <i class="fas fa-file-medical menu-icon"></i>
+                        <span class="menu-text">Appointment Records</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="{{ route('messages.index') }}" class="menu-link {{ request()->routeIs('messages.*') ? 'active' : '' }}">
+                        <i class="fas fa-comments menu-icon"></i>
+                        <span class="menu-text">Messages</span>
+                        <span id="unread-message-count" class="badge bg-danger ms-2" style="display: none;">0</span>
+                    </a>
+                </div>
             </div>
         </div>
 
