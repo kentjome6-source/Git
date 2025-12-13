@@ -70,9 +70,20 @@
                                 </div>
                             @endif
                         @else
-                            <div class="alert alert-info mt-3" role="alert">
-                                This is your pet listing. You cannot adopt your own pet.
-                            </div>
+                            <!-- Pet owner view -->
+                            @if($adoption->hasPendingRequest())
+                                <?php
+                                    $pendingRequest = $adoption->pendingRequest();
+                                    $adopter = $pendingRequest->adopter;
+                                ?>
+                                <div class="alert alert-info mt-3" role="alert">
+                                    <strong>{{ $adopter->name }}</strong> has requested to adopt this pet.
+                                </div>
+                            @else
+                                <div class="alert alert-info mt-3" role="alert">
+                                    This is your pet listing. You cannot adopt your own pet.
+                                </div>
+                            @endif
                         @endif
                     @else
                         <div class="alert alert-warning mt-3" role="alert">
@@ -83,29 +94,63 @@
                     <!-- Action Buttons at Bottom -->
                     @if(!$adoption->is_adopted)
                         @if($adoption->user_id == auth()->id())
-                            <div class="mt-3">
-                                <div class="d-flex gap-2 flex-wrap adoption-detail-buttons">
-                                    <!-- Edit button -->
-                                    <a href="{{ route('adoptions.edit', $adoption) }}" class="btn btn-warning edit-btn" role="button" aria-label="Edit adoption post for {{ $adoption->pet_name }}">
-                                        <i class="fas fa-edit me-2" aria-hidden="true"></i>Edit
-                                    </a>
-                                    
-                                    <!-- Delete button -->
-                                    <form action="{{ route('adoptions.destroy', $adoption) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger delete-btn" 
-                                                onclick="return confirm('Are you sure you want to delete the adoption post for {{ $adoption->pet_name }}? This action cannot be undone.')"
-                                                aria-label="Delete adoption post for {{ $adoption->pet_name }}">
-                                            <i class="fas fa-trash me-2" aria-hidden="true"></i>Delete
-                                        </button>
-                                    </form>
-                                    
-                                    <a href="{{ route('adoptions.index') }}" class="btn btn-secondary ms-auto back-btn" role="button" aria-label="Back to Adoptions">
-                                        Back to Adoptions
-                                    </a>
+                            <!-- Pet owner actions -->
+                            @if($adoption->hasPendingRequest())
+                                <?php
+                                    $pendingRequest = $adoption->pendingRequest();
+                                ?>
+                                <div class="mt-3">
+                                    <div class="d-flex gap-2 flex-wrap adoption-detail-buttons">
+                                        <!-- Approve button -->
+                                        <form action="{{ route('adoptions.approve', $adoption) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success approve-btn" 
+                                                    onclick="return confirm('Are you sure you want to approve the adoption request for {{ $adoption->pet_name }}?')"
+                                                    aria-label="Approve adoption request for {{ $adoption->pet_name }}">
+                                                <i class="fas fa-check me-2" aria-hidden="true"></i>Approve
+                                            </button>
+                                        </form>
+                                        
+                                        <!-- Reject button -->
+                                        <form action="{{ route('adoptions.reject', $adoption) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-danger reject-btn" 
+                                                    onclick="return confirm('Are you sure you want to reject the adoption request for {{ $adoption->pet_name }}?')"
+                                                    aria-label="Reject adoption request for {{ $adoption->pet_name }}">
+                                                <i class="fas fa-times me-2" aria-hidden="true"></i>Reject
+                                            </button>
+                                        </form>
+                                        
+                                        <a href="{{ route('adoptions.index') }}" class="btn btn-secondary ms-auto back-btn" role="button" aria-label="Back to Adoptions">
+                                            Back to Adoptions
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
+                            @else
+                                <div class="mt-3">
+                                    <div class="d-flex gap-2 flex-wrap adoption-detail-buttons">
+                                        <!-- Edit button -->
+                                        <a href="{{ route('adoptions.edit', $adoption) }}" class="btn btn-warning edit-btn" role="button" aria-label="Edit adoption post for {{ $adoption->pet_name }}">
+                                            <i class="fas fa-edit me-2" aria-hidden="true"></i>Edit
+                                        </a>
+                                        
+                                        <!-- Delete button -->
+                                        <form action="{{ route('adoptions.destroy', $adoption) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger delete-btn" 
+                                                    onclick="return confirm('Are you sure you want to delete the adoption post for {{ $adoption->pet_name }}? This action cannot be undone.')"
+                                                    aria-label="Delete adoption post for {{ $adoption->pet_name }}">
+                                                <i class="fas fa-trash me-2" aria-hidden="true"></i>Delete
+                                            </button>
+                                        </form>
+                                        
+                                        <a href="{{ route('adoptions.index') }}" class="btn btn-secondary ms-auto back-btn" role="button" aria-label="Back to Adoptions">
+                                            Back to Adoptions
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
                         @elseif($adoption->hasPendingRequest() && $adoption->pendingRequest()->adopter_id == auth()->id())
                             <!-- Adopter actions for pending request -->
                             <div class="mt-3">
