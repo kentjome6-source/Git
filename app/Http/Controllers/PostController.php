@@ -78,7 +78,7 @@ class PostController extends Controller
     public function myPosts()
     {
         $posts = Post::where('user_id', Auth::id())
-            ->with('comments', 'likes')
+            ->with('user', 'comments', 'likes')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
         

@@ -38,8 +38,19 @@
                             <div class="d-flex justify-content-center">
                                 <div class="card mb-4 shadow-sm rounded-3 border-0" style="max-width: 800px; width: 100%;">
                                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <small class="text-muted" style="font-size: 1rem;">{{ $post->created_at->diffForHumans() }}</small>
+                                        <div class="d-flex align-items-center">
+                                            @if(Auth::user()->profile_picture_path)
+                                                <img src="{{ Auth::user()->profile_picture_url }}" alt="{{ Auth::user()->name }} Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                            @else
+                                                <div class="profile-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                                     style="width: 50px; height: 50px; font-size: 1.2rem; min-width: 50px;">
+                                                    {{ substr(Auth::user()->name, 0, 2) }}
+                                                </div>
+                                            @endif
+                                            <div>
+                                                <h6 class="mb-0 fw-bold" style="font-size: 1rem;">{{ Auth::user()->name }}</h6>
+                                                <small class="text-muted" style="font-size: 0.85rem;">{{ $post->created_at->diffForHumans() }}</small>
+                                            </div>
                                         </div>
                                         <div class="dropdown">
                                             <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
@@ -101,6 +112,21 @@
 @endsection
 
 <style>
+/* Profile avatar styling */
+.profile-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #5b4b9b;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    min-width: 50px;
+}
+
 /* Reduce button width on desktop */
 @media (min-width: 768px) {
     .create-post-btn {
