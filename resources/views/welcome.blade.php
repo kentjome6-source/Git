@@ -3,182 +3,651 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to PawPortal</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>PawPortal - Pet Care Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --slate: #0f172a;
+            --slate-light: #1e293b;
+            --blue: #3b82f6;
+            --cyan: #06b6d4;
+            --orange: #f97316;
+            --gray: #64748b;
+            --gray-light: #f1f5f9;
+            --white: #ffffff;
+        }
+        
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--white);
+            color: var(--slate);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--slate);
+            letter-spacing: -0.02em;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--slate);
+        }
+        
+        .btn-nav {
+            background: var(--slate);
             color: white;
-            padding: 60px 0;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
         }
         
-        .feature-card {
-            transition: transform 0.3s ease;
-            height: 100%;
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
+        .btn-nav:hover {
+            background: var(--slate-light);
+            transform: translateY(-1px);
+            color: white;
         }
         
-        /* Responsive adjustments */
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            padding: 100px 40px 120px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+        
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+        
+        .hero-content {
+            opacity: 0;
+            animation: fadeInLeft 1s ease forwards;
+        }
+        
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .label {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--blue);
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 28px;
+            letter-spacing: -0.02em;
+        }
+        
+        .hero h1 .highlight {
+            background: linear-gradient(120deg, var(--blue), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-description {
+            font-size: 1.15rem;
+            color: var(--gray);
+            line-height: 1.7;
+            margin-bottom: 40px;
+            max-width: 540px;
+        }
+        
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            background: var(--slate);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid var(--slate);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.15);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--slate);
+            padding: 16px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid var(--slate);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--slate);
+            color: white;
+        }
+        
+        .hero-visual {
+            position: relative;
+            height: 500px;
+            opacity: 0;
+            animation: fadeInRight 1s 0.2s ease forwards;
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .visual-card {
+            position: absolute;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .visual-card-1 {
+            top: 0;
+            right: 0;
+            width: 280px;
+            border-left: 4px solid var(--blue);
+            animation-delay: 0s;
+        }
+        
+        .visual-card-2 {
+            top: 180px;
+            right: 100px;
+            width: 260px;
+            border-left: 4px solid var(--cyan);
+            animation-delay: 0.5s;
+        }
+        
+        .visual-card-3 {
+            top: 340px;
+            right: 20px;
+            width: 240px;
+            border-left: 4px solid var(--orange);
+            animation-delay: 1s;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .card-icon-1 { background: rgba(59, 130, 246, 0.1); color: var(--blue); }
+        .card-icon-2 { background: rgba(6, 182, 212, 0.1); color: var(--cyan); }
+        .card-icon-3 { background: rgba(249, 115, 22, 0.1); color: var(--orange); }
+        
+        .card-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+        
+        .card-text {
+            font-size: 0.85rem;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+        
+        /* Services Section */
+        .services {
+            background: var(--gray-light);
+            padding: 100px 40px;
+        }
+        
+        .services-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            margin-bottom: 60px;
+        }
+        
+        .section-header .label {
+            color: var(--cyan);
+        }
+        
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+        
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            max-width: 600px;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 24px;
+        }
+        
+        .service-item {
+            background: white;
+            padding: 40px 32px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .service-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .service-item:hover {
+            border-color: var(--blue);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+        }
+        
+        .service-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .service-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--blue);
+            background: rgba(59, 130, 246, 0.1);
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        
+        .service-item h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+        }
+        
+        .service-item p {
+            color: var(--gray);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        /* Stats Section */
+        .stats {
+            background: var(--slate);
+            color: white;
+            padding: 80px 40px;
+        }
+        
+        .stats-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 60px;
+            text-align: center;
+        }
+        
+        .stat-item {
+            opacity: 0;
+            transform: scale(0.9);
+            animation: scaleIn 0.6s ease forwards;
+        }
+        
+        .stat-item:nth-child(1) { animation-delay: 0.1s; }
+        .stat-item:nth-child(2) { animation-delay: 0.2s; }
+        .stat-item:nth-child(3) { animation-delay: 0.3s; }
+        .stat-item:nth-child(4) { animation-delay: 0.4s; }
+        
+        @keyframes scaleIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, var(--blue), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        /* CTA Section */
+        .cta {
+            padding: 120px 40px;
+            text-align: center;
+        }
+        
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cta h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+        }
+        
+        .cta p {
+            font-size: 1.15rem;
+            color: var(--gray);
+            margin-bottom: 40px;
+            line-height: 1.7;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--gray-light);
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        
+        footer p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
+            
+            .hero-visual {
+                height: 400px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+        
         @media (max-width: 768px) {
-            .hero-section {
-                padding: 40px 0;
+            .nav-container {
+                padding: 20px;
             }
             
-            .display-4 {
-                font-size: 2rem;
+            .hero {
+                padding: 60px 20px 80px;
             }
             
-            .lead {
-                font-size: 1rem;
+            .services,
+            .stats,
+            .cta {
+                padding: 60px 20px;
             }
             
-            .btn-lg {
-                padding: 10px 16px;
-                font-size: 1rem;
+            .services-grid {
+                grid-template-columns: 1fr;
             }
             
-            h2.fw-bold {
-                font-size: 1.75rem;
+            .hero-actions {
+                flex-direction: column;
             }
             
-            .feature-card {
-                margin-bottom: 20px;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .hero-section {
-                padding: 30px 0;
-            }
-            
-            .display-4 {
-                font-size: 1.75rem;
-            }
-            
-            .btn {
+            .btn-primary,
+            .btn-secondary {
                 width: 100%;
-                margin-bottom: 10px;
+                text-align: center;
             }
             
-            .d-flex.flex-column.flex-sm-row {
-                flex-direction: column !important;
-                align-items: center;
+            .stats-container {
+                gap: 40px;
             }
         }
-        
     </style>
 </head>
 <body>
-    <!-- Hero Section -->
-    <section class="hero-section text-center">
-        <div class="container">
-            <img src="{{ asset('images/logo/logo.png') }}" alt="PawPortal Logo" class="mb-4" style="max-height: 150px;">
-            <h1 class="display-4 fw-bold mb-3">Welcome to PawPortal</h1>
-            <p class="lead mb-4">Find veterinarian services and lost/found pets in your area</p>
-            <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
-                <a href="{{ route('login') }}" class="btn btn-light btn-lg px-4">
-                    <i class="fas fa-sign-in-alt me-2"></i>Login
-                </a>
-                <a href="{{ route('register') }}" class="btn btn-outline-light btn-lg px-4">
-                    <i class="fas fa-user-plus me-2"></i>Register as Pet Parent
-                </a>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">PawPortal</div>
+            <div class="nav-links">
+                <a href="#services">Services</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+                <a href="{{ route('login') }}" class="btn-nav">Sign In</a>
             </div>
         </div>
-    </section>
+    </nav>
 
-    <!-- Features Section -->
-    <section class="py-5">
-        <div class="container">
-            <div class="row text-center mb-5">
-                <div class="col-12">
-                    <h2 class="fw-bold">Why Choose PawPortal?</h2>
-                    <p class="text-muted">Find veterinarian services and lost/found pets in your area</p>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-grid">
+            <div class="hero-content">
+                <span class="label">Pet Care Platform</span>
+                <h1>
+                    Complete care for <span class="highlight">your companion</span>
+                </h1>
+                <p class="hero-description">
+                    Connect with trusted veterinarians, reunite lost pets with their families, and join a community of pet lovers in your area. Everything you need in one platform.
+                </p>
+                <div class="hero-actions">
+                    <a href="{{ route('register') }}" class="btn-primary">Get Started</a>
+                    <a href="{{ route('login') }}" class="btn-secondary">Sign In</a>
                 </div>
             </div>
             
-            <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 feature-card border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="mb-3">
-                                <i class="fas fa-stethoscope fa-3x text-success"></i>
-                            </div>
-                            <h5 class="card-title">Vet Appointments</h5>
-                            <p class="card-text text-muted">Connect with qualified veterinarians for consultations and professional advice.</p>
-                        </div>
-                    </div>
+            <div class="hero-visual">
+                <div class="visual-card visual-card-1">
+                    <div class="card-icon card-icon-1">🏥</div>
+                    <div class="card-title">Vet Appointments</div>
+                    <p class="card-text">Book consultations with licensed professionals</p>
                 </div>
-                
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 feature-card border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="mb-3">
-                                <i class="fas fa-map-marked-alt fa-3x text-success"></i>
-                            </div>
-                            <h5 class="card-title">Interactive Maps</h5>
-                            <p class="card-text text-muted">Locate nearby veterinarian shops and view lost/found pets in your area.</p>
-                        </div>
-                    </div>
+                <div class="visual-card visual-card-2">
+                    <div class="card-icon card-icon-2">📍</div>
+                    <div class="card-title">Local Services</div>
+                    <p class="card-text">Find nearby clinics and pet alerts</p>
                 </div>
-                
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 feature-card border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="mb-3">
-                                <i class="fas fa-search fa-3x text-warning"></i>
-                            </div>
-                            <h5 class="card-title">Lost & Found</h5>
-                            <p class="card-text text-muted">Help reunite lost pets with their families through our community network.</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 feature-card border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="mb-3">
-                                <i class="fas fa-paw fa-3x text-info"></i>
-                            </div>
-                            <h5 class="card-title">Pet Adoption</h5>
-                            <p class="card-text text-muted">Find your perfect companion from our selection of pets waiting for their forever homes.</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 feature-card border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="mb-3">
-                                <i class="fas fa-users fa-3x text-purple"></i>
-                            </div>
-                            <h5 class="card-title">Community Feed</h5>
-                            <p class="card-text text-muted">Connect with fellow pet lovers, share photos, and engage with our social community.</p>
-                        </div>
-                    </div>
+                <div class="visual-card visual-card-3">
+                    <div class="card-icon card-icon-3">🤝</div>
+                    <div class="card-title">Community</div>
+                    <p class="card-text">Connect with fellow pet parents</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="bg-light py-5">
-        <div class="container text-center">
-            <h3 class="fw-bold mb-3">Ready to Get Started?</h3>
-            <p class="text-muted mb-4">Find veterinarian services and lost/found pets in your area.</p>
-            <a href="{{ route('login') }}" class="btn btn-primary btn-lg px-4">
-                <i class="fas fa-paw me-2"></i>Start Your Journey
-            </a>
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="services-container">
+            <div class="section-header">
+                <span class="label">What We Offer</span>
+                <h2>Comprehensive pet care solutions</h2>
+                <p>Everything you need to care for your pet, connect with professionals, and stay involved in your community.</p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-item">
+                    <div class="service-header">
+                        <span class="service-number">01</span>
+                    </div>
+                    <h3>Veterinary Appointments</h3>
+                    <p>Book consultations with licensed veterinarians in your area. Get professional medical advice when you need it most.</p>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-header">
+                        <span class="service-number">02</span>
+                    </div>
+                    <h3>Location Services</h3>
+                    <p>Find veterinary clinics near you and see real-time updates about lost and found pets in your neighborhood.</p>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-header">
+                        <span class="service-number">03</span>
+                    </div>
+                    <h3>Lost & Found Network</h3>
+                    <p>Report missing pets or help reunite others with their companions through our community alert network.</p>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-header">
+                        <span class="service-number">04</span>
+                    </div>
+                    <h3>Pet Adoption</h3>
+                    <p>Browse pets available for adoption and find your next family member from local shelters and rescues.</p>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-header">
+                        <span class="service-number">05</span>
+                    </div>
+                    <h3>Community Feed</h3>
+                    <p>Share photos, ask questions, and connect with other pet parents who understand the joys and challenges.</p>
+                </div>
+                
+                <div class="service-item">
+                    <div class="service-header">
+                        <span class="service-number">06</span>
+                    </div>
+                    <h3>Easy Scheduling</h3>
+                    <p>Manage all your pet care appointments in one place with reminders and flexible rescheduling options.</p>
+                </div>
+            </div>
         </div>
     </section>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
-        .text-purple {
-            color: #6f42c1;
-        }
-    </style>
+
+    <script>
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, index * 100);
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.service-item').forEach(item => {
+            observer.observe(item);
+        });
+    </script>
 </body>
 </html>
