@@ -285,7 +285,7 @@
                 <div class="profile-picture-container">
                     <h5 class="section-title">Profile Picture</h5>
                     @if($user->profile_picture_path)
-                        <img src="{{ asset('storage/' . $user->profile_picture_path) }}" alt="Profile Picture" class="profile-picture" id="profilePreview">
+                        <img src="{{ $user->profile_picture_url }}" alt="Profile Picture" class="profile-picture" id="profilePreview">
                     @else
                         <div class="profile-picture d-flex align-items-center justify-content-center bg-success text-white fs-1" style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px;" id="profilePreview">
                             {{ 'Vet' }}

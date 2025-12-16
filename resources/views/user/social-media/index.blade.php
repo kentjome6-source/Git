@@ -40,7 +40,7 @@
                                     <div class="card-header bg-white d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 py-3">
                                         <div class="d-flex align-items-center mb-2 mb-sm-0">
                                             @if($post->user->profile_picture_path)
-                                                <img src="{{ asset('storage/' . $post->user->profile_picture_path) }}" alt="{{ $post->user->name }} Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                <img src="{{ $post->user->profile_picture_url }}" alt="{{ $post->user->name }} Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
                                             @else
                                                 <div class="profile-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
                                                      style="width: 50px; height: 50px; font-size: 1.2rem; min-width: 50px;">

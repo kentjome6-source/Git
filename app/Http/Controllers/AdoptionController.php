@@ -151,7 +151,7 @@ class AdoptionController extends Controller
         $adoptionHistory->adopted_at = now();
         $adoptionHistory->save();
 
-        return redirect()->back()->with('success', 'Adoption request approved successfully!');
+        return redirect()->route('adoptions.index')->with('success', 'Adoption request approved successfully!');
     }
     
     /**
@@ -177,7 +177,7 @@ class AdoptionController extends Controller
         $adoptionRequest->responded_at = now();
         $adoptionRequest->save();
 
-        return redirect()->back()->with('success', 'Adoption request rejected successfully!');
+        return redirect()->route('adoptions.index')->with('success', 'Adoption request rejected successfully!');
     }
     
     /**

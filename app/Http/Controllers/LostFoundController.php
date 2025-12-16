@@ -67,7 +67,7 @@ class LostFoundController extends Controller
             'contact_name' => 'required|string|max:255',
             'contact_phone' => 'required|string|max:20',
             'contact_email' => 'nullable|email|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
         ]);
 
         // Explicitly specify the fields to include instead of using $request->all()
@@ -143,7 +143,7 @@ class LostFoundController extends Controller
             'contact_name' => 'required|string|max:255',
             'contact_phone' => 'required|string|max:20',
             'contact_email' => 'nullable|email|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
         ]);
 
         // Explicitly specify the fields to include instead of using $request->all()

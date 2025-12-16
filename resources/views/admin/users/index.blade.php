@@ -12,7 +12,7 @@
     .page-subtitle { font-size: 1.1rem; color: white; opacity: 0.9; }
     
     .stats-grid {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 20px; margin-bottom: 30px;
     }
     .stat-card {
@@ -338,24 +338,20 @@
             margin-top: 10px;
             padding-top: 10px;
             border-top: 1px solid #eee;
+            justify-content: center; /* Center the buttons for all user roles */
         }
         
         /* Pet parent specific mobile view adjustments */
-        .user-card-actions.pet-parent-actions {
-            justify-content: space-between; /* Space between buttons */
-        }
         
-        .user-card-actions.pet-parent-actions .btn-view-mobile {
-            flex: 0 0 auto;
-            min-width: 100px; /* Reduced width */
-            max-width: fit-content;
-        }
+        /* Removed specific width styling for pet parents to ensure consistency across all roles */
         
         .user-card-actions.pet-parent-actions .btn-delete-mobile {
             flex: 0 0 auto;
             min-width: 80px;
             max-width: fit-content;
         }
+        
+        /* Removed specific width styling for pet parents view button to ensure consistency across all roles */
         
         /* Vet-specific mobile improvements */
         .user-card-header.vet-header .user-card-info,
@@ -450,8 +446,14 @@
         .user-card-actions.pet-parent-actions,
         .user-card-actions.vet-actions {
             flex-direction: row;
-            justify-content: space-between; /* Space between buttons */
+            justify-content: center; /* Changed from space-between to center for consistency */
             gap: 10px; /* Add some spacing between buttons */
+        }
+        
+        /* Center the View Details button for all accounts on small screens */
+        .user-card-actions {
+            flex-direction: row;
+            justify-content: center;
         }
         
         .user-card-btn {
@@ -465,12 +467,7 @@
             margin-bottom: 0;
         }
         
-        .user-card-actions.pet-parent-actions .btn-view-mobile,
-        .user-card-actions.vet-actions .btn-view-mobile {
-            flex: 0 0 auto;
-            min-width: 100px; /* Reduced width */
-            max-width: fit-content;
-        }
+        /* Removed specific width styling for pet parents and vets to ensure consistency across all roles */
         
         .user-card-actions.pet-parent-actions .btn-delete-mobile,
         .user-card-actions.vet-actions .btn-delete-mobile {
@@ -575,26 +572,14 @@
 
 <!-- Actions Bar -->
 <div class="actions-bar">
-    <div class="bulk-actions">
-        <select id="bulk-action" class="bulk-select">
-            <option value="">Bulk Actions</option>
-            <option value="delete">Delete Selected</option>
-        </select>
-        <button type="button" id="apply-bulk" class="bulk-btn">Apply</button>
-    </div>
-    <!-- Removed Add New User button as requested -->
+    <!-- Bulk actions removed as requested -->
 </div>
 
 <!-- Users Table (Desktop) -->
 <div class="users-table">
-    <form id="bulk-form" method="POST" action="{{ route('admin.users.bulk-action') }}">
-        @csrf
-        <input type="hidden" name="action" id="bulk-action-input">
-        
-        <table>
+    <table>
             <thead>
                 <tr>
-                    <th><input type="checkbox" id="select-all"></th>
                     <th>User</th>
                     <th>Role</th>
                     <th>Status</th>
@@ -606,16 +591,12 @@
             <tbody>
                 @forelse($users as $user)
                 <tr>
-                    <td>
-                        @if($user->role !== 'vet')
-                        <input type="checkbox" name="users[]" value="{{ $user->id }}" class="user-checkbox">
-                        @endif
-                    </td>
+                    
                     <td>
                         <div class="user-info">
                             <div class="user-avatar" style="background: {{ (isset($user) && isset($user->role) && strtolower($user->role) === 'admin') ? '#e74c3c' : ($user->role === 'vet' ? '#27ae60' : '#3498db') }};">
                                 @if($user->profile_picture_path)
-                                    <img src="{{ asset('storage/' . $user->profile_picture_path) }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                    <img src="{{ $user->profile_picture_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                                 @else
                                     @if(isset($user) && isset($user->role) && strtolower($user->role) === 'admin')
                                         AD
@@ -659,17 +640,6 @@
                             <a href="{{ route('admin.users.show', $user) }}" class="action-btn btn-view">
                                 👁️ View
                             </a>
-                            @if($user->id !== auth()->id())
-                                <form method="POST" action="{{ route('admin.users.destroy', $user) }}" 
-                                      style="display: inline;" 
-                                      onsubmit="return confirm('Are you sure you want to delete this user?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="action-btn btn-delete">
-                                        🗑️ Delete
-                                    </button>
-                                </form>
-                            @endif
                         </div>
                     </td>
                 </tr>
@@ -683,7 +653,6 @@
                 @endforelse
             </tbody>
         </table>
-    </form>
 </div>
 
 <!-- Users Mobile Cards (Mobile) -->
@@ -693,7 +662,7 @@
         <div class="user-card-header {{ $user->role === 'vet' ? 'vet-header' : ($user->role === 'user' ? 'user-header' : '') }}">
             <div class="user-card-avatar" style="background: {{ (isset($user) && isset($user->role) && strtolower($user->role) === 'admin') ? '#e74c3c' : ($user->role === 'vet' ? '#27ae60' : '#3498db') }};">
                 @if($user->profile_picture_path)
-                    <img src="{{ asset('storage/' . $user->profile_picture_path) }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                    <img src="{{ $user->profile_picture_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                 @else
                     @if(isset($user) && isset($user->role) && strtolower($user->role) === 'admin')
                         AD
@@ -704,6 +673,7 @@
                     @endif
                 @endif
             </div>
+
             <div class="user-card-info">
                 <h4 class="user-card-name">{{ $user->role === 'vet' ? 'Dr. ' : '' }}{{ $user->name }}</h4>
                 <p class="user-card-email">{{ $user->email }}</p>
@@ -762,17 +732,6 @@
             <a href="{{ route('admin.users.show', $user) }}" class="user-card-btn btn-view-mobile {{ $user->role === 'vet' ? 'vet-view' : ($user->role === 'user' ? 'user-view' : '') }}">
                 👁️ View Details
             </a>
-            @if($user->id !== auth()->id())
-                <form method="POST" action="{{ route('admin.users.destroy', $user) }}" 
-                      style="display: inline;" 
-                      onsubmit="return confirm('Are you sure you want to delete this user?')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="user-card-btn btn-delete-mobile">
-                        🗑️ Delete
-                    </button>
-                </form>
-            @endif
             @if($user->role === 'vet' && !$user->is_verified_vet)
                 <form method="POST" action="{{ route('admin.users.verify-vet', $user) }}" 
                       style="display: inline;" 
@@ -795,37 +754,5 @@
     @endforelse
 </div>
 
-<!-- JavaScript for bulk actions -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Select all checkbox functionality
-    document.getElementById('select-all').addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('.user-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
-    });
-    
-    // Bulk action handler
-    document.getElementById('apply-bulk').addEventListener('click', function() {
-        const action = document.getElementById('bulk-action').value;
-        if (!action) {
-            alert('Please select a bulk action.');
-            return;
-        }
-        
-        const selectedUsers = document.querySelectorAll('.user-checkbox:checked');
-        if (selectedUsers.length === 0) {
-            alert('Please select at least one user.');
-            return;
-        }
-        
-        const actionText = action === 'delete' ? 'delete' : action;
-        if (confirm(`Are you sure you want to ${actionText} ${selectedUsers.length} selected user(s)?`)) {
-            document.getElementById('bulk-action-input').value = action;
-            document.getElementById('bulk-form').submit();
-        }
-    });
-});
-</script>
+
 @endsection

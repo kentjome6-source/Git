@@ -196,33 +196,6 @@ class UserController extends Controller
     }
     
     /**
-     * Delete user
-     */
-    public function destroy(User $user)
-    {
-        // Prevent deletion of the current admin user
-        if ($user->id === auth()->id()) {
-            return redirect()->route('admin.users.index')
-                           ->with('error', 'You cannot delete your own account!');
-        }
-        
-        // Ensure we're only deleting legitimate users
-        if (!$user->legitimate()->exists()) {
-            return redirect()->route('admin.users.index')
-                           ->with('error', 'User not found.');
-        }
-        
-        // Delete user's pets first to maintain referential integrity
-        $user->pets()->delete();
-        
-        // Delete the user
-        $user->delete();
-        
-        return redirect()->route('admin.users.index')
-                        ->with('success', 'User and associated pets deleted successfully!');
-    }
-    
-    /**
      * Verify a veterinarian
      */
     public function verifyVet($id)
@@ -268,45 +241,5 @@ class UserController extends Controller
     
     
     
-    /**
-     * Perform bulk actions on users
-     */
-    public function bulkAction(Request $request)
-    {
-        $action = $request->input('action');
-        $userIds = $request->input('user_ids', []);
-        
-        // Remove current admin ID from the list to prevent self-deletion
-        $currentAdminId = auth()->id();
-        $userIds = array_filter($userIds, function($id) use ($currentAdminId) {
-            return $id != $currentAdminId;
-        });
-        
-        if (empty($userIds)) {
-            return redirect()->route('admin.users.index')
-                           ->with('error', 'No valid users selected for action.');
-        }
-        
-        switch ($action) {
-            case 'delete':
-                // Delete users and their pets
-                User::whereIn('id', $userIds)->delete();
-                return redirect()->route('admin.users.index')
-                               ->with('success', 'Selected users deleted successfully!');
-                
-            case 'activate':
-                User::whereIn('id', $userIds)->update(['is_active' => true]);
-                return redirect()->route('admin.users.index')
-                               ->with('success', 'Selected users activated successfully!');
-                
-            case 'deactivate':
-                User::whereIn('id', $userIds)->update(['is_active' => false]);
-                return redirect()->route('admin.users.index')
-                               ->with('success', 'Selected users deactivated successfully!');
-                
-            default:
-                return redirect()->route('admin.users.index')
-                               ->with('error', 'Invalid action selected.');
-        }
-    }
+
 }

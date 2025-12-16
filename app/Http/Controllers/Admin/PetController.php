@@ -36,7 +36,7 @@ class PetController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'breed' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'description' => 'nullable|string|max:1000',
             'appropriate_food' => 'nullable|string|max:1000',
             'other_care_details' => 'nullable|string|max:1000',
@@ -87,7 +87,7 @@ class PetController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'breed' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'description' => 'nullable|string|max:1000',
             'appropriate_food' => 'nullable|string|max:1000',
             'other_care_details' => 'nullable|string|max:1000',

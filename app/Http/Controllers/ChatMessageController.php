@@ -14,7 +14,7 @@ use App\Jobs\SendMessageJob;
 class ChatMessageController extends Controller
 {
     /**
-     * Display the messages index page with contacts and messages
+     * Display the messages index page with contacts only
      */
     public function index(Request $request)
     {
@@ -28,44 +28,26 @@ class ChatMessageController extends Controller
         // Add unread counts to users
         $users = $this->addUnreadCounts($users, $currentUser->id);
         
-        // Get selected user (first contact by default)
-        $selectedUserId = $request->query('user');
-        if (!$selectedUserId && !$users->isEmpty()) {
-            $selectedUserId = $users->first()->id;
-        }
-        
-        // Get messages with selected user
-        $messages = collect();
-        if ($selectedUserId) {
-            $messages = ChatMessage::where(function ($query) use ($currentUser, $selectedUserId) {
-                $query->where('sender_id', $currentUser->id)
-                      ->where('recipient_id', $selectedUserId);
-            })->orWhere(function ($query) use ($currentUser, $selectedUserId) {
-                $query->where('sender_id', $selectedUserId)
-                      ->where('recipient_id', $currentUser->id);
-            })->orderBy('created_at', 'asc')->get();
-        }
-        
         // Use veterinarian-specific view if user is a vet
         if ($currentUser->role === 'vet') {
-            return view('vet.messages.index', compact('users', 'selectedUserId', 'messages'));
+            return view('vet.messages.index', compact('users'));
         }
         
-        return view('messages.index', compact('users', 'selectedUserId', 'messages'));
+        return view('messages.index', compact('users'));
     }
     
     /**
-     * Show messages with a specific user
+     * Show conversation with a specific user
      */
-    public function show(User $user)
+    public function conversation(User $user)
     {
         $currentUser = Auth::user();
         
-        // Get contacts
-        $users = $this->getContacts($currentUser);
-        
-        // Add unread counts to users
-        $users = $this->addUnreadCounts($users, $currentUser->id);
+        // Validate that the user is a valid contact
+        $isValidContact = $this->isValidContact($currentUser, $user->id);
+        if (!$isValidContact) {
+            return redirect()->route('messages.index')->with('error', 'You can only message users you have appointments with.');
+        }
         
         // Get messages with selected user
         $messages = ChatMessage::where(function ($query) use ($currentUser, $user) {
@@ -76,15 +58,15 @@ class ChatMessageController extends Controller
                   ->where('recipient_id', $currentUser->id);
         })->orderBy('created_at', 'asc')->get();
         
-        // Set selected user ID for the view
-        $selectedUserId = $user->id;
+        // Use the correct variable name for the view
+        $selectedUser = $user;
         
         // Use veterinarian-specific view if user is a vet
         if ($currentUser->role === 'vet') {
-            return view('vet.messages.index', compact('users', 'selectedUserId', 'messages'));
+            return view('vet.messages.conversation', compact('selectedUser', 'messages'));
         }
         
-        return view('messages.index', compact('users', 'selectedUserId', 'messages'));
+        return view('messages.conversation', compact('selectedUser', 'messages'));
     }
     
     /**
@@ -96,64 +78,66 @@ class ChatMessageController extends Controller
             'recipient_id' => 'required|exists:users,id',
             'message' => 'required|string|max:1000'
         ]);
-        
+
         $currentUser = Auth::user();
         $recipientId = $request->input('recipient_id');
         $messageText = $request->input('message');
         
+        // Validate that the recipient is a valid contact
+        $isValidContact = $this->isValidContact($currentUser, $recipientId);
+        if (!$isValidContact) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You can only message users you have appointments with.'
+            ], 403);
+        }
+
         // Create the message
         $message = new ChatMessage();
         $message->sender_id = $currentUser->id;
         $message->recipient_id = $recipientId;
         $message->message = $messageText;
         $message->save();
-        
+
         try {
             broadcast(new MessageSent($message))->toOthers();
-            
+
             $unreadCount = ChatMessage::where('recipient_id', $message->recipient_id)
                                       ->whereNull('read_at')
                                       ->count();
-            
+
             broadcast(new UnreadMessageCountUpdated($message->recipient_id, $unreadCount))->toOthers();
         } catch (\Exception $e) {
         }
-        
+
         return response()->json([
             'success' => true,
-            'message' => $message
+            'message' => $message->load('sender'),
+            'unread_count' => $unreadCount ?? 0
         ]);
     }
     
     /**
      * Mark messages as read
      */
-    public function markAsRead(Request $request)
+    public function markAsRead(Request $request, $userId)
     {
-        $request->validate([
-            'contact_id' => 'required|exists:users,id'
-        ]);
-        
         $currentUser = Auth::user();
-        $contactId = $request->input('contact_id');
         
-        // Mark messages as read
-        ChatMessage::where('sender_id', $contactId)
+        // Update all messages from the sender to current user that are unread
+        ChatMessage::where('sender_id', $userId)
                    ->where('recipient_id', $currentUser->id)
                    ->whereNull('read_at')
                    ->update(['read_at' => now()]);
         
-        // Get updated unread count
+        // Also broadcast the updated unread count
         $unreadCount = ChatMessage::where('recipient_id', $currentUser->id)
                                   ->whereNull('read_at')
                                   ->count();
         
-        // Broadcast updated unread count
         broadcast(new UnreadMessageCountUpdated($currentUser->id, $unreadCount))->toOthers();
         
-        return response()->json([
-            'success' => true
-        ]);
+        return response()->json(['success' => true]);
     }
     
     /**
@@ -173,32 +157,22 @@ class ChatMessageController extends Controller
     }
     
     /**
-     * Get unread message count for a specific contact
+     * Poll for new messages
      */
-    public function getContactUnreadCount(Request $request)
-    {
-        $request->validate([
-            'contact_id' => 'required|exists:users,id'
-        ]);
-        
-        $contactId = $request->input('contact_id');
-        $currentUser = Auth::user();
-        
-        $unreadCount = ChatMessage::where('sender_id', $contactId)
-                                  ->where('recipient_id', $currentUser->id)
-                                  ->whereNull('read_at')
-                                  ->count();
-        
-        return response()->json([
-            'unread_count' => $unreadCount
-        ]);
-    }
-    
     public function pollMessages(Request $request, User $user)
     {
         $currentUser = Auth::user();
         $lastMessageId = $request->query('last_message_id', 0);
-
+        
+        // Validate that the user is a valid contact
+        $isValidContact = $this->isValidContact($currentUser, $user->id);
+        if (!$isValidContact) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid contact.'
+            ], 403);
+        }
+        
         $messages = ChatMessage::where(function ($query) use ($currentUser, $user) {
             $query->where('sender_id', $currentUser->id)
                   ->where('recipient_id', $user->id);
@@ -231,21 +205,27 @@ class ChatMessageController extends Controller
     private function getContacts($user)
     {
         if ($user->role === 'vet') {
-            // For veterinarians, get users they have appointments with
+            // For veterinarians, only show pet parents they have appointments with
+            // AND ensure they are legitimate pet parent accounts
+            // Only show pet parents with accepted appointments
             return User::where('role', 'user')
                       ->whereHas('appointments', function ($query) use ($user) {
-                          $query->where('vet_id', $user->id);
+                          $query->where('vet_id', $user->id)
+                                ->where('status', 'accepted');
                       })
                       ->get();
         } else {
-            // For pet parents, get all other pet parents AND veterinarians they have appointments with
+            // For pet parents, show:
+            // 1. Other pet parents
+            // 2. Veterinarians they have appointments with (only accepted appointments)
             $petParents = User::where('role', 'user')
                            ->where('id', '!=', $user->id)
                            ->get();
             
             $veterinarians = User::where('role', 'vet')
                               ->whereHas('vetAppointments', function ($query) use ($user) {
-                                  $query->where('user_id', $user->id);
+                                  $query->where('user_id', $user->id)
+                                        ->where('status', 'accepted');
                               })
                               ->get();
             
@@ -262,15 +242,64 @@ class ChatMessageController extends Controller
         // Note: This query needs to be updated to match the actual database structure
         // The error was occurring because this query was using 'receiver_id' and 'is_read'
         // but the database actually has 'recipient_id' and 'read_at'
+        // but the database actually has 'recipient_id' and 'read_at'
         $unreadCounts = ChatMessage::select('sender_id', DB::raw('count(*) as unread_count'))
                                   ->where('recipient_id', $currentUserId)
                                   ->whereNull('read_at')
                                   ->groupBy('sender_id')
                                   ->pluck('unread_count', 'sender_id');
-        
+
         return $users->map(function ($user) use ($unreadCounts) {
             $user->unread_count = $unreadCounts[$user->id] ?? 0;
             return $user;
         });
+    }
+    
+    /**
+     * Check if a recipient is a valid contact for the current user
+     */
+    private function isValidContact($currentUser, $recipientId)
+    {
+        // Don't allow messaging oneself
+        if ($currentUser->id == $recipientId) {
+            return false;
+        }
+        
+        // Get the recipient user
+        $recipient = User::find($recipientId);
+        if (!$recipient) {
+            return false;
+        }
+        
+        if ($currentUser->role === 'vet') {
+            // Veterinarians can only message pet parents they have appointments with
+            // AND ensure the recipient is a legitimate pet parent account
+            // Only allow messaging pet parents with accepted appointments
+            if ($recipient->role !== 'user') {
+                return false;
+            }
+            
+            return $recipient->appointments()
+                            ->where('vet_id', $currentUser->id)
+                            ->where('status', 'accepted')
+                            ->exists();
+        } else {
+            // Pet parents can message:
+            // 1. Other pet parents (no appointment required)
+            // 2. Veterinarians they have appointments with (only accepted appointments)
+            if ($recipient->role === 'user') {
+                // Pet parent messaging another pet parent - allowed
+                return true;
+            } elseif ($recipient->role === 'vet') {
+                // Pet parent messaging a veterinarian - only if they have an accepted appointment
+                return $recipient->vetAppointments()
+                                ->where('user_id', $currentUser->id)
+                                ->where('status', 'accepted')
+                                ->exists();
+            } else {
+                // Don't allow messaging admins or other roles
+                return false;
+            }
+        }
     }
 }

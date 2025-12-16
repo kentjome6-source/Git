@@ -88,9 +88,8 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
         'show' => 'admin.users.show',
         'edit' => 'admin.users.edit',
         'update' => 'admin.users.update',
-        'destroy' => 'admin.users.destroy',
     ]);
-    Route::post('admin/users/bulk-action', [UserController::class, 'bulkAction'])->name('admin.users.bulk-action');
+    
     Route::post('admin/users/{user}/verify-vet', [UserController::class, 'verifyVet'])->name('admin.users.verify-vet');
     Route::post('admin/users/{user}/reject-vet', [UserController::class, 'rejectVet'])->name('admin.users.reject-vet');
     
@@ -141,9 +140,9 @@ Route::middleware(['auth'])->group(function () {
     
     // Messages Routes
     Route::get('/messages', [ChatMessageController::class, 'index'])->name('messages.index');
-    Route::get('/messages/{user}', [ChatMessageController::class, 'show'])->name('messages.show');
+    Route::get('/messages/conversation/{user}', [ChatMessageController::class, 'conversation'])->name('messages.conversation');
     Route::post('/messages/send', [ChatMessageController::class, 'sendMessage'])->name('messages.send');
-    Route::post('/messages/mark-as-read', [ChatMessageController::class, 'markAsRead'])->name('messages.mark-as-read');
+    Route::post('/messages/mark-as-read/{userId}', [ChatMessageController::class, 'markAsRead'])->name('messages.mark-as-read');
     Route::get('/messages/unread-count', [ChatMessageController::class, 'getUnreadCount'])->name('messages.unread-count');
     Route::get('/messages/contact-unread-count', [ChatMessageController::class, 'getContactUnreadCount'])->name('messages.contact-unread-count');
     Route::get('/messages/poll/{user}', [ChatMessageController::class, 'pollMessages'])->name('messages.poll');

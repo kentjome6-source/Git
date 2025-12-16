@@ -133,12 +133,24 @@ class AuthController extends Controller
                 if ($user) {
                     $user->update(['google_id' => $googleUser->getId()]);
                 } else {
+                    // For new users, we'll save the Google avatar URL directly
+                    // The User model will handle displaying it correctly
+                    $avatarUrl = $googleUser->getAvatar();
+                    
+                    // Google sometimes provides avatar URLs with size parameters
+                    // We can modify it to get a better size for our application
+                    if ($avatarUrl) {
+                        // Remove any existing size parameters and set to 400px
+                        $avatarUrl = preg_replace('/\?sz=\d+$/', '', $avatarUrl);
+                        $avatarUrl .= '?sz=400'; // Set size to 400px
+                    }
+                    
                     $user = User::create([
                         'name' => $googleUser->getName(),
                         'email' => $googleUser->getEmail(),
                         'google_id' => $googleUser->getId(),
                         'role' => 'user',
-                        'profile_picture_path' => $googleUser->getAvatar(),
+                        'profile_picture_path' => $avatarUrl, // Store the full URL
                     ]);
                 }
             }

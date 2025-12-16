@@ -31,7 +31,7 @@
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
                                     @if($post->user && $post->user->profile_picture_path)
-                                        <img src="{{ asset('storage/' . $post->user->profile_picture_path) }}" alt="{{ $post->user->name }} Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                        <img src="{{ $post->user->profile_picture_url }}" alt="{{ $post->user->name }} Profile Picture" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
                                     @else
                                         <div class="profile-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
                                              style="width: 50px; height: 50px; font-size: 1.2rem;">
@@ -132,7 +132,7 @@
                                         <div class="card-body">
                                             <div class="d-flex align-items-center mb-2">
                                                 @if($comment->user && $comment->user->profile_picture_path)
-                                                    <img src="{{ asset('storage/' . $comment->user->profile_picture_path) }}" alt="{{ $comment->user->name }} Profile Picture" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                                    <img src="{{ $comment->user->profile_picture_url }}" alt="{{ $comment->user->name }} Profile Picture" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
                                                 @else
                                                     <div class="profile-avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2" 
                                                          style="width: 40px; height: 40px; font-size: 1rem;">

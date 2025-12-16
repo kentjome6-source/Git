@@ -576,17 +576,6 @@
         @endif
     @endif
     
-    @if($user->id !== auth()->id())
-        <form method="POST" action="{{ route('admin.users.destroy', $user) }}" 
-              style="display: inline;" 
-              onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">
-                🗑️ Delete User
-            </button>
-        </form>
-    @endif
 </div>
 
 

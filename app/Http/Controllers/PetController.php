@@ -36,7 +36,7 @@ class PetController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'description' => 'nullable|string|max:1000',
         ]);
 
@@ -91,7 +91,7 @@ class PetController extends Controller
         }
 
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'description' => 'nullable|string|max:1000',
         ]);
 

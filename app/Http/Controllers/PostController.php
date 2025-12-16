@@ -38,7 +38,7 @@ class PostController extends Controller
     {
         $request->validate([
             'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
         ]);
 
         $postData = [
@@ -78,7 +78,7 @@ class PostController extends Controller
     public function myPosts()
     {
         $posts = Post::where('user_id', Auth::id())
-            ->with('comments', 'likes')
+            ->with('user', 'comments', 'likes')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
         
