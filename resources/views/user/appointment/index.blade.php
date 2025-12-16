@@ -2,515 +2,732 @@
 
 @section('title', 'Appointments')
 
-@section('styles')
-<style>
-    .admin-header {
-        background: #fff; padding: 30px; border-radius: 15px; margin-bottom: 30px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        text-align: center; /* Center content in header */
-    }
-    .admin-title { font-size: 2.5rem; color: #5b4b9b; margin-bottom: 10px; }
-    .admin-subtitle { font-size: 1.1rem; color: #666; }
-
-    .request-btn-container {
-        margin-top: 20px;
-        display: flex;
-        justify-content: center;
-    }
-
-    .stats-grid {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px; margin-bottom: 40px;
-    }
-    .stat-card {
-        background: #fff; padding: 25px; border-radius: 12px;
-        text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        border-left: 4px solid #5b4b9b;
-    }
-    .stat-card.pending { border-left-color: #f39c12; }
-    .stat-card.confirmed { border-left-color: #27ae60; }
-    .stat-card.completed { border-left-color: #e74c3c; }
-    .stat-number {
-        font-size: 2.5rem; font-weight: 700; margin-bottom: 10px;
-    }
-    .stat-card.pending .stat-number { color: #f39c12; }
-    .stat-card.confirmed .stat-number { color: #27ae60; }
-    .stat-card.completed .stat-number { color: #e74c3c; }
-    .stat-label {
-        font-size: 1rem; color: #666; text-transform: uppercase;
-        font-weight: 600;
-    }
-
-    .section-header {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #eee;
-    }
-    .section-title {
-        font-size: 1.5rem; font-weight: 600; color: #333;
-        display: flex; align-items: center; gap: 10px;
-    }
-    .section-count {
-        background: #5b4b9b; color: #fff; padding: 4px 12px;
-        border-radius: 20px; font-size: 0.9rem; font-weight: 600;
-    }
-
-    .listings-table {
-        background: #fff; border-radius: 15px; overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-bottom: 40px;
-    }
-    .table {
-        width: 100%; border-collapse: collapse;
-    }
-    .table th {
-        background: #f8f9fa; padding: 15px; text-align: left;
-        font-weight: 600; color: #333; border-bottom: 1px solid #eee;
-    }
-    .table td {
-        padding: 15px; border-bottom: 1px solid #f0f0f0;
-        vertical-align: middle;
-    }
-    .table tr:hover { background: #f9f9f9; }
-
-    .pet-info {
-        display: flex; align-items: center; gap: 15px;
-    }
-    .pet-details h4 {
-        font-size: 1rem; font-weight: 600; color: #333; margin-bottom: 5px;
-    }
-    .pet-details p {
-        font-size: 0.85rem; color: #666; margin-bottom: 2px;
-    }
-
-    .status-badge {
-        padding: 6px 12px; border-radius: 20px; font-size: 0.8rem;
-        font-weight: 600; text-transform: uppercase;
-    }
-    .status-badge.pending { background: #f39c12; color: #fff; }
-    .status-badge.accepted { background: #27ae60; color: #fff; }
-    .status-badge.rejected { background: #e74c3c; color: #fff; }
-    .status-badge.cancelled { background: #6c757d; color: #fff; }
-
-    .action-buttons {
-        display: flex; gap: 8px;
-    }
-    .btn {
-        padding: 8px 16px; border: none; border-radius: 6px;
-        text-decoration: none; font-weight: 600; cursor: pointer;
-        transition: 0.2s; display: inline-flex; align-items: center; gap: 5px;
-        font-size: 0.85rem;
-    }
-    .btn-primary { background: #5b4b9b; color: #fff; }
-    .btn-primary:hover { background: #4a3d7a; }
-    .btn-success { background: #27ae60; color: #fff; }
-    .btn-success:hover { background: #229954; }
-    .btn-warning { background: #f39c12; color: #fff; }
-    .btn-warning:hover { background: #e67e22; }
-    .btn-secondary { background: #6c757d; color: #fff; }
-    .btn-secondary:hover { background: #5a6268; }
-
-    .alert {
-        padding: 15px 20px; border-radius: 8px; margin-bottom: 20px;
-        font-weight: 500;
-    }
-    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-
-    .pagination {
-        display: flex; justify-content: center; gap: 10px; margin-top: 20px;
-    }
-    .pagination a, .pagination span {
-        padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px;
-        text-decoration: none; color: #666; transition: 0.2s;
-    }
-    .pagination a:hover { background: #5b4b9b; color: #fff; border-color: #5b4b9b; }
-    .pagination .current { background: #5b4b9b; color: #fff; border-color: #5b4b9b; }
-    
-    /* Swipeable table for mobile */
-    .swipeable-table-container {
-        display: none;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        padding: 10px 0;
-    }
-    
-    .swipeable-table-row {
-        display: flex;
-        flex-direction: column;
-        border: 1px solid #eee;
-        border-radius: 10px;
-        margin-bottom: 15px;
-        background: #fff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    
-    .swipeable-table-item {
-        padding: 12px 15px;
-        border-bottom: 1px solid #f0f0f0;
-        display: flex;
-        justify-content: space-between;
-    }
-    
-    .swipeable-table-item:last-child {
-        border-bottom: none;
-    }
-    
-    .swipeable-table-label {
-        font-weight: 600;
-        color: #5b4b9b;
-        min-width: 100px;
-    }
-    
-    .swipeable-table-value {
-        text-align: right;
-        flex: 1;
-    }
-    
-    .swipeable-status-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 15px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-    
-    .swipeable-action-buttons {
-        display: flex;
-        gap: 8px;
-        padding: 10px 15px;
-    }
-    
-    .swipeable-action-buttons .btn {
-        flex: 1;
-        justify-content: center;
-        padding: 8px;
-        font-size: 0.8rem;
-    }
-
-    /* Responsive styles */
-    @media (max-width: 768px) {
-        .admin-header {
-            padding: 20px 15px;
-        }
-        
-        .admin-title {
-            font-size: 2rem;
-        }
-        
-        .stats-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        
-        .stat-card {
-            padding: 20px 15px;
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-        }
-        
-        .section-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        
-        .table-container {
-            display: none;
-        }
-        
-        .swipeable-table-container {
-            display: block;
-        }
-        
-        .table {
-            display: block;
-            overflow-x: auto;
-        }
-        
-        .table th,
-        .table td {
-            padding: 10px 8px;
-            font-size: 0.9rem;
-        }
-        
-        .pet-info {
-            gap: 10px;
-        }
-        
-        .pet-details h4 {
-            font-size: 0.95rem;
-        }
-        
-        .pet-details p {
-            font-size: 0.8rem;
-        }
-        
-        .action-buttons {
-            flex-direction: column;
-            gap: 5px;
-        }
-        
-        .btn {
-            width: 100%;
-            justify-content: center;
-            padding: 6px 12px;
-            font-size: 0.8rem;
-        }
-        
-        .status-badge {
-            font-size: 0.7rem;
-            padding: 4px 8px;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .section-title {
-            font-size: 1.25rem;
-        }
-        
-        .admin-title {
-            font-size: 1.75rem;
-        }
-        
-        .admin-subtitle {
-            font-size: 1rem;
-        }
-        
-        .request-btn-container .btn {
-            width: 100%;
-            padding: 10px;
-        }
-        
-        .table th,
-        .table td {
-            padding: 8px 6px;
-            font-size: 0.85rem;
-        }
-        
-        .pet-info {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 5px;
-        }
-    }
-    
-    /* Desktop view - hide swipeable table */
-    @media (min-width: 769px) {
-        .swipeable-table-container {
-            display: none !important;
-        }
-        .table-container {
-            display: block !important;
-        }
-    }
-</style>
-@endsection
-
 @section('content')
-    <div class="admin-header">
-        <h1 class="admin-title">My Appointments</h1>
-        <p class="admin-subtitle">Manage your pet appointments</p>
-        <div class="request-btn-container">
-            <a href="{{ route('appointments.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Request Appointment
-            </a>
-        </div>
-    </div>
-
-    @if(session('success'))
-        <div class="alert alert-success">
-            <i class="fas fa-check-circle"></i> {{ session('success') }}
-        </div>
-    @endif
-
-    @if($appointments->count() > 0)
-        <div class="stats-grid">
-            <div class="stat-card pending">
-                <div class="stat-number">{{ $appointments->count() }}</div>
-                <div class="stat-label">Pending Review</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{{ $appointments->count() }}</div>
-                <div class="stat-label">Total</div>
+<div class="appointments-page">
+    <div class="container-fluid px-4 py-5">
+        <!-- Page Header -->
+        <div class="page-header mb-5">
+            <div class="header-content">
+                <div class="header-text">
+                    <span class="label">Healthcare</span>
+                    <h1 class="page-title">My Appointments</h1>
+                    <p class="page-subtitle">Manage your pet's healthcare appointments</p>
+                </div>
+                <a href="{{ route('appointments.create') }}" class="btn-create-appointment">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>Request Appointment</span>
+                </a>
             </div>
         </div>
 
-        <!-- All Appointments -->
-        <div class="listings-table">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-stethoscope"></i>
-                    All Appointments
-                    <span class="section-count">{{ $appointments->count() }}</span>
-                </h2>
+        <!-- Success Message -->
+        @if(session('success'))
+            <div class="alert-success-custom mb-4">
+                <div class="alert-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <div class="alert-content">{{ session('success') }}</div>
+                <button type="button" class="alert-close" data-bs-dismiss="alert">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
-            
-            <!-- Desktop Table View -->
-                    <div class="table-container">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Pet Name</th>
-                            <th>Status</th>
-                            <th>Veterinarian</th>
-                            <th>Created</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($appointments as $appointment)
-                            <tr>
-                                <td>
-                                    <div class="pet-info">
-                                        <div class="pet-details">
-                                            <h4>{{ $appointment->pet_name }}</h4>
-                                            {{-- Pet complaint removed per simplified requirements --}}
-                                        </div>
+        @endif
+
+        @if($appointments->count() > 0)
+            <!-- Stats Cards -->
+            <div class="stats-grid mb-5">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-pending">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <div class="stat-number">{{ $appointments->count() }}</div>
+                    <div class="stat-label">Pending Review</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-total">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                    </div>
+                    <div class="stat-number">{{ $appointments->count() }}</div>
+                    <div class="stat-label">Total Appointments</div>
+                </div>
+            </div>
+
+            <!-- Appointments List -->
+            <div class="appointments-container">
+                <div class="section-header">
+                    <h2 class="section-title">All Appointments</h2>
+                    <span class="section-badge">{{ $appointments->count() }}</span>
+                </div>
+                
+                <div class="appointments-list">
+                    @foreach($appointments as $appointment)
+                        <div class="appointment-card">
+                            <div class="appointment-header">
+                                <div class="pet-info">
+                                    <h3 class="pet-name">{{ $appointment->pet_name }}</h3>
+                                    <div class="appointment-meta">
+                                        <span class="meta-item">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <polyline points="12 6 12 12 16 14"></polyline>
+                                            </svg>
+                                            {{ $appointment->created_at->format('M d, Y') }}
+                                        </span>
                                     </div>
-                                </td>
-                                <td>
+                                </div>
+                                
+                                <div class="appointment-status">
                                     @php
-                                        // Map statuses for pet parents view
                                         $statusDisplay = match($appointment->status) {
-                                            'pending' => 'Pending Review',
+                                            'pending' => 'Pending',
                                             'accepted' => 'Accepted',
                                             'rejected' => 'Rejected',
                                             'cancelled' => 'Cancelled',
                                             default => ucfirst($appointment->status)
                                         };
                                         
-                                        // Map CSS classes for pet parents view
                                         $statusClass = match($appointment->status) {
-                                            'pending' => 'pending',
-                                            'accepted' => 'accepted',
-                                            'rejected' => 'rejected',
-                                            'cancelled' => 'cancelled',
-                                            default => 'pending'
+                                            'pending' => 'status-pending',
+                                            'accepted' => 'status-accepted',
+                                            'rejected' => 'status-rejected',
+                                            'cancelled' => 'status-cancelled',
+                                            default => 'status-pending'
                                         };
                                     @endphp
                                     <span class="status-badge {{ $statusClass }}">{{ $statusDisplay }}</span>
-                                </td>
-                                <td>
-                                    @if($appointment->vet)
-                                        <span class="badge bg-success">Dr. {{ $appointment->vet->name }}</span>
-                                    @else
-                                        <span class="badge bg-warning">Not assigned</span>
-                                    @endif
-                                </td>
-                                <td>{{ $appointment->created_at->format('M d, Y') }}</td>
-                                
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="{{ route('appointments.show', $appointment) }}" class="btn btn-primary">
-                                            <i class="fas fa-eye"></i> View
-                                        </a>
-                                        @if($appointment->status === 'pending')
-                                            <a href="{{ route('appointments.edit', $appointment) }}" class="btn btn-warning">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </a>
+                                </div>
+                            </div>
+                            
+                            <div class="appointment-body">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                        Veterinarian
+                                    </div>
+                                    <div class="info-value">
+                                        @if($appointment->vet)
+                                            Dr. {{ $appointment->vet->name }}
+                                        @else
+                                            <span class="text-muted">Not assigned</span>
                                         @endif
                                     </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                
-                @if($appointments->hasPages())
-                    <div class="pagination">
-                        {{ $appointments->links() }}
-                    </div>
-                @endif
-            </div>
-            
-            <!-- Mobile Swipeable View -->
-            <div class="swipeable-table-container">
-                        @foreach($appointments as $appointment)
-                    <div class="swipeable-table-row">
-                        <div class="swipeable-table-item">
-                            <span class="swipeable-table-label">Pet Name:</span>
-                            <span class="swipeable-table-value">{{ $appointment->pet_name }}</span>
-                        </div>
-                        
-                        {{-- Removed pet species and breed information as per user request --}}
-                        
-                        <div class="swipeable-table-item">
-                            <span class="swipeable-table-label">Status:</span>
-                            <span class="swipeable-table-value">
-                                @php
-                                    // Map statuses for pet parents view
-                                    $statusDisplay = match($appointment->status) {
-                                        'pending' => 'Pending Review',
-                                        'accepted' => 'Accepted',
-                                        'rejected' => 'Rejected',
-                                        'cancelled' => 'Cancelled',
-                                        default => ucfirst($appointment->status)
-                                    };
-                                    
-                                    // Map CSS classes for pet parents view
-                                    $statusClass = match($appointment->status) {
-                                        'pending' => 'pending',
-                                        'accepted' => 'accepted',
-                                        'rejected' => 'rejected',
-                                        'cancelled' => 'cancelled',
-                                        default => 'pending'
-                                    };
-                                @endphp
-                                <span class="swipeable-status-badge {{ $statusClass }}">{{ $statusDisplay }}</span>
-                            </span>
-                        </div>
-                        
-                        <div class="swipeable-table-item">
-                            <span class="swipeable-table-label">Veterinarian:</span>
-                            <span class="swipeable-table-value">
-                                @if($appointment->vet)
-                                    Dr. {{ $appointment->vet->name }}
-                                @else
-                                    Not assigned
-                                @endif
-                            </span>
-                        </div>
-                        
-                        <div class="swipeable-table-item">
-                            <span class="swipeable-table-label">Created:</span>
-                            <span class="swipeable-table-value">{{ $appointment->created_at->format('M d, Y') }}</span>
-                        </div>
-                        
-                        
-                        
-                        <div class="swipeable-action-buttons">
-                            <a href="{{ route('appointments.show', $appointment) }}" class="btn btn-primary">
-                                <i class="fas fa-eye"></i> View
-                            </a>
-                            @if($appointment->status === 'pending')
-                                <a href="{{ route('appointments.edit', $appointment) }}" class="btn btn-warning">
-                                    <i class="fas fa-edit"></i> Edit
+                                </div>
+                            </div>
+                            
+                            <div class="appointment-footer">
+                                <a href="{{ route('appointments.show', $appointment) }}" class="btn-view">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                    View Details
                                 </a>
-                            @endif
+                                
+                                @if($appointment->status === 'pending')
+                                    <a href="{{ route('appointments.edit', $appointment) }}" class="btn-edit">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                        Edit
+                                    </a>
+                                @endif
+                            </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
                 
                 @if($appointments->hasPages())
-                    <div class="pagination">
+                    <div class="pagination-wrapper">
                         {{ $appointments->links() }}
                     </div>
                 @endif
             </div>
-        </div>
-    @else
-        <div class="listings-table">
-            <div style="padding: 40px; text-align: center; color: #666;">
-                <i class="fas fa-stethoscope" style="font-size: 3rem; color: #5b4b9b; margin-bottom: 15px;"></i>
-                <h3>No appointments yet</h3>
-                <p>Start your pet's healthcare journey by requesting your first appointment.</p>
-                <!-- Button is already in header, so no need to duplicate here -->
+        @else
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                    </svg>
+                </div>
+                <h3 class="empty-title">No appointments yet</h3>
+                <p class="empty-text">Start your pet's healthcare journey by requesting your first appointment</p>
+                {{-- <a href="{{ route('appointments.create') }}" class="btn-empty-action">
+                    Request Appointment
+                </a> --}}
             </div>
-        </div>
-    @endif
+        @endif
+    </div>
+</div>
+
+<style>
+    :root {
+        --slate: #0f172a;
+        --slate-light: #1e293b;
+        --blue: #3b82f6;
+        --purple: #8b5cf6;
+        --green: #10b981;
+        --orange: #f59e0b;
+        --red: #ef4444;
+        --gray: #64748b;
+        --gray-light: #f1f5f9;
+        --gray-lighter: #f8fafc;
+    }
+
+    .appointments-page {
+        font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--gray-lighter);
+        min-height: 100vh;
+    }
+
+    /* Page Header */
+    .page-header {
+        animation: fadeInDown 0.6s ease-out;
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 24px;
+    }
+
+    .label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--blue);
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+
+    .page-title {
+        font-size: clamp(2rem, 4vw, 2.75rem);
+        font-weight: 700;
+        color: var(--slate);
+        margin-bottom: 8px;
+        letter-spacing: -0.02em;
+    }
+
+    .page-subtitle {
+        font-size: 1.05rem;
+        color: var(--gray);
+    }
+
+    .btn-create-appointment {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: var(--purple);
+        color: white;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .btn-create-appointment:hover {
+        background: #7c3aed;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        color: white;
+    }
+
+    /* Success Alert */
+    .alert-success-custom {
+        background: #d1fae5;
+        border: 1px solid #a7f3d0;
+        border-radius: 12px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        animation: slideDown 0.4s ease-out;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-icon {
+        flex-shrink: 0;
+        color: #059669;
+    }
+
+    .alert-content {
+        flex: 1;
+        color: #065f46;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .alert-close {
+        flex-shrink: 0;
+        background: none;
+        border: none;
+        color: #059669;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        transition: opacity 0.2s;
+    }
+
+    .alert-close:hover {
+        opacity: 0.7;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 24px;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 28px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+
+    .stat-icon-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--orange);
+    }
+
+    .stat-icon-total {
+        background: rgba(139, 92, 246, 0.1);
+        color: var(--purple);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--slate);
+        margin-bottom: 8px;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--gray);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* Appointments Container */
+    .appointments-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--slate);
+        letter-spacing: -0.01em;
+    }
+
+    .section-badge {
+        background: var(--purple);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    /* Appointments List */
+    .appointments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .appointment-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .appointment-card:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        border-color: var(--blue);
+    }
+
+    .appointment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .pet-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--slate);
+        margin-bottom: 8px;
+    }
+
+    .appointment-meta {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        color: var(--gray);
+    }
+
+    .meta-item svg {
+        flex-shrink: 0;
+    }
+
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: #d97706;
+    }
+
+    .status-accepted {
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+    }
+
+    .status-rejected {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+    }
+
+    .status-cancelled {
+        background: rgba(100, 116, 139, 0.1);
+        color: var(--gray);
+    }
+
+    .appointment-body {
+        padding: 24px;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .info-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: var(--gray);
+        font-weight: 500;
+    }
+
+    .info-value {
+        font-size: 0.95rem;
+        color: var(--slate);
+        font-weight: 500;
+        text-align: right;
+    }
+
+    .text-muted {
+        color: var(--gray);
+        font-weight: 400;
+    }
+
+    .appointment-footer {
+        display: flex;
+        gap: 12px;
+        padding: 20px 24px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-view,
+    .btn-edit {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .btn-view {
+        background: var(--purple);
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #7c3aed;
+        transform: translateY(-1px);
+        color: white;
+    }
+
+    .btn-edit {
+        background: white;
+        color: var(--orange);
+        border: 1px solid var(--orange);
+    }
+
+    .btn-edit:hover {
+        background: var(--orange);
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .empty-icon {
+        margin-bottom: 24px;
+        color: var(--gray);
+        opacity: 0.4;
+    }
+
+    .empty-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--slate);
+        margin-bottom: 12px;
+    }
+
+    .empty-text {
+        font-size: 1.05rem;
+        color: var(--gray);
+        margin-bottom: 28px;
+    }
+
+    .btn-empty-action {
+        display: inline-flex;
+        padding: 14px 28px;
+        background: var(--purple);
+        color: white;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-empty-action:hover {
+        background: #7c3aed;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        color: white;
+    }
+
+    /* Pagination */
+    .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn-create-appointment {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .stat-card {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .appointment-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .appointment-footer {
+            flex-direction: column;
+        }
+
+        .btn-view,
+        .btn-edit {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .container-fluid {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .appointment-card {
+            margin-bottom: 16px;
+        }
+
+        .appointment-header,
+        .appointment-body,
+        .appointment-footer {
+            padding: 16px;
+        }
+
+        .pet-name {
+            font-size: 1.1rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .stat-card {
+            padding: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .stat-number {
+            font-size: 1.75rem;
+        }
+    }
+</style>
 @endsection

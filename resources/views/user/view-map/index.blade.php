@@ -6,421 +6,713 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
-    .map-header { background: #5b4b9b; padding: 30px 0; color: white; text-align: center; }
-    .map-title { font-size: 2rem; font-weight: 700; margin-bottom: 10px; }
-    .map-subtitle { font-size: 1rem; opacity: 0.9; }
+    :root {
+        --slate: #0f172a;
+        --slate-light: #1e293b;
+        --blue: #3b82f6;
+        --purple: #8b5cf6;
+        --green: #10b981;
+        --orange: #f59e0b;
+        --gray: #64748b;
+        --gray-light: #f1f5f9;
+        --gray-lighter: #f8fafc;
+    }
 
-    .content-section { padding: 30px 15px; }
-    .section-title { font-size: 1.75rem; font-weight: 700; color: #1f2937; margin-bottom: 20px; text-align: center; }
+    .map-page {
+        font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--gray-lighter);
+        min-height: 100vh;
+    }
 
-    .shelters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
-    
+    /* Page Header */
+    .page-header {
+        padding: 40px 20px;
+        text-align: center;
+        animation: fadeInDown 0.6s ease-out;
+    }
 
-    .shelter-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s; border: 2px solid transparent; }
-    .shelter-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); border-color: #667eea; }
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
-    .shelter-header { display: flex; align-items: center; margin-bottom: 15px; }
-    .shelter-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.25rem; margin-right: 12px; }
-    .shelter-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.25rem; margin-right: 12px; }
-    .icon-pet-shop { background: linear-gradient(135deg, #667eea, #764ba2); }
-    .icon-veterinarian { background: linear-gradient(135deg, #10b981, #059669); }
-    .icon-grooming { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .label {
+        display: inline-block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--blue);
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
 
-    .shelter-info h3 { margin: 0 0 3px 0; font-size: 1.15rem; font-weight: 600; color: #1f2937; }
-    .shelter-info p { margin: 0; color: #6b7280; font-size: 0.85rem; }
+    .page-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        color: var(--slate);
+        margin-bottom: 12px;
+        letter-spacing: -0.02em;
+    }
 
-    .shelter-details { margin-bottom: 15px; }
-    .detail-item { display: flex; align-items: flex-start; margin-bottom: 8px; color: #4b5563; }
-    .detail-item i { width: 18px; margin-right: 8px; color: #667eea; margin-top: 3px; }
+    .page-subtitle {
+        font-size: 1.1rem;
+        color: var(--gray);
+    }
 
-    .type-badge { padding: 5px 10px; border-radius: 16px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin-bottom: 12px; }
-    .type-pet-shop { background: #ddd6fe; color: #5b21b6; }
-    .type-veterinarian { background: #dcfce7; color: #166534; }
-    .type-grooming { background: #fef3c7; color: #92400e; }
+    /* Map Section */
+    .map-section {
+        padding: 0 20px 40px;
+        animation: fadeIn 0.8s ease-out;
+    }
 
-    .btn { padding: 10px 20px; border-radius: 6px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; text-align: center; display: inline-block; font-size: 0.9rem; }
-    .btn-primary { background: #667eea; color: white; }
-    .btn-primary:hover { background: #5a67d8; color: white; text-decoration: none; }
-    .btn-secondary { background: #9ca3af; color: white; }
-    .btn-secondary:hover { background: #6b7280; color: white; text-decoration: none; }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
 
-    .empty-state { text-align: center; padding: 40px 15px; color: #6b7280; }
-    .empty-state i { font-size: 3rem; margin-bottom: 15px; opacity: 0.3; }
-    .empty-state h3 { margin-bottom: 8px; color: #374151; font-size: 1.5rem; }
+    .map-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
 
-    /* Map Styles */
-    .map-section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .map-container { 
-        height: 450px; 
-        border-radius: 10px; 
-        overflow: hidden; 
-        border: 2px solid #e5e7eb; 
-        position: relative; 
+    .map-container {
+        position: relative;
+        height: 500px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+
+    #shelterMap {
+        height: 100%;
         width: 100%;
     }
-    
-    /* Map Controls */
-    .map-controls { position: absolute; top: 8px; right: 8px; z-index: 1000; display: flex; gap: 4px; }
-    .map-btn { background: white; border: 1px solid #ccc; border-radius: 4px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s; }
-    .map-btn:hover { background: #f5f5f5; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-    .map-btn i { font-size: 12px; color: #333; }
-    .fullscreen-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; display: none; }
-    
-    /* Responsive styles for mobile */
-    @media (max-width: 768px) {
-        .map-header { padding: 25px 0; }
-        .map-title { font-size: 1.75rem; }
-        .map-subtitle { font-size: 0.9rem; }
-        
-        .content-section { padding: 25px 15px; }
-        .section-title { font-size: 1.5rem; margin-bottom: 15px; }
-        
-        .shelters-grid { 
-            grid-template-columns: 1fr; 
-            gap: 15px; 
-            margin-bottom: 25px; 
-        }
-        
-        .shelter-card { 
-            padding: 15px; 
-            border-radius: 10px; 
-        }
-        
-        .shelter-header { margin-bottom: 12px; }
-        .shelter-icon { 
-            width: 45px; 
-            height: 45px; 
-            border-radius: 8px; 
-            font-size: 1rem; 
-            margin-right: 10px; 
-        }
-        
-        .shelter-info h3 { font-size: 1.1rem; }
-        .shelter-info p { font-size: 0.8rem; }
-        
-        .detail-item { margin-bottom: 6px; }
-        .detail-item i { width: 16px; margin-right: 6px; }
-        
-        .type-badge { 
-            padding: 4px 8px; 
-            border-radius: 14px; 
-            font-size: 0.7rem; 
-            margin-bottom: 10px; 
-        }
-        
-        .btn { 
-            padding: 8px 16px; 
-            border-radius: 5px; 
-            font-size: 0.85rem; 
-        }
-        
-        .map-section { 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 25px; 
-        }
-        
-        .map-container { 
-            height: 350px; 
-            border-radius: 8px; 
-        }
-        
-        .map-controls { 
-            top: 6px; 
-            right: 6px; 
-            gap: 3px; 
-        }
-        
-        .map-btn { 
-            width: 24px; 
-            height: 24px; 
-        }
-        
-        .map-btn i { font-size: 10px; }
-        
-        .empty-state { padding: 30px 15px; }
-        .empty-state i { font-size: 2.5rem; margin-bottom: 12px; }
-        .empty-state h3 { font-size: 1.25rem; }
+
+    .map-controls {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 1000;
+        display: flex;
+        gap: 8px;
     }
-    
+
+    .map-btn {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.2s;
+    }
+
+    .map-btn:hover {
+        background: var(--gray-light);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .map-btn svg {
+        width: 16px;
+        height: 16px;
+        stroke: var(--slate);
+    }
+
+    /* Shelters Section */
+    .shelters-section {
+        padding: 40px 20px;
+    }
+
+    .shelters-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .section-title {
+        font-size: clamp(1.75rem, 3vw, 2.25rem);
+        font-weight: 700;
+        color: var(--slate);
+        letter-spacing: -0.02em;
+    }
+
+    /* Shelters Grid */
+    .shelters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+    }
+
+    .shelter-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .shelter-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        border-color: var(--green);
+    }
+
+    .shelter-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .shelter-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--green) 0%, #059669 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .shelter-icon svg {
+        width: 28px;
+        height: 28px;
+        stroke: white;
+    }
+
+    .shelter-info h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--slate);
+        margin-bottom: 4px;
+        letter-spacing: -0.01em;
+    }
+
+    .shelter-info p {
+        font-size: 0.9rem;
+        color: var(--gray);
+        margin: 0;
+    }
+
+    .vet-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--green);
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .vet-badge svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+    }
+
+    .shelter-description {
+        color: var(--gray);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .shelter-details {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+
+    .detail-item svg {
+        width: 16px;
+        height: 16px;
+        stroke: var(--blue);
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .detail-item span {
+        word-break: break-word;
+    }
+
+    .map-link {
+        background: var(--gray-light);
+        padding: 16px;
+        border-radius: 10px;
+        text-align: center;
+        color: var(--gray);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .map-link svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+    }
+
+    .empty-icon {
+        margin-bottom: 24px;
+        color: var(--gray);
+        opacity: 0.4;
+    }
+
+    .empty-icon svg {
+        width: 80px;
+        height: 80px;
+        stroke: currentColor;
+    }
+
+    .empty-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--slate);
+        margin-bottom: 12px;
+    }
+
+    .empty-text {
+        font-size: 1.05rem;
+        color: var(--gray);
+    }
+
+    /* Success Notification */
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--green);
+        color: white;
+        padding: 16px 20px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideInRight 0.3s ease-out;
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .notification svg {
+        width: 20px;
+        height: 20px;
+        stroke: currentColor;
+    }
+
+    /* Fullscreen Overlay */
+    .fullscreen-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 9999;
+        display: none;
+    }
+
+    #fullscreen-map {
+        height: 100%;
+        width: 100%;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .shelters-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 30px 15px;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+        }
+
+        .map-section {
+            padding: 0 15px 30px;
+        }
+
+        .map-wrapper {
+            padding: 20px;
+        }
+
+        .map-container {
+            height: 400px;
+        }
+
+        .shelters-section {
+            padding: 30px 15px;
+        }
+
+        .shelters-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+    }
+
     @media (max-width: 576px) {
-        .map-header { padding: 20px 0; }
-        .map-title { font-size: 1.5rem; }
-        .map-subtitle { font-size: 0.85rem; }
-        
-        .content-section { padding: 20px 10px; }
-        .section-title { font-size: 1.35rem; margin-bottom: 12px; }
-        
-        .shelters-grid { gap: 12px; margin-bottom: 20px; }
-        
-        .shelter-card { padding: 12px; }
-        
-        .shelter-header { margin-bottom: 10px; }
-        .shelter-icon { 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 6px; 
-            font-size: 0.9rem; 
-            margin-right: 8px; 
+        .page-header {
+            padding: 25px 10px;
         }
-        
-        .shelter-info h3 { font-size: 1rem; }
-        .shelter-info p { font-size: 0.75rem; }
-        
-        .detail-item { margin-bottom: 5px; }
-        .detail-item i { width: 14px; margin-right: 5px; }
-        
-        .type-badge { 
-            padding: 3px 6px; 
-            border-radius: 12px; 
-            font-size: 0.65rem; 
-            margin-bottom: 8px; 
+
+        .map-section {
+            padding: 0 10px 25px;
         }
-        
-        .btn { 
-            padding: 6px 12px; 
-            border-radius: 4px; 
-            font-size: 0.8rem; 
+
+        .map-wrapper {
+            padding: 16px;
         }
-        
-        .map-section { 
-            padding: 12px; 
-            border-radius: 8px; 
-            margin-bottom: 20px; 
+
+        .map-container {
+            height: 320px;
         }
-        
-        .map-container { 
-            height: 280px; 
-            border-radius: 6px; 
+
+        .map-controls {
+            top: 8px;
+            right: 8px;
+            gap: 6px;
         }
-        
-        .map-controls { top: 5px; right: 5px; gap: 2px; }
-        
-        .map-btn { 
-            width: 22px; 
-            height: 22px; 
+
+        .map-btn {
+            width: 32px;
+            height: 32px;
         }
-        
-        .map-btn i { font-size: 9px; }
-        
-        .empty-state { padding: 25px 10px; }
-        .empty-state i { font-size: 2rem; margin-bottom: 10px; }
-        .empty-state h3 { font-size: 1.1rem; }
+
+        .map-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .shelters-section {
+            padding: 25px 10px;
+        }
+
+        .shelter-card {
+            padding: 20px;
+        }
+
+        .shelter-header {
+            gap: 12px;
+        }
+
+        .shelter-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .shelter-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .notification {
+            top: 10px;
+            right: 10px;
+            left: 10px;
+            padding: 14px 16px;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .map-container {
+            height: 280px;
+        }
+
+        .shelter-card {
+            padding: 16px;
+        }
     }
 </style>
 @endsection
 
 @section('content')
-<div class="map-header">
-    <h1 class="map-title">Find Vet Shops & Services</h1>
-    <p class="map-subtitle">Find shelters, services, and lost/found pets near you</p>
-</div>
+<div class="map-page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <span class="label">Location Services</span>
+        <h1 class="page-title">Find Vet Shops & Services</h1>
+        <p class="page-subtitle">Discover veterinarians and pet services near you</p>
+    </div>
 
-<div class="content-section">
+    <!-- Map Section -->
     <div class="map-section">
-        <h2 class="section-title">Location Map</h2>
-        <div class="map-container">
-            <div id="shelterMap" style="height: 100%; width: 100%;"></div>
-            <div class="map-controls">
-                <button id="fullscreen-btn" class="map-btn" title="Fullscreen">
-                    <i class="fas fa-expand"></i>
-                </button>
+        <div class="map-wrapper">
+            <div class="map-container">
+                <div id="shelterMap"></div>
+                <div class="map-controls">
+                    <button id="fullscreen-btn" class="map-btn" title="Fullscreen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="content-section">
-        <h2 class="section-title">Available Shelters & Services</h2>
-        
-        @if($shelters->count() > 0)
-            <div class="shelters-grid">
-                @foreach($shelters as $shelter)
-                    <div class="shelter-card">
-                        <div class="shelter-header">
-                            <div class="shelter-icon icon-veterinarian">
-                                <i class="fas fa-user-md"></i>
-                            </div>
-                            <div class="shelter-info">
-                                <h3>{{ $shelter->name }}</h3>
-                                <p>{{ $shelter->city }}, {{ $shelter->province }}</p>
-                            </div>
-                        </div>
-
-                        <span class="type-badge type-veterinarian">
-                            Veterinarian
-                        </span>
-
-                        @if($shelter->description)
-                            <p style="margin-bottom: 20px; color: #4b5563;">{{ $shelter->description }}</p>
-                        @endif
-
-                        <div class="shelter-details">
-                            <div class="detail-item">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span style="word-break: break-word;">{{ $shelter->address }}</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-phone"></i>
-                                <span style="word-break: break-word;">{{ $shelter->phone }}</span>
-                            </div>
-                            @if($shelter->email)
-                                <div class="detail-item">
-                                    <i class="fas fa-envelope"></i>
-                                    <span style="word-break: break-word;">{{ $shelter->email }}</span>
+    <!-- Shelters Section -->
+    <div class="shelters-section">
+        <div class="shelters-container">
+            <div class="section-header">
+                <h2 class="section-title">Available Veterinarians</h2>
+            </div>
+            
+            @if($shelters->count() > 0)
+                <div class="shelters-grid">
+                    @foreach($shelters as $shelter)
+                        <div class="shelter-card">
+                            <div class="shelter-header">
+                                <div class="shelter-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                                    </svg>
                                 </div>
-                            @endif
-                            @if($shelter->operating_hours && isset($shelter->operating_hours['weekdays']))
-                                <div class="detail-item">
-                                    <i class="fas fa-clock"></i>
-                                    <span style="word-break: break-word;">{{ $shelter->operating_hours['weekdays'] ?? 'Contact for hours' }}</span>
+                                <div class="shelter-info">
+                                    <h3>{{ $shelter->name }}</h3>
+                                    <p>{{ $shelter->city }}, {{ $shelter->province }}</p>
                                 </div>
-                            @endif
-                        </div>
+                            </div>
 
-                        <div style="text-align: center; padding: 15px; background: #f8fafc; border-radius: 8px; margin-top: 15px;">
-                            <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">
-                                <i class="fas fa-info-circle"></i> View details on map
-                            </p>
+                            <span class="vet-badge">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                                </svg>
+                                Veterinarian
+                            </span>
+
+                            @if($shelter->description)
+                                <p class="shelter-description">{{ $shelter->description }}</p>
+                            @endif
+
+                            <div class="shelter-details">
+                                <div class="detail-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                        <circle cx="12" cy="10" r="3"/>
+                                    </svg>
+                                    <span>{{ $shelter->address }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                    </svg>
+                                    <span>{{ $shelter->phone }}</span>
+                                </div>
+                                @if($shelter->email)
+                                    <div class="detail-item">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                            <polyline points="22,6 12,13 2,6"/>
+                                        </svg>
+                                        <span>{{ $shelter->email }}</span>
+                                    </div>
+                                @endif
+                                @if($shelter->operating_hours && isset($shelter->operating_hours['weekdays']))
+                                    <div class="detail-item">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <polyline points="12 6 12 12 16 14"/>
+                                        </svg>
+                                        <span>{{ $shelter->operating_hours['weekdays'] ?? 'Contact for hours' }}</span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="map-link">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="16" x2="12" y2="12"/>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                                </svg>
+                                <span>View location on map</span>
+                            </div>
                         </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                            <line x1="9" y1="9" x2="9.01" y2="9"/>
+                            <line x1="15" y1="9" x2="15.01" y2="9"/>
+                        </svg>
                     </div>
-                @endforeach
-            </div>
-        @else
-            <div class="empty-state">
-                <i class="fas fa-paw"></i>
-                <h3>No shelters available</h3>
-                <p>Check back later for shelter locations.</p>
-            </div>
-        @endif
+                    <h3 class="empty-title">No veterinarians available</h3>
+                    <p class="empty-text">Check back later for service locations</p>
+                </div>
+            @endif
+        </div>
     </div>
 </div>
 
 @if(session('success'))
-    <div class="notification" style="position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000;">
-        <i class="fas fa-check-circle"></i> {{ session('success') }}
+    <div class="notification">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <span>{{ session('success') }}</span>
     </div>
     <script>
         setTimeout(function() {
-            document.querySelector('.notification').style.display = 'none';
+            const notification = document.querySelector('.notification');
+            if (notification) {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100px)';
+                setTimeout(() => notification.remove(), 300);
+            }
         }, 5000);
     </script>
-
 @endif
+
+<!-- Fullscreen Overlay -->
+<div id="fullscreen-overlay" class="fullscreen-overlay">
+    <div id="fullscreen-map"></div>
+    <div class="map-controls">
+        <button id="exit-fullscreen-btn" class="map-btn" title="Exit Fullscreen">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+            </svg>
+        </button>
+    </div>
+</div>
 
 <!-- Leaflet JavaScript -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
-// Function to get human-readable name for shelter type
-function getShelterTypeName(type) {
-    switch(type) {
-        case 'pet_shop':
-            return 'Vet Shop';
-        case 'veterinarian':
-            return 'Veterinarian';
-        case 'grooming':
-            return 'Grooming Service';
-        default:
-            return 'Veterinarian';
-    }
-}
-
-// Combine shelters and lost/found items for the map
+// Map data
 const mapShelters = @json($shelters);
 const mapLostFoundItems = @json($lostFoundItems);
 const mapData = [...mapShelters, ...mapLostFoundItems];
 
-// Initialize map when document is ready
+// Initialize map
 document.addEventListener('DOMContentLoaded', function() {
-    // Wait a bit for the assets to load
     setTimeout(function() {
         if (typeof SharedMap !== 'undefined') {
-            // Initialize the shared map component
             const sharedMap = new SharedMap('shelterMap', mapData, {
                 fullscreenEnabled: true,
                 showViewDetails: true,
                 viewDetailsRoute: '/view-map/'
             });
             
-            
-            // Check if we need to focus on a specific shelter
             const urlParams = new URLSearchParams(window.location.search);
             const focusShelterId = urlParams.get('shelter');
             
             if (focusShelterId) {
-                // Find the shelter in our data
                 const focusShelter = mapData.find(item => item.id == focusShelterId && item.latitude && item.longitude);
                 
                 if (focusShelter) {
-                    // Wait a bit for the map to initialize, then focus on the shelter
                     setTimeout(function() {
-                        // Center the map on the specific shelter with zoom level 15
                         sharedMap.map.setView([parseFloat(focusShelter.latitude), parseFloat(focusShelter.longitude)], 15);
                         
-                        // Find the marker for this shelter and open its popup
                         sharedMap.markersLayer.eachLayer(function(layer) {
-                            if (layer.options && layer.options.icon && layer.options.icon.options.html) {
-                                // Check if this is the marker for our focus shelter
-                                if (layer._latlng.lat === parseFloat(focusShelter.latitude) && 
-                                    layer._latlng.lng === parseFloat(focusShelter.longitude)) {
-                                    // Open the popup for this marker
-                                    layer.openPopup();
-                                }
+                            if (layer._latlng.lat === parseFloat(focusShelter.latitude) && 
+                                layer._latlng.lng === parseFloat(focusShelter.longitude)) {
+                                layer.openPopup();
                             }
                         });
                     }, 500);
                 }
             }
             
-            // Store reference to map for potential future use
             window.shelterMap = sharedMap;
         } else {
-            // Fallback to basic map initialization
             initBasicMap();
         }
     }, 100);
 });
 
-// Fallback function for basic map initialization
 function initBasicMap() {
-    // Create map centered on San Francisco, Agusan del Sur
     const map = L.map('shelterMap', {
-        zoomControl: false // Disable zoom controls
+        zoomControl: false
     }).setView([8.504588, 125.975800], 15);
     
-    // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
     
-    // Add markers for shelters
     mapShelters.forEach(shelter => {
         if (shelter.latitude && shelter.longitude) {
             const lat = parseFloat(shelter.latitude);
             const lng = parseFloat(shelter.longitude);
             
-            // Use only veterinarian icon for all locations
-            let iconClass = 'fas fa-user-md';
-            let iconColor = '#10b981';
-            
-            // Create custom icon
             const customIcon = L.divIcon({
-                html: `<div style="background: ${iconColor}; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="${iconClass}" style="font-size: 12px;"></i></div>`,
+                html: `<div style="background: #10b981; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="fas fa-user-md" style="font-size: 12px;"></i></div>`,
                 iconSize: [36, 36],
                 iconAnchor: [18, 18],
                 popupAnchor: [0, -18],
                 className: 'custom-marker'
             });
             
-            // Create marker
             const marker = L.marker([lat, lng], { icon: customIcon });
             
-            // Create popup content
             const popupContent = `
                 <div style="min-width: 250px;">
                     <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                        <div style="background: ${iconColor}; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                            <i class="${iconClass}"></i>
+                        <div style="background: #10b981; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                            <i class="fas fa-user-md"></i>
                         </div>
                         <div>
                             <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">${shelter.name}</h4>
@@ -428,22 +720,22 @@ function initBasicMap() {
                         </div>
                     </div>
                     <div style="margin-bottom: 8px; color: #4b5563; word-break: break-word;">
-                        <i class="fas fa-map-marker-alt" style="color: #667eea; margin-right: 6px;"></i>
+                        <i class="fas fa-map-marker-alt" style="color: #3b82f6; margin-right: 6px;"></i>
                         ${shelter.address}<br>
                         ${shelter.city}, ${shelter.province}
                     </div>
                     <div style="margin-bottom: 8px; color: #4b5563;">
-                        <i class="fas fa-phone" style="color: #667eea; margin-right: 6px;"></i>
+                        <i class="fas fa-phone" style="color: #3b82f6; margin-right: 6px;"></i>
                         ${shelter.phone || 'Not provided'}
                     </div>
                     ${shelter.email ? `
                         <div style="margin-bottom: 12px; color: #4b5563; word-break: break-word;">
-                            <i class="fas fa-envelope" style="color: #667eea; margin-right: 6px;"></i>
+                            <i class="fas fa-envelope" style="color: #3b82f6; margin-right: 6px;"></i>
                             ${shelter.email}
                         </div>
                     ` : ''}
                     <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
-                        <a href="/view-map/${shelter.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+                        <a href="/view-map/${shelter.id}" style="background: #8b5cf6; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>
                     </div>
@@ -455,21 +747,17 @@ function initBasicMap() {
         }
     });
     
-    // Add markers for lost/found items
     mapLostFoundItems.forEach(item => {
         if (item.latitude && item.longitude) {
             const lat = parseFloat(item.latitude);
             const lng = parseFloat(item.longitude);
             
-            // Create custom icon with pet image if available
             let iconHtml = '';
             if (item.image_path) {
-                // Use the pet image as the marker without any icon overlay
                 iconHtml = `<div style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
                     <img src="/storage/${item.image_path}" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>`;
             } else {
-                // Use the default icon if no image is available
                 const color = item.type === 'lost' ? '#e74c3c' : '#27ae60';
                 const iconClass = item.type === 'lost' ? 'fas fa-heart-broken' : 'fas fa-heart';
                 iconHtml = `<div style="background: ${color}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
@@ -485,10 +773,8 @@ function initBasicMap() {
                 className: 'custom-marker'
             });
             
-            // Create marker
             const marker = L.marker([lat, lng], { icon: customIcon });
             
-            // Create popup content
             const popupContent = `
                 <div style="min-width: 250px;">
                     <div style="display: flex; align-items: center; margin-bottom: 10px;">
@@ -506,19 +792,19 @@ function initBasicMap() {
                         </div>
                     </div>
                     <div style="margin-bottom: 8px; color: #4b5563;">
-                        <i class="fas fa-tag" style="color: #667eea; margin-right: 6px;"></i>
+                        <i class="fas fa-tag" style="color: #3b82f6; margin-right: 6px;"></i>
                         ${item.pet_type}
                     </div>
                     <div style="margin-bottom: 8px; color: #4b5563;">
-                        <i class="fas fa-calendar" style="color: #667eea; margin-right: 6px;"></i>
+                        <i class="fas fa-calendar" style="color: #3b82f6; margin-right: 6px;"></i>
                         Reported: ${new Date(item.created_at).toLocaleDateString()}
                     </div>
                     <div style="margin-bottom: 12px; color: #4b5563;">
-                        <i class="fas fa-user" style="color: #667eea; margin-right: 6px;"></i>
+                        <i class="fas fa-user" style="color: #3b82f6; margin-right: 6px;"></i>
                         ${item.user ? item.user.name : 'Anonymous'}
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
-                        <a href="/lost-found/${item.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+                        <a href="/lost-found/${item.id}" style="background: #8b5cf6; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>
                     </div>
@@ -530,10 +816,7 @@ function initBasicMap() {
         }
     });
     
-    // Store reference to map
     window.shelterMap = map;
-    
-    // Initialize fullscreen functionality manually if SharedMap is not available
     initFullscreenFunctionality();
 }
 
@@ -543,24 +826,20 @@ function initFullscreenFunctionality() {
     const fullscreenOverlay = document.getElementById('fullscreen-overlay');
     
     if (fullscreenBtn) {
-        // Add both click and touch events for better mobile support
         fullscreenBtn.addEventListener('click', handleFullscreenToggle);
         fullscreenBtn.addEventListener('touchstart', handleFullscreenToggle);
     }
     
     if (exitFullscreenBtn) {
-        // Add both click and touch events for better mobile support
         exitFullscreenBtn.addEventListener('click', exitFullscreen);
         exitFullscreenBtn.addEventListener('touchstart', exitFullscreen);
     }
     
     if (fullscreenOverlay) {
-        // Add both click and touch events for better mobile support
         fullscreenOverlay.addEventListener('click', handleOverlayClick);
         fullscreenOverlay.addEventListener('touchstart', handleOverlayClick);
     }
     
-    // Exit fullscreen on ESC key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && fullscreenOverlay && fullscreenOverlay.style.display === 'block') {
             exitFullscreen();
@@ -592,46 +871,35 @@ function handleOverlayClick(e) {
 }
 
 function initFullscreenMap() {
-    const mapShelters = @json($shelters);
-    const mapLostFoundItems = @json($lostFoundItems);
-    const fullscreenMapData = [...mapShelters, ...mapLostFoundItems];
-    
     window.fullscreenMap = L.map('fullscreen-map', {
-        zoomControl: false // Disable zoom controls
+        zoomControl: false
     }).setView([8.504588, 125.975800], 15);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(window.fullscreenMap);
     
-    // Add markers to fullscreen map for shelters
+    // Add all markers to fullscreen map (same as main map)
     mapShelters.forEach(shelter => {
         if (shelter.latitude && shelter.longitude) {
             const lat = parseFloat(shelter.latitude);
             const lng = parseFloat(shelter.longitude);
             
-            // Use only veterinarian icon for all locations
-            let iconClass = 'fas fa-user-md';
-            let iconColor = '#10b981';
-            
-            // Create custom icon
             const customIcon = L.divIcon({
-                html: `<div style="background: ${iconColor}; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="${iconClass}" style="font-size: 12px;"></i></div>`,
+                html: `<div style="background: #10b981; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="fas fa-user-md" style="font-size: 12px;"></i></div>`,
                 iconSize: [36, 36],
                 iconAnchor: [18, 18],
                 popupAnchor: [0, -18],
                 className: 'custom-marker'
             });
             
-            // Create marker
             const marker = L.marker([lat, lng], { icon: customIcon });
             
-            // Create popup content
             const popupContent = `
                 <div style="min-width: 250px;">
                     <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                        <div style="background: ${iconColor}; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                            <i class="${iconClass}"></i>
+                        <div style="background: #10b981; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                            <i class="fas fa-user-md"></i>
                         </div>
                         <div>
                             <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">${shelter.name}</h4>
@@ -639,22 +907,22 @@ function initFullscreenMap() {
                         </div>
                     </div>
                     <div style="margin-bottom: 8px; color: #4b5563; word-break: break-word;">
-                        <i class="fas fa-map-marker-alt" style="color: #667eea; margin-right: 6px;"></i>
+                        <i class="fas fa-map-marker-alt" style="color: #3b82f6; margin-right: 6px;"></i>
                         ${shelter.address}<br>
                         ${shelter.city}, ${shelter.province}
                     </div>
                     <div style="margin-bottom: 8px; color: #4b5563;">
-                        <i class="fas fa-phone" style="color: #667eea; margin-right: 6px;"></i>
+                        <i class="fas fa-phone" style="color: #3b82f6; margin-right: 6px;"></i>
                         ${shelter.phone || 'Not provided'}
                     </div>
                     ${shelter.email ? `
                         <div style="margin-bottom: 12px; color: #4b5563; word-break: break-word;">
-                            <i class="fas fa-envelope" style="color: #667eea; margin-right: 6px;"></i>
+                            <i class="fas fa-envelope" style="color: #3b82f6; margin-right: 6px;"></i>
                             ${shelter.email}
                         </div>
                     ` : ''}
                     <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
-                        <a href="/view-map/${shelter.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+                        <a href="/view-map/${shelter.id}" style="background: #8b5cf6; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>
                     </div>
@@ -664,86 +932,6 @@ function initFullscreenMap() {
             marker.bindPopup(popupContent);
             marker.addTo(window.fullscreenMap);
         }
-    });
-    
-    // Add markers to fullscreen map for lost/found items
-    mapLostFoundItems.forEach(item => {
-        if (item.latitude && item.longitude) {
-            const lat = parseFloat(item.latitude);
-            const lng = parseFloat(item.longitude);
-            
-            // Create custom icon with pet image if available
-            let iconHtml = '';
-            if (item.image_path) {
-                // Use the pet image as the marker without any icon overlay
-                iconHtml = `<div style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                    <img src="/storage/${item.image_path}" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>`;
-            } else {
-                // Use the default icon if no image is available
-                const color = item.type === 'lost' ? '#e74c3c' : '#27ae60';
-                const iconClass = item.type === 'lost' ? 'fas fa-heart-broken' : 'fas fa-heart';
-                iconHtml = `<div style="background: ${color}; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                    <i class="${iconClass}" style="font-size: 16px;"></i>
-                </div>`;
-            }
-            
-            const customIcon = L.divIcon({
-                html: iconHtml,
-                iconSize: item.image_path ? [56, 56] : [46, 46],
-                iconAnchor: item.image_path ? [28, 28] : [23, 23],
-                popupAnchor: [0, -28],
-                className: 'custom-marker'
-            });
-            
-            // Create marker
-            const marker = L.marker([lat, lng], { icon: customIcon });
-            
-            // Create popup content
-            const popupContent = `
-                <div style="min-width: 250px;">
-                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                        ${item.image_path ? 
-                            `<div style="width: 60px; height: 60px; border-radius: 8px; overflow: hidden; margin-right: 12px;">
-                                <img src="/storage/${item.image_path}" style="width: 100%; height: 100%; object-fit: cover;">
-                            </div>` : 
-                            `<div style="background: ${item.type === 'lost' ? '#e74c3c' : '#27ae60'}; color: white; width: 60px; height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                                <i class="fas ${item.type === 'lost' ? 'fa-heart-broken' : 'fa-heart'}" style="font-size: 24px;"></i>
-                            </div>`
-                        }
-                        <div>
-                            <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937;">${item.pet_name}</h4>
-                            <span style="background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Lost/Found</span>
-                        </div>
-                    </div>
-                    <div style="margin-bottom: 8px; color: #4b5563;">
-                        <i class="fas fa-tag" style="color: #667eea; margin-right: 6px;"></i>
-                        ${item.pet_type}
-                    </div>
-                    <div style="margin-bottom: 8px; color: #4b5563;">
-                        <i class="fas fa-calendar" style="color: #667eea; margin-right: 6px;"></i>
-                        Reported: ${new Date(item.created_at).toLocaleDateString()}
-                    </div>
-                    <div style="margin-bottom: 12px; color: #4b5563;">
-                        <i class="fas fa-user" style="color: #667eea; margin-right: 6px;"></i>
-                        ${item.user ? item.user.name : 'Anonymous'}
-                    </div>
-                    <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
-                        <a href="/lost-found/${item.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
-                            <i class="fas fa-eye"></i> View Details
-                        </a>
-                    </div>
-                </div>
-            `;
-            
-            marker.bindPopup(popupContent);
-            marker.addTo(window.fullscreenMap);
-        }
-    });
-    
-    // Add click handler to exit fullscreen when clicking on the map
-    window.fullscreenMap.on('click', function() {
-        exitFullscreen();
     });
 }
 
@@ -755,14 +943,4 @@ function exitFullscreen() {
     }
 }
 </script>
-
-<!-- Fullscreen Overlay -->
-<div id="fullscreen-overlay" class="fullscreen-overlay">
-    <div id="fullscreen-map" style="height: 100%; width: 100%;"></div>
-    <div class="map-controls">
-        <button id="exit-fullscreen-btn" class="map-btn" title="Exit Fullscreen">
-            <i class="fas fa-compress"></i>
-        </button>
-    </div>
-</div>
 @endsection

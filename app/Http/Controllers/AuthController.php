@@ -173,8 +173,6 @@ class AuthController extends Controller
             // Handle state mismatch specifically - redirect back to Google login
             return redirect()->route('auth.google');
         } catch (\Exception $e) {
-            // Log the actual error for debugging
-            \Log::error('Google authentication error: ' . $e->getMessage());
             return redirect()->route('login')->with('error', 'Google authentication failed. Please try again.');
         }
     }

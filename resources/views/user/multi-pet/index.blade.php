@@ -1,206 +1,431 @@
 @extends('layouts.app')
 
-@section('title', 'Multi-Pet Dashboard')
+@section('title', 'Pet Dashboard')
 
 @section('content')
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-12">
-            {{-- Hero Header Section --}}
-            <div class="text-center mb-5">
-                <h1 class="display-4 fw-bold text-primary mb-3">
-                    <i class="fas fa-paw me-2"></i>Pet Dashboard
-                </h1>
-                <p class="lead text-muted">Discover your perfect companion</p>
+<div class="pet-dashboard">
+    <div class="container-fluid px-4 py-5">
+        {{-- Hero Header Section --}}
+        <div class="dashboard-header mb-5">
+            <div class="header-content">
+                <span class="label">Pet Dashboard</span>
             </div>
+        </div>
 
-            {{-- Success Message --}}
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-4 border-0 mb-4" role="alert">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-check-circle fs-4 me-3"></i>
-                        <div>{{ session('success') }}</div>
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {{-- Success Message --}}
+        @if(session('success'))
+            <div class="alert-success-custom mb-4">
+                <div class="alert-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
                 </div>
-            @endif
+                <div class="alert-content">{{ session('success') }}</div>
+                <button type="button" class="alert-close" data-bs-dismiss="alert">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        @endif
 
-            {{-- Dashboard Content --}}
-            @if($pets->isEmpty())
-                <div class="text-center py-5">
-                    <div class="mb-4">
-                        <i class="fas fa-dog fa-5x text-muted opacity-50"></i>
-                    </div>
-                    <h3 class="text-muted mb-3">No Pets Available Yet</h3>
-                    <p class="text-muted">Check back soon for adorable companions looking for homes!</p>
+        {{-- Dashboard Content --}}
+        @if($pets->isEmpty())
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                    </svg>
                 </div>
-            @else
-                {{-- Pet Cards Grid --}}
-                <div class="row g-4">
-                    @foreach($pets as $pet)
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card h-100 border-0 shadow-sm hover-lift transition-all rounded-4 overflow-hidden">
-                                {{-- Pet Image --}}
-                                <div class="position-relative">
-                                    @if($pet->image_path)
-                                        <img src="{{ asset('storage/' . $pet->image_path) }}" 
-                                             class="card-img-top" 
-                                             alt="{{ $pet->name }}" 
-                                             style="height: 280px; object-fit: cover;">
-                                    @else
-                                        <div class="bg-gradient d-flex align-items-center justify-content-center position-relative" 
-                                             style="height: 280px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                            <i class="fas fa-paw fa-4x text-white opacity-75"></i>
-                                        </div>
-                                    @endif
-                                    
-                                    {{-- Overlay Badge --}}
-                                </div>
-
-                                {{-- Card Body --}}
-                                <div class="card-body d-flex flex-column p-4">
-                                    {{-- Pet Name --}}
-                                    <h5 class="card-title fw-bold mb-3 text-dark">
-                                        <i class="fas fa-paw text-primary me-2" style="font-size: 0.9rem;"></i>
-                                        {{ $pet->name }}
-                                    </h5>
-
-                                    {{-- Pet Description --}}
-                                    <p class="card-text text-muted mb-3 flex-grow-1" style="line-height: 1.6;">
-                                        {{ Str::limit($pet->description ?? 'No description provided.', 100) }}
-                                    </p>
-
-                                    {{-- Divider --}}
-                                    <hr class="my-3">
-
-                                    {{-- Footer Info --}}
-                                    <div class="d-flex justify-content-end align-items-center">
-                                        <a href="{{ route('pet.multipet.show', $pet) }}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>View Details
-                                        </a>
+                <h3 class="empty-title">No Pets Available Yet</h3>
+                <p class="empty-text">Check back soon for adorable companions looking for homes!</p>
+            </div>
+        @else
+            {{-- Pet Cards Grid --}}
+            <div class="pets-grid">
+                @foreach($pets as $pet)
+                    <div class="pet-card">
+                        <a href="{{ route('pet.multipet.show', $pet) }}" class="pet-card-link">
+                            {{-- Pet Image --}}
+                            <div class="pet-image-wrapper">
+                                @if($pet->image_path)
+                                    <img src="{{ asset('storage/' . $pet->image_path) }}" 
+                                         class="pet-image" 
+                                         alt="{{ $pet->name }}">
+                                @else
+                                    <div class="pet-image-placeholder">
+                                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                                            <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                                            <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                                        </svg>
                                     </div>
+                                @endif
+                            </div>
+
+                            {{-- Card Body --}}
+                            <div class="pet-card-body">
+                                <h3 class="pet-name">{{ $pet->name }}</h3>
+                                <p class="pet-description">
+                                    {{ Str::limit($pet->description ?? 'No description provided.', 100) }}
+                                </p>
+                                
+                                <div class="pet-card-footer">
+                                    <span class="view-details-text">
+                                        View Details
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            <polyline points="12 5 19 12 12 19"></polyline>
+                                        </svg>
+                                    </span>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-        </div>
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+        @endif
     </div>
 </div>
 
 {{-- Custom Styles --}}
 <style>
-    .hover-lift {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    :root {
+        --slate: #0f172a;
+        --slate-light: #1e293b;
+        --blue: #3b82f6;
+        --purple: #8b5cf6;
+        --gray: #64748b;
+        --gray-light: #f1f5f9;
+        --gray-lighter: #f8fafc;
     }
-    
-    .hover-lift:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+
+    .pet-dashboard {
+        font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--gray-lighter);
+        min-height: 100vh;
     }
-    
-    .transition-all {
-        transition: all 0.3s ease;
+
+    /* Header */
+    .dashboard-header {
+        text-align: center;
+        padding: 40px 20px;
+        animation: fadeInDown 0.6s ease-out;
     }
-    
-    .bg-gradient {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    
-    .card-img-top {
-        transition: transform 0.3s ease;
+
+    .label {
+        display: inline-block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--blue);
+        margin-bottom: 16px;
+        font-weight: 600;
     }
-    
-    .card:hover .card-img-top {
-        transform: scale(1.05);
+
+    .dashboard-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        color: var(--slate);
+        margin-bottom: 12px;
+        letter-spacing: -0.02em;
     }
-    
-    .card {
+
+    .dashboard-subtitle {
+        font-size: 1.1rem;
+        color: var(--gray);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Success Alert */
+    .alert-success-custom {
+        background: #d1fae5;
+        border: 1px solid #a7f3d0;
+        border-radius: 12px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        animation: slideDown 0.4s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-icon {
+        flex-shrink: 0;
+        color: #059669;
+    }
+
+    .alert-content {
+        flex: 1;
+        color: #065f46;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .alert-close {
+        flex-shrink: 0;
+        background: none;
+        border: none;
+        color: #059669;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        transition: opacity 0.2s;
+    }
+
+    .alert-close:hover {
+        opacity: 0.7;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .empty-icon {
+        margin-bottom: 24px;
+        color: var(--gray);
+        opacity: 0.4;
+    }
+
+    .empty-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--slate);
+        margin-bottom: 12px;
+    }
+
+    .empty-text {
+        font-size: 1.05rem;
+        color: var(--gray);
+    }
+
+    /* Pet Grid */
+    .pets-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 28px;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    /* Pet Card */
+    .pet-card {
+        background: white;
+        border-radius: 16px;
         overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #e2e8f0;
     }
-    
-    /* Match sidebar color theme */
-    .display-4 {
-        color: #5b4b9b !important;
+
+    .pet-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        border-color: var(--blue);
     }
-    
-    .btn-primary {
-        background: #5b4b9b !important;
-        border-color: #5b4b9b !important;
+
+    .pet-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
     }
-    
-    .btn-primary:hover {
-        background: #4a3d82 !important;
-        border-color: #4a3d82 !important;
+
+    /* Pet Image */
+    .pet-image-wrapper {
+        position: relative;
+        width: 100%;
+        height: 280px;
+        overflow: hidden;
+        background: var(--gray-light);
     }
-    
-    .card-title {
-        color: #5b4b9b !important;
+
+    .pet-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
     }
-    
-    /* Responsive adjustments */
+
+    .pet-card:hover .pet-image {
+        transform: scale(1.08);
+    }
+
+    .pet-image-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
+        color: white;
+    }
+
+    /* Card Body */
+    .pet-card-body {
+        padding: 24px;
+    }
+
+    .pet-name {
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: var(--slate);
+        margin-bottom: 12px;
+        letter-spacing: -0.01em;
+    }
+
+    .pet-description {
+        font-size: 0.95rem;
+        color: var(--gray);
+        line-height: 1.6;
+        margin-bottom: 20px;
+        min-height: 3em;
+    }
+
+    .pet-card-footer {
+        padding-top: 16px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .view-details-text {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--blue);
+        transition: all 0.2s;
+    }
+
+    .pet-card:hover .view-details-text {
+        gap: 12px;
+    }
+
+    .view-details-text svg {
+        transition: transform 0.2s;
+    }
+
+    .pet-card:hover .view-details-text svg {
+        transform: translateX(4px);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .pets-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+    }
+
     @media (max-width: 768px) {
-        .display-4 {
+        .dashboard-header {
+            padding: 30px 15px;
+        }
+
+        .dashboard-title {
             font-size: 2rem;
         }
-        
-        .lead {
+
+        .dashboard-subtitle {
             font-size: 1rem;
         }
-        
-        .card-img-top {
-            height: 280px !important; /* Increased from 250px */
+
+        .pets-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .pet-image-wrapper {
+            height: 240px;
         }
     }
-    
+
     @media (max-width: 576px) {
-        .py-5 {
-            padding-top: 1rem !important;
-            padding-bottom: 1rem !important;
+        .container-fluid {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+            padding-top: 24px !important;
+            padding-bottom: 24px !important;
         }
-        
-        .mb-5 {
-            margin-bottom: 1rem !important;
+
+        .dashboard-header {
+            padding: 20px 0;
+            margin-bottom: 32px !important;
         }
-        
-        .g-4 {
-            --bs-gutter-x: 1rem;
+
+        .pets-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
         }
-        
-        .card-img-top {
-            height: 250px !important; /* Increased from 220px */
+
+        .pet-card-body {
+            padding: 20px;
         }
-        
-        .card-body {
-            padding: 1rem !important;
+
+        .pet-image-wrapper {
+            height: 220px;
         }
-        
-        .card-title {
-            font-size: 1.1rem;
+
+        .pet-name {
+            font-size: 1.2rem;
         }
-        
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.8rem;
+
+        .pet-description {
+            font-size: 0.9rem;
+            min-height: auto;
+        }
+
+        .alert-success-custom {
+            padding: 14px 16px;
+            font-size: 0.9rem;
         }
     }
-    
+
     @media (max-width: 400px) {
-        .card {
-            margin-bottom: 1rem;
+        .pet-image-wrapper {
+            height: 200px;
         }
-        
-        .card-img-top {
-            height: 230px !important; /* Increased from 200px */
+
+        .pet-card-body {
+            padding: 16px;
         }
-        
-        .card-title {
-            font-size: 1rem;
-        }
-        
-        .card-text {
-            font-size: 0.9rem;
+
+        .pet-name {
+            font-size: 1.1rem;
         }
     }
 </style>
