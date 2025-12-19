@@ -348,26 +348,26 @@
                 </div>
                 <div class="menu-item">
                     <a href="{{ route('view.map') }}" class="menu-link {{ request()->routeIs('view.map*') || request()->routeIs('view-map.show') ? 'active' : '' }}">
+                        <i class="fas fa-map menu-icon" aria-hidden="true"></i>
+                        <span class="menu-text">Services</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="{{ route('view.map') }}" class="menu-link {{ request()->routeIs('view.map*') || request()->routeIs('view-map.show') ? 'active' : '' }}">
                         <i class="fas fa-paw menu-icon" aria-hidden="true"></i>
-                        <span class="menu-text">Map</span>
+                        <span class="menu-text">My Pet</span>
                     </a>
                 </div>
                 <div class="menu-item">
                     <a href="{{ route('social-media.index') }}" class="menu-link {{ request()->routeIs('social-media.*') ? 'active' : '' }}">
                         <i class="fas fa-users menu-icon" aria-hidden="true"></i>
-                        <span class="menu-text">Furparent Social Media</span>
+                        <span class="menu-text">Feed</span>
                     </a>
                 </div>
                 <div class="menu-item">
-                    <a href="{{ route('appointments.index') }}" class="menu-link {{ request()->routeIs('appointments.*') && !request()->routeIs('appointments.history') && !request()->routeIs('appointments.history.show') ? 'active' : '' }}">
+                    <a href="{{ route('appointments.index') }}" class="menu-link {{ request()->routeIs('appointments.*') ? 'active' : '' }}">
                         <i class="fas fa-stethoscope menu-icon" aria-hidden="true"></i>
                         <span class="menu-text">Appointment</span>
-                    </a>
-                </div>
-                <div class="menu-item">
-                    <a href="{{ route('appointments.history') }}" class="menu-link {{ request()->routeIs('appointments.history') || request()->routeIs('appointments.history.show') ? 'active' : '' }}">
-                        <i class="fas fa-history menu-icon" aria-hidden="true"></i>
-                        <span class="menu-text">Appointment History</span>
                     </a>
                 </div>
                 <div class="menu-item">

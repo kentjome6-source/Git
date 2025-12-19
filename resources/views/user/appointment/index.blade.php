@@ -13,13 +13,22 @@
                     <h1 class="page-title">My Appointments</h1>
                     <p class="page-subtitle">Manage your pet's healthcare appointments</p>
                 </div>
-                <a href="{{ route('appointments.create') }}" class="btn-create-appointment">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    <span>Request Appointment</span>
-                </a>
+                <div class="header-actions">
+                    <a href="{{ route('appointments.history') }}" class="btn-history">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>History</span>
+                    </a>
+                    <a href="{{ route('appointments.create') }}" class="btn-create-appointment">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span>Request Appointment</span>
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -223,6 +232,12 @@
         gap: 24px;
     }
 
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
     .label {
         display: block;
         font-size: 0.75rem;
@@ -244,6 +259,28 @@
     .page-subtitle {
         font-size: 1.05rem;
         color: var(--gray);
+    }
+
+    .btn-history {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: white;
+        color: var(--purple);
+        border: 2px solid var(--purple);
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-history:hover {
+        background: var(--purple);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
     }
 
     .btn-create-appointment {
@@ -637,8 +674,13 @@
             align-items: flex-start;
         }
 
-        .btn-create-appointment {
+        .header-actions {
             width: 100%;
+        }
+
+        .btn-history,
+        .btn-create-appointment {
+            flex: 1;
             justify-content: center;
         }
 

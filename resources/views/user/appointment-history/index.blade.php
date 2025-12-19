@@ -9,6 +9,17 @@ use Illuminate\Support\Str;
 @section('content')
 <div class="history-page">
     <div class="container-fluid px-4 py-5">
+        <!-- Back Button -->
+        <div class="back-nav mb-4">
+            <a href="{{ route('appointments.index') }}" class="back-button">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5"></path>
+                    <path d="M12 19l-7-7 7-7"></path>
+                </svg>
+                <span>Back to Appointments</span>
+            </a>
+        </div>
+
         <!-- Page Header -->
         <div class="page-header mb-5">
             <div class="header-content">
@@ -163,6 +174,37 @@ use Illuminate\Support\Str;
         font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
         background: var(--gray-lighter);
         min-height: 100vh;
+    }
+
+    /* Back Button */
+    .back-nav {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--gray);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        padding: 8px 12px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .back-button:hover {
+        color: var(--blue);
+        background: rgba(59, 130, 246, 0.05);
+    }
+
+    .back-button svg {
+        transition: transform 0.2s ease;
+    }
+
+    .back-button:hover svg {
+        transform: translateX(-2px);
     }
 
     /* Page Header */
@@ -488,6 +530,20 @@ use Illuminate\Support\Str;
         .btn-view-history {
             width: 100%;
             justify-content: center;
+        }
+
+        .back-button {
+            font-size: 0.9rem;
+            padding: 6px 10px;
+        }
+
+        .back-button span {
+            display: none;
+        }
+
+        .back-button::after {
+            content: 'Back';
+            font-size: 0.9rem;
         }
     }
 
