@@ -8,12 +8,6 @@
         <!-- Sidebar - Contacts & Requests -->
         <div class="col-lg-4 col-md-5 col-12 border-end">
             <div class="d-flex flex-column h-100">
-                <!-- Header -->
-                <div class="p-3 border-bottom" style="background-color: #5b4b9b;">
-                    <h4 class="mb-0 text-white">
-                        <i class="fas fa-comments me-2"></i>Messenger
-                    </h4>
-                </div>
                 
                 <!-- Search -->
                 <div class="p-3 border-bottom">

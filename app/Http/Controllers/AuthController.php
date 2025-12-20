@@ -38,7 +38,7 @@ class AuthController extends Controller
                     return back()->with('error', 'Your account is pending verification by an administrator.');
                 }
             } else {
-                return redirect()->route('pet.multipet.index');
+                return redirect()->route('appointments.index');
             }
         }
 
@@ -72,7 +72,7 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
-        return redirect()->route('pet.multipet.index');
+        return redirect()->route('appointments.index');
     }
 
     public function showVetRegister()
@@ -167,7 +167,7 @@ class AuthController extends Controller
                     return redirect()->route('login')->with('error', 'Your account is pending verification by an administrator.');
                 }
             } else {
-                return redirect()->route('pet.multipet.index');
+                return redirect()->route('appointments.index');
             }
         } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
             // Handle state mismatch specifically - redirect back to Google login

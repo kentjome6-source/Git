@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('adoption', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('pet_id')->nullable();
-            $table->unsignedBigInteger('user_id'); // Pet owner
+            $table->unsignedBigInteger('user_id');
             $table->string('uploader_type')->default('user');
             $table->string('pet_name');
             $table->string('breed')->nullable();
