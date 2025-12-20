@@ -6,7 +6,6 @@ use App\Models\Appointment;
 use App\Models\Pet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 
 class AppointmentController extends Controller
@@ -22,28 +21,39 @@ class AppointmentController extends Controller
      */
     public function index()
     {
-        $appointments = Appointment::where('user_id', Auth::id())
-            ->where('status', 'pending')
-            ->with(['pet', 'vet'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        return view('user.appointment.index', compact('appointments'));
-    }
-
-    /**
-     * Show the form for creating a new appointment request
-     */
-    public function create()
-    {
-        $pets = Pet::where('user_id', Auth::id())->get();
-        $vets = User::where('role', 'vet')->where('is_verified_vet', true)->get();
+        $user = Auth::user();
         
-        return view('user.appointment.create', compact('pets', 'vets'));
+        // Get user's appointments
+        if ($user->role === 'vet') {
+            // For vets: show appointments assigned to them
+            $appointments = Appointment::where('vet_id', $user->id)
+                ->with('user')
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        } else {
+            // For pet parents: show their own appointments
+            $appointments = Appointment::where('user_id', $user->id)
+                ->where('status', 'pending')
+                ->with(['pet', 'vet'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        }
+
+        // Get available vets for the modal form
+        $vets = User::where('role', 'vet')
+            ->where('is_verified_vet', true)
+            ->get();
+    
+        // Check which view to use based on user role
+        if ($user->role === 'vet') {
+            return view('user.appointment.vet-index', compact('appointments', 'vets'));
+        }
+        
+        return view('user.appointment.index', compact('appointments', 'vets'));
     }
 
     /**
-     * Store a newly created appointment request
+     * Store a newly created appointment request (from modal)
      */
     public function store(Request $request)
     {
@@ -104,39 +114,63 @@ class AppointmentController extends Controller
     }
 
     /**
-     * Display the specified appointment
+     * Show the form for editing the specified appointment (for AJAX modal)
      */
-    public function show(Appointment $appointment)
-    {
-        // Ensure user can only view their own appointments or if they're a vet
-        if ($appointment->user_id !== Auth::id() && Auth::user()->role !== 'vet') {
-            abort(403, 'Unauthorized access to appointment.');
-        }
-
-        $appointment->load(['pet', 'vet', 'user']);
-        return view('user.appointment.show', compact('appointment'));
-    }
-
-    /**
-     * Show the form for editing the specified appointment
-     */
-    public function edit(Appointment $appointment)
+    public function edit(Request $request, Appointment $appointment)
     {
         // Only allow editing if appointment is pending and user owns it
         if ($appointment->user_id !== Auth::id() || $appointment->status !== 'pending') {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot edit this appointment.'
+                ], 403);
+            }
             abort(403, 'Cannot edit this appointment.');
         }
 
-        $pets = Pet::where('user_id', Auth::id())->get();
-        $vets = User::where('role', 'vet')->where('is_verified_vet', true)->get();
+        // Get available vets for the edit form
+        $vets = User::where('role', 'vet')
+            ->where('is_verified_vet', true)
+            ->get();
+
+        // Parse scheduled datetime for form
+        $preferred_date = null;
+        $preferred_time = null;
         
-        return view('user.appointment.edit', compact('appointment', 'pets', 'vets'));
+        if ($appointment->scheduled_datetime) {
+            $datetime = \Carbon\Carbon::parse($appointment->scheduled_datetime);
+            $preferred_date = $datetime->format('Y-m-d');
+            $preferred_time = $datetime->format('H:i');
+        }
+
+        // Return HTML for modal (AJAX) or full page view
+        if (request()->wantsJson() || request()->ajax()) {
+            $html = view('appointments.partials.edit-form', compact('appointment', 'vets', 'preferred_date', 'preferred_time'))->render();
+            
+            return response()->json([
+                'success' => true,
+                'html' => $html
+            ]);
+        }
+
+        // Fallback: return full edit page
+        return view('user.appointment.edit', compact('appointment', 'vets', 'preferred_date', 'preferred_time'));
     }
 
+    /**
+     * Update the specified appointment (from modal)
+     */
     public function update(Request $request, Appointment $appointment)
     {
         // Only allow updating if appointment is pending and user owns it
         if ($appointment->user_id !== Auth::id() || $appointment->status !== 'pending') {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot update this appointment.'
+                ], 403);
+            }
             abort(403, 'Cannot update this appointment.');
         }
 
@@ -191,8 +225,22 @@ class AppointmentController extends Controller
             ]);
         }
 
-        return redirect()->back()
+        return redirect()->route('appointments.index')
             ->with('success', 'Appointment updated successfully!');
+    }
+
+    /**
+     * Display the specified appointment
+     */
+    public function show(Appointment $appointment)
+    {
+        // Ensure user can only view their own appointments or if they're a vet
+        if ($appointment->user_id !== Auth::id() && Auth::user()->role !== 'vet') {
+            abort(403, 'Unauthorized access to appointment.');
+        }
+
+        $appointment->load(['pet', 'vet', 'user']);
+        return view('user.appointment.show', compact('appointment'));
     }
 
     /**
@@ -330,5 +378,29 @@ class AppointmentController extends Controller
         $appointment->update($validated);
 
         return redirect()->back()->with('success', 'Appointment updated successfully!');
+    }
+
+    /**
+     * Create method (no longer needed as modal handles it, but keep for compatibility)
+     */
+    public function create()
+    {
+        // Get available vets for the modal form
+        $vets = User::where('role', 'vet')
+            ->where('is_verified_vet', true)
+            ->get();
+
+        // Return partial view for modal if AJAX request
+        if (request()->wantsJson() || request()->ajax()) {
+            $html = view('appointments.partials.create-form', compact('vets'))->render();
+            
+            return response()->json([
+                'success' => true,
+                'html' => $html
+            ]);
+        }
+
+        // Fallback to full page (for direct access)
+        return view('user.appointment.create', compact('vets'));
     }
 }
