@@ -38,4 +38,25 @@ class AdoptionHistory extends Model
     {
         return $this->belongsTo(User::class, 'adopter_id');
     }
+    
+    // Relationship: adoption history has many followups
+    public function followups()
+    {
+        return $this->hasMany(AdoptionFollowup::class);
+    }
+    
+    // Get pending followups
+    public function pendingFollowups()
+    {
+        return $this->followups()->where('completed', false)->get();
+    }
+    
+    // Get overdue followups
+    public function overdueFollowups()
+    {
+        return $this->followups()
+            ->where('completed', false)
+            ->where('scheduled_date', '<', now())
+            ->get();
+    }
 }

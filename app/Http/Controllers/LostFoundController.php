@@ -100,6 +100,14 @@ class LostFoundController extends Controller
 
         LostFound::create($data);
 
+        // Support AJAX requests for modal
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Your ' . $request->type . ' pet listing has been submitted successfully!'
+            ]);
+        }
+
         return redirect()->route('pet.lostfound')
             ->with('success', 'Your ' . $request->type . ' pet listing has been submitted successfully!');
     }
@@ -177,6 +185,14 @@ class LostFoundController extends Controller
         }
 
         $lostFound->update($data);
+
+        // Support AJAX requests for modal
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Your ' . $request->type . ' pet listing has been updated successfully!'
+            ]);
+        }
 
         return redirect()->route('pet.lostfound')
             ->with('success', 'Your ' . $request->type . ' pet listing has been updated successfully!');

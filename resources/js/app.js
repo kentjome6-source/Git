@@ -1,4 +1,5 @@
 import './bootstrap';
+import './sweetalert-config';
 import SharedMap from './shared-map';
 
 // Make SharedMap available globally

@@ -419,7 +419,7 @@
                                         <a href="{{ route('lost-found.show', $listing) }}" class="btn btn-outline btn-sm">
                                             <i class="fas fa-eye"></i> View
                                         </a>
-                                        <a href="{{ route('lost-found.edit', $listing) }}" class="btn btn-outline btn-sm">
+                                        <a href="{{ route('lost-found.edit', $listing) }}" class="btn btn-outline btn-sm" data-modal data-modal-title="Edit Listing">
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
                                         @if(!$listing->is_resolved)

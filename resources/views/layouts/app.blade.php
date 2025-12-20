@@ -335,6 +335,12 @@
         <div class="sidebar-menu-container">
             <div class="menu">
                 <div class="menu-item">
+                    <a href="{{ route('appointments.index') }}" class="menu-link {{ request()->routeIs('appointments.*') ? 'active' : '' }}">
+                        <i class="fas fa-stethoscope menu-icon" aria-hidden="true"></i>
+                        <span class="menu-text">Appointment</span>
+                    </a>
+                </div>
+                <div class="menu-item">
                     <a href="{{ route('pet.multipet.index') }}" class="menu-link {{ request()->routeIs('pet.multipet.*') ? 'active' : '' }}">
                         <i class="fas fa-dog menu-icon" aria-hidden="true"></i>
                         <span class="menu-text">Multi-Pet Dashboard</span>
@@ -353,7 +359,7 @@
                     </a>
                 </div>
                 <div class="menu-item">
-                    <a href="{{ route('view.map') }}" class="menu-link {{ request()->routeIs('view.map*') || request()->routeIs('view-map.show') ? 'active' : '' }}">
+                    <a href="{{ route('my.pets') }}" class="menu-link {{ request()->routeIs('my.pets*') ? 'active' : '' }}">
                         <i class="fas fa-paw menu-icon" aria-hidden="true"></i>
                         <span class="menu-text">My Pet</span>
                     </a>
@@ -362,12 +368,6 @@
                     <a href="{{ route('social-media.index') }}" class="menu-link {{ request()->routeIs('social-media.*') ? 'active' : '' }}">
                         <i class="fas fa-users menu-icon" aria-hidden="true"></i>
                         <span class="menu-text">Feed</span>
-                    </a>
-                </div>
-                <div class="menu-item">
-                    <a href="{{ route('appointments.index') }}" class="menu-link {{ request()->routeIs('appointments.*') ? 'active' : '' }}">
-                        <i class="fas fa-stethoscope menu-icon" aria-hidden="true"></i>
-                        <span class="menu-text">Appointment</span>
                     </a>
                 </div>
                 <div class="menu-item">
@@ -476,6 +476,9 @@
         
     });
 </script>
+
+{{-- SweetAlert Messages --}}
+<x-sweetalert />
 
 @yield('scripts')
 </body>

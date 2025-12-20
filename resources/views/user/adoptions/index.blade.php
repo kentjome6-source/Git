@@ -21,7 +21,7 @@
                         </svg>
                         <span>History</span>
                     </a>
-                    <a href="{{ route('adoptions.create') }}" class="btn-primary-action">
+                    <a href="{{ route('adoptions.create') }}" class="btn-primary-action" data-modal data-modal-title="List Pet for Adoption">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -136,16 +136,12 @@
                         
                         @if($adoption->user_id != auth()->id())
                             @if($adoption->isAvailable())
-                                <form action="{{ route('adoptions.adopt', $adoption) }}" method="POST" class="w-100">
-                                    @csrf
-                                    <button type="submit" class="btn-adopt" 
-                                            onclick="return confirm('Are you sure you want to adopt {{ $adoption->pet_name }}?')">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                                        </svg>
-                                        Adopt {{ $adoption->pet_name }}
-                                    </button>
-                                </form>
+                                <button type="button" class="btn-adopt w-100" onclick="handleAdoptSubmit({{ $adoption->id }}, '{{ $adoption->pet_name }}')">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                    </svg>
+                                    Adopt {{ $adoption->pet_name }}
+                                </button>
                             @elseif($adoption->hasPendingRequest() && $adoption->pendingRequest()->adopter_id == auth()->id())
                                 <button class="btn-status btn-pending" disabled>
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -249,6 +245,20 @@ function openImageModal(src) {
         var myModal = new bootstrap.Modal(document.getElementById('imageModal'));
         myModal.show();
     }
+}
+
+function handleAdoptSubmit(adoptionId, petName) {
+    showConfirm(
+        `Do you want to submit an adoption application for ${petName}? You'll need to fill out an application form.`,
+        'Submit Application?',
+        'Continue',
+        'Cancel'
+    ).then((result) => {
+        if (result.isConfirmed) {
+            // Redirect to application page or show application form
+            window.location.href = `/adoptions/${adoptionId}`;
+        }
+    });
 }
 </script>
 

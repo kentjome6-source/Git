@@ -144,7 +144,7 @@
             <!-- Back Button at Bottom Right -->
             <div class="d-flex justify-content-end mt-4 gap-2 flex-wrap">
                 @if($appointment->status === 'pending' && $appointment->user_id === auth()->id())
-                    <a href="{{ route('appointments.edit', $appointment) }}" class="btn btn-warning">
+                    <a href="{{ route('appointments.edit', $appointment) }}" class="btn btn-warning" data-modal data-modal-title="Edit Appointment Request">
                         <i class="fas fa-edit me-2"></i>Edit Request
                     </a>
                 @endif

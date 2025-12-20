@@ -90,6 +90,15 @@ class AppointmentController extends Controller
 
         $appointment = Appointment::create($appointmentData);
 
+        // Support AJAX requests for modal
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment request submitted successfully!',
+                'data' => $appointment
+            ]);
+        }
+
         return redirect()->route('appointments.index')
             ->with('success', 'Appointment request submitted successfully!');
     }
@@ -172,6 +181,15 @@ class AppointmentController extends Controller
         ];
 
         $appointment->update($appointmentData);
+
+        // Support AJAX requests for modal
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment updated successfully!',
+                'data' => $appointment
+            ]);
+        }
 
         return redirect()->back()
             ->with('success', 'Appointment updated successfully!');

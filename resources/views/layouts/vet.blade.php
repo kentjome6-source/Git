@@ -431,6 +431,9 @@
     });
 </script>
 
+{{-- SweetAlert Messages --}}
+<x-sweetalert />
+
 @yield('scripts')
 </body>
 </html>

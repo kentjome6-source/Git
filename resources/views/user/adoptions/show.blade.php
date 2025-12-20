@@ -130,7 +130,7 @@
                                 <div class="mt-3">
                                     <div class="d-flex gap-2 flex-wrap adoption-detail-buttons">
                                         <!-- Edit button -->
-                                        <a href="{{ route('adoptions.edit', $adoption) }}" class="btn btn-warning edit-btn" role="button" aria-label="Edit adoption post for {{ $adoption->pet_name }}">
+                                        <a href="{{ route('adoptions.edit', $adoption) }}" class="btn btn-warning edit-btn" role="button" aria-label="Edit adoption post for {{ $adoption->pet_name }}" data-modal data-modal-title="Edit Adoption Listing">
                                             <i class="fas fa-edit me-2" aria-hidden="true"></i>Edit
                                         </a>
                                         

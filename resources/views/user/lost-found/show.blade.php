@@ -410,7 +410,7 @@
 
         @if(Auth::id() === $lostFound->user_id)
         <div class="action-buttons">
-            <a href="{{ route('lost-found.edit', $lostFound) }}" class="btn btn-primary">
+            <a href="{{ route('lost-found.edit', $lostFound) }}" class="btn btn-primary" data-modal data-modal-title="Edit Lost/Found Listing">
                 <i class="fas fa-edit"></i> Edit Listing
             </a>
             

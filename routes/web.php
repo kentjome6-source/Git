@@ -148,6 +148,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/messages/poll/{user}', [ChatMessageController::class, 'pollMessages'])->name('messages.poll');
     
     // Pet Routes
+    Route::get('/my-pets', [PetController::class, 'myPets'])->name('my.pets');
+    Route::get('/my-pets/{pet}/track', [PetController::class, 'trackPet'])->name('my.pets.track');
+    Route::get('/my-pets/{pet}/report-missing', [PetController::class, 'reportMissing'])->name('my.pets.report-missing');
     Route::resource('pets', PetController::class)->names([
         'index' => 'pet.multipet.index',
         'create' => 'pet.multipet.create',
@@ -165,12 +168,25 @@ Route::middleware(['auth'])->group(function () {
     
     // Adoption Routes
     Route::get('/adoptions/history', [UserAdoptionController::class, 'history'])->name('adoptions.history');
+    Route::get('/adoptions/followups', [UserAdoptionController::class, 'viewFollowups'])->name('adoptions.followups');
     Route::resource('adoptions', UserAdoptionController::class);
     Route::post('/adoptions/{adoption}/adopt', [UserAdoptionController::class, 'adopt'])->name('adoptions.adopt');
     Route::post('/adoptions/{adoption}/approve', [UserAdoptionController::class, 'approveAdoption'])->name('adoptions.approve');
     Route::post('/adoptions/{adoption}/reject', [UserAdoptionController::class, 'rejectAdoption'])->name('adoptions.reject');
     Route::post('/adoptions/{adoption}/complete', [UserAdoptionController::class, 'completeAdoption'])->name('adoptions.complete');
     Route::delete('/adoptions/{adoption}', [UserAdoptionController::class, 'destroy'])->name('adoptions.destroy');
+    
+    // Adoption Application Routes
+    Route::get('/adoption-requests/{request}/application', [UserAdoptionController::class, 'viewApplication'])->name('adoptions.application.view');
+    
+    // Adoption Agreement Routes
+    Route::get('/adoption-agreements/{agreement}', [UserAdoptionController::class, 'viewAgreement'])->name('adoptions.agreement.view');
+    Route::post('/adoption-agreements/{agreement}/sign', [UserAdoptionController::class, 'signAgreement'])->name('adoptions.agreement.sign');
+    Route::post('/adoption-agreements/{agreement}/update-fee', [UserAdoptionController::class, 'updateAdoptionFee'])->name('adoptions.agreement.updateFee');
+    Route::post('/adoption-agreements/{agreement}/mark-payment', [UserAdoptionController::class, 'markPaymentCompleted'])->name('adoptions.agreement.markPayment');
+    
+    // Adoption Followup Routes
+    Route::post('/adoption-followups/{followup}/complete', [UserAdoptionController::class, 'completeFollowup'])->name('adoptions.followup.complete');
 
     // Lost & Found Routes
     Route::get('pet/lostfound', [LostFoundController::class, 'index'])->name('pet.lostfound');

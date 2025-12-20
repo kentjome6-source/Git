@@ -50,7 +50,7 @@
             <div class="pets-grid">
                 @foreach($pets as $pet)
                     <div class="pet-card">
-                        <a href="{{ route('pet.multipet.show', $pet) }}" class="pet-card-link">
+                        <a href="{{ route('pet.multipet.show', $pet) }}" class="pet-card-link" data-modal data-modal-title="Pet Details">
                             {{-- Pet Image --}}
                             <div class="pet-image-wrapper">
                                 @if($pet->image_path)

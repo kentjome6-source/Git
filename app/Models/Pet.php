@@ -15,8 +15,16 @@ class Pet extends Model
         'breed',
         'image_path',
         'description',
+        'latitude',
+        'longitude',
+        'last_known_location',
         'appropriate_food',
         'other_care_details',
+    ];
+
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
     ];
 
     // Relationship: a Pet belongs to a user
@@ -46,5 +54,17 @@ class Pet extends Model
         
         // Return a default image if no image is uploaded
         return asset('images/pawpatrol.jpg');
+    }
+
+    // Check if pet has location tracking
+    public function hasLocation()
+    {
+        return !is_null($this->latitude) && !is_null($this->longitude);
+    }
+
+    // Relationship: a Pet can have lost/found reports
+    public function lostFoundReports()
+    {
+        return $this->hasMany(LostFound::class, 'pet_id');
     }
 }

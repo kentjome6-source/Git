@@ -54,6 +54,15 @@ class PostController extends Controller
 
         $post = Post::create($postData);
 
+        // Support AJAX requests for modal
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Post created successfully!',
+                'data' => $post
+            ]);
+        }
+
         return redirect()->route('social-media.index')
             ->with('success', 'Post created successfully!');
     }

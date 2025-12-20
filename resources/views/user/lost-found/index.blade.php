@@ -14,7 +14,7 @@
                     <p class="page-subtitle">Help reunite pets with their families</p>
                 </div>
                 <div class="header-actions">
-                    <a href="{{ route('lost-found.create') }}" class="btn-report">
+                    <a href="{{ route('lost-found.create') }}" class="btn-report" data-modal data-modal-title="Report Lost/Found Pet">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>

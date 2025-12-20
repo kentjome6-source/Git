@@ -10,6 +10,44 @@ use Illuminate\Support\Facades\Storage;
 class PetController extends Controller
 {
     /**
+     * Display user's own pets
+     */
+    public function myPets()
+    {
+        $pets = Pet::where('user_id', Auth::id())
+                   ->orderBy('created_at', 'desc')
+                   ->get();
+        
+        return view('user.my-pets.index', compact('pets'));
+    }
+
+    /**
+     * Track a specific pet on the map
+     */
+    public function trackPet(Pet $pet)
+    {
+        // Ensure the pet belongs to the authenticated user
+        if ($pet->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized access to pet.');
+        }
+
+        return view('user.my-pets.track', compact('pet'));
+    }
+
+    /**
+     * Show report missing form for a pet
+     */
+    public function reportMissing(Pet $pet)
+    {
+        // Ensure the pet belongs to the authenticated user
+        if ($pet->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized access to pet.');
+        }
+
+        return view('user.my-pets.report-missing', compact('pet'));
+    }
+
+    /**
      * Display a listing of the user's pets.
      */
     public function index()
@@ -36,13 +74,16 @@ class PetController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'name' => 'required|string|max:255',
+            'breed' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'description' => 'nullable|string|max:1000',
         ]);
 
         $pet = new Pet();
         $pet->user_id = Auth::id();
         $pet->name = $request->input('name');
+        $pet->breed = $request->input('breed');
         $pet->description = $request->input('description');
 
         // Handle image upload
@@ -53,7 +94,7 @@ class PetController extends Controller
 
         $pet->save();
 
-        return redirect()->route('pet.multipet.index')->with('success', 'Pet posted successfully!');
+        return redirect()->route('my.pets')->with('success', 'Pet added successfully!');
     }
 
     /**
@@ -91,7 +132,9 @@ class PetController extends Controller
         }
 
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'name' => 'required|string|max:255',
+            'breed' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'description' => 'nullable|string|max:1000',
         ]);
 
@@ -106,12 +149,23 @@ class PetController extends Controller
             $pet->image_path = $imagePath;
         }
         
-        // Update description
+        // Update pet details
+        $pet->name = $request->input('name');
+        $pet->breed = $request->input('breed');
         $pet->description = $request->input('description');
 
         $pet->save();
 
-        return redirect()->route('pet.multipet.index')->with('success', 'Pet updated successfully!');
+        // Support AJAX requests for modal
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pet updated successfully!',
+                'data' => $pet
+            ]);
+        }
+
+        return redirect()->route('my.pets')->with('success', 'Pet updated successfully!');
     }
 
     /**
@@ -131,6 +185,6 @@ class PetController extends Controller
 
         $pet->delete();
 
-        return redirect()->route('pet.multipet.index')->with('success', 'Pet deleted successfully!');
+        return redirect()->route('my.pets')->with('success', 'Pet deleted successfully!');
     }
 }
