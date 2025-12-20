@@ -19,6 +19,8 @@ class ChatMessage extends Model
         'recipient_id',
         'message',
         'read_at',
+        'message_type',
+        'message_request_id'
     ];
 
     /**
@@ -46,5 +48,9 @@ class ChatMessage extends Model
     public function recipient()
     {
         return $this->belongsTo(User::class, 'recipient_id');
+    }
+    public function messageRequest()
+    {
+        return $this->belongsTo(MessageRequest::class);
     }
 }

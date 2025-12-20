@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+
 use App\Models\User;
-use App\Models\ChatMessage;
 use App\Events\MessageSent;
+use App\Models\ChatMessage;
+use Illuminate\Http\Request;
+use App\Models\MessageRequest;
+use App\Events\MessageRequestSent;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Events\MessageRequestUpdated;
 use App\Events\UnreadMessageCountUpdated;
-use App\Jobs\SendMessageJob;
 
 class ChatMessageController extends Controller
 {
@@ -20,36 +23,57 @@ class ChatMessageController extends Controller
     {
         $currentUser = Auth::user();
         
-        // Get contacts (other users excluding current user)
-        // For veterinarians, only show users they have appointments with
-        // For pet parents, show all other pet parents
-        $users = $this->getContacts($currentUser);
+        // Get accepted contacts (existing conversations)
+        $contacts = $this->getAcceptedContacts($currentUser);
         
-        // Add unread counts to users
-        $users = $this->addUnreadCounts($users, $currentUser->id);
+        // Get pending message requests
+        $pendingRequests = MessageRequest::where('recipient_id', $currentUser->id)
+            ->where('status', 'pending')
+            ->with('sender')
+            ->get();
+        
+        // Get message requests sent by current user
+        $sentRequests = MessageRequest::where('sender_id', $currentUser->id)
+            ->where('status', 'pending')
+            ->with('recipient')
+            ->get();
+        
+        // Initialize selectedUser as null (for the combined view)
+        $selectedUser = null;
         
         // Use veterinarian-specific view if user is a vet
         if ($currentUser->role === 'vet') {
-            return view('vet.messages.index', compact('users'));
+            return view('vet.messages.index', compact('contacts', 'pendingRequests', 'sentRequests', 'selectedUser'));
         }
         
-        return view('messages.index', compact('users'));
+        return view('messages.index', compact('contacts', 'pendingRequests', 'sentRequests', 'selectedUser'));
     }
-    
+
     /**
-     * Show conversation with a specific user
+     * Load conversation via AJAX (for combined view)
      */
-    public function conversation(User $user)
+    public function loadConversation(Request $request, User $user)
     {
         $currentUser = Auth::user();
         
-        // Validate that the user is a valid contact
-        $isValidContact = $this->isValidContact($currentUser, $user->id);
-        if (!$isValidContact) {
-            return redirect()->route('messages.index')->with('error', 'You can only message users you have appointments with.');
+        // Check if conversation is accepted
+        $messageRequest = MessageRequest::where(function($query) use ($currentUser, $user) {
+            $query->where('sender_id', $currentUser->id)
+                  ->where('recipient_id', $user->id);
+        })->orWhere(function($query) use ($currentUser, $user) {
+            $query->where('sender_id', $user->id)
+                  ->where('recipient_id', $currentUser->id);
+        })->first();
+        
+        // If no message request exists or it's not accepted
+        if (!$messageRequest || $messageRequest->status !== 'accepted') {
+            return response()->json([
+                'success' => false,
+                'message' => 'You need to accept the message request first.'
+            ], 403);
         }
         
-        // Get messages with selected user
+        // Get messages
         $messages = ChatMessage::where(function ($query) use ($currentUser, $user) {
             $query->where('sender_id', $currentUser->id)
                   ->where('recipient_id', $user->id);
@@ -58,10 +82,52 @@ class ChatMessageController extends Controller
                   ->where('recipient_id', $currentUser->id);
         })->orderBy('created_at', 'asc')->get();
         
-        // Use the correct variable name for the view
+        return response()->json([
+            'success' => true,
+            'messages' => $messages->map(function($message) use ($currentUser) {
+                return [
+                    'id' => $message->id,
+                    'sender_id' => $message->sender_id,
+                    'message' => $message->message,
+                    'created_at' => $message->created_at,
+                    'is_sender' => $message->sender_id == $currentUser->id
+                ];
+            })
+        ]);
+    }
+
+    /**
+     * Show conversation page (separate page view)
+     */
+    public function conversation(User $user)
+    {
+        $currentUser = Auth::user();
+        
+        // Check if conversation is accepted
+        $messageRequest = MessageRequest::where(function($query) use ($currentUser, $user) {
+            $query->where('sender_id', $currentUser->id)
+                  ->where('recipient_id', $user->id);
+        })->orWhere(function($query) use ($currentUser, $user) {
+            $query->where('sender_id', $user->id)
+                  ->where('recipient_id', $currentUser->id);
+        })->first();
+        
+        // If no message request exists or it's not accepted
+        if (!$messageRequest || $messageRequest->status !== 'accepted') {
+            return redirect()->route('messages.index')->with('error', 'You need to accept the message request first.');
+        }
+        
+        // Get messages
+        $messages = ChatMessage::where(function ($query) use ($currentUser, $user) {
+            $query->where('sender_id', $currentUser->id)
+                  ->where('recipient_id', $user->id);
+        })->orWhere(function ($query) use ($currentUser, $user) {
+            $query->where('sender_id', $user->id)
+                  ->where('recipient_id', $currentUser->id);
+        })->orderBy('created_at', 'asc')->get();
+        
         $selectedUser = $user;
         
-        // Use veterinarian-specific view if user is a vet
         if ($currentUser->role === 'vet') {
             return view('vet.messages.conversation', compact('selectedUser', 'messages'));
         }
@@ -83,38 +149,214 @@ class ChatMessageController extends Controller
         $recipientId = $request->input('recipient_id');
         $messageText = $request->input('message');
         
-        // Validate that the recipient is a valid contact
-        $isValidContact = $this->isValidContact($currentUser, $recipientId);
-        if (!$isValidContact) {
+        // Don't allow messaging oneself
+        if ($currentUser->id == $recipientId) {
             return response()->json([
                 'success' => false,
-                'message' => 'You can only message users you have appointments with.'
+                'message' => 'You cannot message yourself.'
             ], 403);
         }
-
+        
+        // Check if there's an existing message request
+        $messageRequest = MessageRequest::where(function($query) use ($currentUser, $recipientId) {
+            $query->where('sender_id', $currentUser->id)
+                  ->where('recipient_id', $recipientId);
+        })->orWhere(function($query) use ($currentUser, $recipientId) {
+            $query->where('sender_id', $recipientId)
+                  ->where('recipient_id', $currentUser->id);
+        })->first();
+        
+        // If no existing request, create one
+        if (!$messageRequest) {
+            $messageRequest = MessageRequest::create([
+                'sender_id' => $currentUser->id,
+                'recipient_id' => $recipientId,
+                'status' => 'pending'
+            ]);
+            
+            $messageType = 'request';
+        } else {
+            // Check if current user can message (must be accepted or sender of pending request)
+            if ($messageRequest->status !== 'accepted' && 
+                $messageRequest->sender_id !== $currentUser->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You cannot message this user until they accept your request.'
+                ], 403);
+            }
+            
+            $messageType = $messageRequest->status === 'pending' ? 'request' : 'regular';
+        }
+        
         // Create the message
         $message = new ChatMessage();
         $message->sender_id = $currentUser->id;
         $message->recipient_id = $recipientId;
         $message->message = $messageText;
+        $message->message_type = $messageType;
+        $message->message_request_id = $messageRequest->id;
         $message->save();
 
+        $message->load('sender');
+        
         try {
-            broadcast(new MessageSent($message))->toOthers();
-
-            $unreadCount = ChatMessage::where('recipient_id', $message->recipient_id)
+            if ($messageType === 'request') {
+                broadcast(new MessageRequestSent($messageRequest, $message))->toOthers();
+            } else {
+                broadcast(new MessageSent($message))->toOthers();
+            }
+            
+            // Update unread count
+            $unreadCount = ChatMessage::where('recipient_id', $recipientId)
                                       ->whereNull('read_at')
                                       ->count();
-
-            broadcast(new UnreadMessageCountUpdated($message->recipient_id, $unreadCount))->toOthers();
+            
+            broadcast(new UnreadMessageCountUpdated($recipientId, $unreadCount))->toOthers();
         } catch (\Exception $e) {
+            // Log::error('Broadcast error: ' . $e->getMessage());
         }
-
+        
         return response()->json([
             'success' => true,
-            'message' => $message->load('sender'),
-            'unread_count' => $unreadCount ?? 0
+            'message' => $message,
+            'message_type' => $messageType,
+            'request_status' => $messageRequest->status
         ]);
+    }
+
+    /**
+     * Accept a message request
+     */
+    public function acceptRequest(Request $request, MessageRequest $messageRequest)
+    {
+        $currentUser = Auth::user();
+        
+        // Ensure the current user is the recipient
+        if ($messageRequest->recipient_id !== $currentUser->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+        
+        if ($messageRequest->status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Request already processed'
+            ], 400);
+        }
+        
+        $messageRequest->update([
+            'status' => 'accepted',
+            'accepted_at' => now()
+        ]);
+        
+        // Update all request messages to regular type
+        ChatMessage::where('message_request_id', $messageRequest->id)
+            ->update(['message_type' => 'regular']);
+        
+        try {
+            broadcast(new MessageRequestUpdated($messageRequest))->toOthers();
+        } catch (\Exception $e) {
+            // \Log::error('Broadcast error: ' . $e->getMessage());
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message_request' => $messageRequest->load(['sender', 'recipient'])
+        ]);
+    }
+
+    /**
+     * Decline a message request
+     */
+    public function declineRequest(Request $request, MessageRequest $messageRequest)
+    {
+        $currentUser = Auth::user();
+        
+        // Ensure the current user is the recipient
+        if ($messageRequest->recipient_id !== $currentUser->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+        
+        if ($messageRequest->status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Request already processed'
+            ], 400);
+        }
+        
+        $messageRequest->update([
+            'status' => 'declined'
+        ]);
+        
+        try {
+            broadcast(new MessageRequestUpdated($messageRequest))->toOthers();
+        } catch (\Exception $e) {
+            // Log::error('Broadcast error: ' . $e->getMessage());
+        }
+        
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
+    public function getRequestsCount()
+    {
+        $currentUser = Auth::user();
+    
+        $count = MessageRequest::where('recipient_id', $currentUser->id)
+            ->where('status', 'pending')
+            ->count();
+    
+        return response()->json(['count' => $count]);
+    }
+
+    /**
+     * Get accepted contacts with last message info
+     */
+    private function getAcceptedContacts($user)
+    {
+        // Get users with accepted message requests
+        $acceptedRequests = MessageRequest::where('status', 'accepted')
+            ->where(function($query) use ($user) {
+                $query->where('sender_id', $user->id)
+                      ->orWhere('recipient_id', $user->id);
+            })
+            ->get();
+        
+        $contactIds = [];
+        foreach ($acceptedRequests as $request) {
+            $contactIds[] = $request->sender_id == $user->id ? $request->recipient_id : $request->sender_id;
+        }
+        
+        if (empty($contactIds)) {
+            return collect();
+        }
+        
+        $contacts = User::whereIn('id', $contactIds)->get();
+        
+        // Get last message for each contact
+        foreach ($contacts as $contact) {
+            $lastMessage = ChatMessage::where(function($query) use ($user, $contact) {
+                $query->where('sender_id', $user->id)
+                      ->where('recipient_id', $contact->id);
+            })->orWhere(function($query) use ($user, $contact) {
+                $query->where('sender_id', $contact->id)
+                      ->where('recipient_id', $user->id);
+            })->orderBy('created_at', 'desc')->first();
+            
+            if ($lastMessage) {
+                $contact->last_message = $lastMessage->message;
+                $contact->last_message_time = $lastMessage->created_at->diffForHumans();
+            }
+        }
+        
+        // Add unread counts
+        return $this->addUnreadCounts($contacts, $user->id);
     }
     
     /**
@@ -164,9 +406,16 @@ class ChatMessageController extends Controller
         $currentUser = Auth::user();
         $lastMessageId = $request->query('last_message_id', 0);
         
-        // Validate that the user is a valid contact
-        $isValidContact = $this->isValidContact($currentUser, $user->id);
-        if (!$isValidContact) {
+        // Check if there's an accepted conversation
+        $messageRequest = MessageRequest::where(function($query) use ($currentUser, $user) {
+            $query->where('sender_id', $currentUser->id)
+                  ->where('recipient_id', $user->id);
+        })->orWhere(function($query) use ($currentUser, $user) {
+            $query->where('sender_id', $user->id)
+                  ->where('recipient_id', $currentUser->id);
+        })->first();
+        
+        if (!$messageRequest || $messageRequest->status !== 'accepted') {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid contact.'
@@ -200,106 +449,19 @@ class ChatMessageController extends Controller
     }
     
     /**
-     * Get contacts based on user role
-     */
-    private function getContacts($user)
-    {
-        if ($user->role === 'vet') {
-            // For veterinarians, only show pet parents they have appointments with
-            // AND ensure they are legitimate pet parent accounts
-            // Only show pet parents with accepted appointments
-            return User::where('role', 'user')
-                      ->whereHas('appointments', function ($query) use ($user) {
-                          $query->where('vet_id', $user->id)
-                                ->where('status', 'accepted');
-                      })
-                      ->get();
-        } else {
-            // For pet parents, show:
-            // 1. Other pet parents
-            // 2. Veterinarians they have appointments with (only accepted appointments)
-            $petParents = User::where('role', 'user')
-                           ->where('id', '!=', $user->id)
-                           ->get();
-            
-            $veterinarians = User::where('role', 'vet')
-                              ->whereHas('vetAppointments', function ($query) use ($user) {
-                                  $query->where('user_id', $user->id)
-                                        ->where('status', 'accepted');
-                              })
-                              ->get();
-            
-            // Merge the collections
-            return $petParents->merge($veterinarians);
-        }
-    }
-    
-    /**
      * Add unread counts to users collection
      */
     private function addUnreadCounts($users, $currentUserId)
     {
-        // Note: This query needs to be updated to match the actual database structure
-        // The error was occurring because this query was using 'receiver_id' and 'is_read'
-        // but the database actually has 'recipient_id' and 'read_at'
-        // but the database actually has 'recipient_id' and 'read_at'
         $unreadCounts = ChatMessage::select('sender_id', DB::raw('count(*) as unread_count'))
                                   ->where('recipient_id', $currentUserId)
                                   ->whereNull('read_at')
                                   ->groupBy('sender_id')
                                   ->pluck('unread_count', 'sender_id');
-
+        
         return $users->map(function ($user) use ($unreadCounts) {
             $user->unread_count = $unreadCounts[$user->id] ?? 0;
             return $user;
         });
-    }
-    
-    /**
-     * Check if a recipient is a valid contact for the current user
-     */
-    private function isValidContact($currentUser, $recipientId)
-    {
-        // Don't allow messaging oneself
-        if ($currentUser->id == $recipientId) {
-            return false;
-        }
-        
-        // Get the recipient user
-        $recipient = User::find($recipientId);
-        if (!$recipient) {
-            return false;
-        }
-        
-        if ($currentUser->role === 'vet') {
-            // Veterinarians can only message pet parents they have appointments with
-            // AND ensure the recipient is a legitimate pet parent account
-            // Only allow messaging pet parents with accepted appointments
-            if ($recipient->role !== 'user') {
-                return false;
-            }
-            
-            return $recipient->appointments()
-                            ->where('vet_id', $currentUser->id)
-                            ->where('status', 'accepted')
-                            ->exists();
-        } else {
-            // Pet parents can message:
-            // 1. Other pet parents (no appointment required)
-            // 2. Veterinarians they have appointments with (only accepted appointments)
-            if ($recipient->role === 'user') {
-                // Pet parent messaging another pet parent - allowed
-                return true;
-            } elseif ($recipient->role === 'vet') {
-                // Pet parent messaging a veterinarian - only if they have an accepted appointment
-                return $recipient->vetAppointments()
-                                ->where('user_id', $currentUser->id)
-                                ->where('status', 'accepted')
-                                ->exists();
-            } else {
-                // Don't allow messaging admins or other roles
-                return false;
-            }
-        }
     }
 }

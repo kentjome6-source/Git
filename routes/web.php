@@ -146,6 +146,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/messages/unread-count', [ChatMessageController::class, 'getUnreadCount'])->name('messages.unread-count');
     Route::get('/messages/contact-unread-count', [ChatMessageController::class, 'getContactUnreadCount'])->name('messages.contact-unread-count');
     Route::get('/messages/poll/{user}', [ChatMessageController::class, 'pollMessages'])->name('messages.poll');
+    Route::post('/messages/requests/{request}/accept', [ChatMessageController::class, 'acceptRequest'])->name('messages.accept-request');
+    Route::post('/messages/requests/{request}/decline', [ChatMessageController::class, 'declineRequest'])->name('messages.decline-request');
+    Route::get('/messages/conversation/{user}/load', [ChatMessageController::class, 'loadConversation'])->name('messages.load-conversation');
+    Route::get('/messages/requests/count', [ChatMessageController::class, 'getRequestsCount'])->name('messages.requests-count');
     
     // Pet Routes
     Route::get('/my-pets', [PetController::class, 'myPets'])->name('my.pets');
