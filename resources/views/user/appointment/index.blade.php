@@ -181,9 +181,9 @@
                 </div>
                 <h3 class="empty-title">No appointments yet</h3>
                 <p class="empty-text">Start your pet's healthcare journey by requesting your first appointment</p>
-                <button type="button" class="btn-empty-action" data-bs-toggle="modal" data-bs-target="#requestAppointmentModal">
+                {{-- <button type="button" class="btn-empty-action" data-bs-toggle="modal" data-bs-target="#requestAppointmentModal">
                     Request Appointment
-                </button>
+                </button> --}}
             </div>
         @endif
     </div>
