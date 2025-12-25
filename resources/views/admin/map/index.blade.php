@@ -6,539 +6,994 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
-    .page-header { 
-        background: #e74c3c; padding: 30px; border-radius: 15px; margin-bottom: 30px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    :root {
+        --primary: #0f172a;
+        --primary-light: #1e293b;
+        --accent: #3b82f6;
+        --accent-light: #60a5fa;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --info: #06b6d4;
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-muted: #94a3b8;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --border-color: #e2e8f0;
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        --radius: 12px;
+        --radius-lg: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
-    .page-header h1 { color: white; }
-    .page-header p { color: white; opacity: 0.9; }
-    .page-title { font-size: 2rem; font-weight: 700; color: white; margin-bottom: 8px; }
-    .page-subtitle { font-size: 1rem; color: white; opacity: 0.9; }
 
-    /* Stats Cards */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-    .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; }
-    .stat-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 1.5rem; color: white; }
-    .stat-info h3 { font-size: 1.75rem; font-weight: 700; margin-bottom: 5px; color: #1f2937; }
-    .stat-info p { margin: 0; color: #6b7280; font-size: 0.9rem; }
-    
-    .bg-blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .bg-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-    .bg-purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
-    .bg-yellow { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
 
-    /* Section Header */
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-    .section-title { font-size: 1.5rem; font-weight: 700; color: #1f2937; margin: 0; }
-    
-    /* Search and Filter */
-    .search-filter-container { display: flex; gap: 10px; flex-wrap: wrap; }
-    .search-form { display: flex; }
-    .search-input { padding: 10px 15px; border: 1px solid #d1d5db; border-radius: 6px 0 0 6px; width: 250px; font-size: 0.9rem; }
-    .search-btn { background: #667eea; color: white; border: none; border-radius: 0 6px 6px 0; padding: 0 15px; cursor: pointer; }
-    .filter-dropdown select { padding: 10px 15px; border: 1px solid #d1d5db; border-radius: 6px; background: white; font-size: 0.9rem; }
-    
-    /* Map Styles */
-    .map-section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .map-container { 
-        height: 450px; 
-        border-radius: 10px; 
-        overflow: hidden; 
-        border: 2px solid #e5e7eb; 
-        position: relative; 
-        width: 100%;
-        max-width: 100vw;
+    .container-fluid {
+        padding: 2rem 1.5rem;
     }
-    
-    /* Map Controls */
-    .map-controls { position: absolute; top: 10px; right: 10px; z-index: 1000; display: flex; gap: 5px; }
-    .map-btn { background: white; border: 1px solid #ccc; border-radius: 4px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s; }
-    .map-btn:hover { background: #f5f5f5; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-    .map-btn i { font-size: 14px; color: #333; }
-    
-    .fullscreen-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; display: none; }
-    
-    /* Table Styles */
-    .table-responsive { overflow-x: auto; }
-    .data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .data-table thead { background: #f3f4f6; }
-    .data-table th { padding: 15px; text-align: left; font-weight: 600; color: #374151; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
-    .data-table td { padding: 15px; border-top: 1px solid #e5e7eb; }
-    .data-table tbody tr:hover { background: #f9fafb; }
-    
-    .table-cell-content strong { display: block; margin-bottom: 3px; }
-    .table-cell-content small { color: #6b7280; }
-    
-    .contact-info div { margin-bottom: 3px; }
-    .contact-info div:last-child { margin-bottom: 0; }
-    
-    .badge { padding: 5px 10px; border-radius: 16px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
-    .badge-info { background: #ddd6fe; color: #5b21b6; }
-    .badge-success { background: #dcfce7; color: #166534; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
-    
-    .status-badge { padding: 5px 10px; border-radius: 16px; font-size: 0.8rem; font-weight: 600; }
-    .status-active { background: #dcfce7; color: #166534; }
-    .status-inactive { background: #fee2e2; color: #991b1b; }
-    
-    .action-buttons { display: flex; gap: 5px; }
-    .btn { padding: 8px 12px; border-radius: 6px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; text-align: center; display: inline-block; font-size: 0.85rem; }
-    .btn-sm { padding: 6px 10px; font-size: 0.8rem; }
-    .btn-info { background: #93c5fd; color: #1e40af; }
-    .btn-warning { background: #fcd34d; color: #92400e; }
-    .btn-secondary { background: #d1d5db; color: #374151; }
-    .btn-success { background: #86efac; color: #166534; }
-    .btn-danger { background: #fca5a5; color: #991b1b; }
-    
-    .btn:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    
-    /* Pagination */
-    .pagination-container { margin-top: 25px; display: flex; justify-content: center; }
-    
-    /* Empty State */
-    .empty-state { text-align: center; padding: 60px 20px; color: #6b7280; }
-    .empty-state i { font-size: 3rem; margin-bottom: 20px; opacity: 0.3; }
-    .empty-state h3 { margin-bottom: 10px; color: #374151; font-size: 1.5rem; }
-    
-    /* Responsive styles */
-    @media (max-width: 768px) {
-        .page-header {
-            padding: 20px 15px;
-            background: #e74c3c;
-        }
-        
-        .page-title {
-            font-size: 1.75rem;
-            color: white;
-        }
-        
-        .page-subtitle {
-            font-size: 0.9rem;
-            color: white;
-        }
-        
-        .stats-grid { grid-template-columns: 1fr; gap: 15px; margin-bottom: 25px; }
-        .stat-card { padding: 15px; }
-        .stat-icon { width: 50px; height: 50px; font-size: 1.25rem; margin-right: 12px; }
-        .stat-info h3 { font-size: 1.5rem; }
-        
-        .section-header { flex-direction: column; align-items: flex-start; gap: 15px; width: 100%; }
-        .section-header .btn-primary { align-self: flex-end; }
-        .section-title { font-size: 1.35rem; }
-        
-        .search-filter-container { width: 100%; }
-        .search-input { width: 100%; }
-        
-        .map-section { padding: 20px; margin-bottom: 25px; }
-        .map-container { height: 350px; border-radius: 8px; }
-        
-        .map-btn { width: 28px; height: 28px; }
-        .map-btn i { font-size: 12px; }
-        
-        .data-table th, .data-table td { padding: 12px 10px; }
-        
-        .action-buttons { flex-wrap: wrap; justify-content: flex-end; }
-        
-        .empty-state { padding: 40px 15px; }
-        .empty-state i { font-size: 2.5rem; margin-bottom: 15px; }
-        .empty-state h3 { font-size: 1.25rem; }
-        
-        /* Mobile specific adjustments for map */
-        .map-container {
-            height: 300px;
-            max-width: 100vw;
-            overflow: hidden;
-        }
-        
-        /* Ensure table fits on mobile */
-        .table-responsive {
-            overflow-x: auto;
-            max-width: 100vw;
-        }
-        
-        .data-table {
-            min-width: 600px; /* Ensures table doesn't shrink too much */
-        }
-        
-        .data-table th, .data-table td {
-            white-space: nowrap;
-            font-size: 0.8rem;
-        }
+
+    /* Page Header */
+    .page-header {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+        animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    
-    @media (max-width: 576px) {
-        .page-title { font-size: 1.5rem; }
-        
-        .stat-card { padding: 12px; }
-        .stat-icon { width: 45px; height: 45px; font-size: 1rem; margin-right: 10px; }
-        .stat-info h3 { font-size: 1.25rem; }
-        .stat-info p { font-size: 0.8rem; }
-        
-        .section-title { font-size: 1.25rem; }
-        
-        .search-input { padding: 8px 12px; font-size: 0.85rem; }
-        .search-btn { padding: 0 12px; }
-        .filter-dropdown select { padding: 8px 12px; font-size: 0.85rem; }
-        
-        .map-section { padding: 15px; margin-bottom: 20px; }
-        .map-container { height: 250px; border-radius: 6px; }
-        
-        .map-btn { width: 24px; height: 24px; }
-        .map-btn i { font-size: 10px; }
-        
-        .data-table th, .data-table td { padding: 8px 6px; font-size: 0.75rem; }
-        
-        .btn { padding: 5px 8px; font-size: 0.75rem; }
-        .btn-sm { padding: 3px 6px; font-size: 0.7rem; }
-        
-        .empty-state { padding: 20px 10px; }
-        .empty-state i { font-size: 1.75rem; margin-bottom: 10px; }
-        .empty-state h3 { font-size: 1rem; }
-        
-        /* Further mobile optimizations */
-        .map-container {
-            height: 250px;
-            max-width: 100vw;
-        }
-        
-        .data-table th, .data-table td {
-            padding: 6px 4px;
-            font-size: 0.7rem;
-        }
-        
-        .action-buttons {
-            flex-direction: column;
-            gap: 3px;
-        }
-        
-        .action-buttons .btn {
-            width: 100%;
-            margin-bottom: 3px;
-        }
+
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
     }
-    
-    /* Mobile swipeable view styles */
-    .mobile-swipeable-view {
-        display: none;
-        padding: 15px;
+
+    .page-subtitle {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        margin: 0;
     }
-    
-    .swipeable-location-card {
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        background: #fff;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+
+    /* Two Column Layout */
+    .main-layout {
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        gap: 1.5rem;
+        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;
     }
-    
-    .swipeable-item {
-        padding: 12px 15px;
-        border-bottom: 1px solid #eee;
+
+    /* Locations Sidebar */
+    .locations-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .sidebar-header {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+    }
+
+    .sidebar-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+    }
+
+    .sidebar-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    .locations-list {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        max-height: calc(100vh - 280px);
+        overflow-y: auto;
+    }
+
+    .locations-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .locations-list::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+    }
+
+    .locations-list::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 3px;
+    }
+
+    .locations-list::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+    }
+
+    /* Map Section */
+    .map-section {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-md);
+        position: sticky;
+        top: 2rem;
+        height: calc(100vh - 280px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .section-header {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
-    
-    .swipeable-item:last-child {
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        letter-spacing: -0.025em;
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: var(--primary);
+        color: white;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        border-radius: var(--radius);
+        text-decoration: none;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover {
+        background: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary i {
+        font-size: 0.875rem;
+    }
+
+    .map-container {
+        flex: 1;
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+        position: relative;
+        min-height: 400px;
+    }
+
+    .map-controls {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .map-btn {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+    }
+
+    .map-btn:hover {
+        background: var(--bg-secondary);
+        box-shadow: var(--shadow-md);
+    }
+
+    .map-btn i {
+        font-size: 0.875rem;
+        color: var(--text-primary);
+    }
+
+    /* Location Cards in Sidebar */
+    .location-card {
+        padding: 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        transition: var(--transition);
+        cursor: pointer;
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    }
+
+    .location-card:nth-child(1) { animation-delay: 0.1s; }
+    .location-card:nth-child(2) { animation-delay: 0.15s; }
+    .location-card:nth-child(3) { animation-delay: 0.2s; }
+    .location-card:nth-child(4) { animation-delay: 0.25s; }
+    .location-card:nth-child(5) { animation-delay: 0.3s; }
+
+    .location-card:last-child {
         border-bottom: none;
     }
-    
+
+    .location-card:hover {
+        background: var(--bg-secondary);
+    }
+
+    .location-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
+
+    .location-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .location-city {
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+    }
+
+    .location-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .location-info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+    }
+
+    .location-info-item i {
+        color: var(--accent);
+        font-size: 0.75rem;
+        width: 14px;
+    }
+
+    .location-actions {
+        display: flex;
+        gap: 0.375rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    /* Table Section - Hidden on Desktop */
+    .content-section {
+        display: none;
+    }
+
+    .desktop-table {
+        display: none;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table thead {
+        background: var(--bg-secondary);
+    }
+
+    .data-table th {
+        padding: 1rem 1.25rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .data-table tbody tr {
+        transition: var(--transition);
+    }
+
+    .data-table tbody tr:hover {
+        background: var(--bg-secondary);
+    }
+
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table-cell-content strong {
+        display: block;
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+        font-size: 0.9375rem;
+    }
+
+    .table-cell-content small {
+        color: var(--text-secondary);
+        font-size: 0.8125rem;
+    }
+
+    .contact-info div {
+        margin-bottom: 0.375rem;
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+    }
+
+    .contact-info div:last-child {
+        margin-bottom: 0;
+    }
+
+    .contact-info i {
+        color: var(--accent);
+        margin-right: 0.375rem;
+        font-size: 0.75rem;
+    }
+
+    /* Badges */
+    .badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        letter-spacing: 0.025em;
+    }
+
+    .badge-info {
+        background: rgba(6, 182, 212, 0.1);
+        color: var(--info);
+    }
+
+    .badge-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .badge-warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.025em;
+    }
+
+    .status-active {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .status-inactive {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.375rem;
+        padding: 0.5rem 0.875rem;
+        border-radius: var(--radius);
+        font-weight: 600;
+        font-size: 0.8125rem;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .btn i {
+        font-size: 0.75rem;
+    }
+
+    .btn-info {
+        background: rgba(6, 182, 212, 0.1);
+        color: var(--info);
+    }
+
+    .btn-info:hover {
+        background: var(--info);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    .btn-warning:hover {
+        background: var(--warning);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    .btn-danger:hover {
+        background: var(--danger);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Mobile View */
+    .mobile-swipeable-view {
+        display: none;
+    }
+
+    .swipeable-location-card {
+        background: var(--bg-primary);
+        border-radius: var(--radius);
+        border: 1px solid var(--border-color);
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    }
+
+    .swipeable-location-card:nth-child(1) { animation-delay: 0.1s; }
+    .swipeable-location-card:nth-child(2) { animation-delay: 0.15s; }
+    .swipeable-location-card:nth-child(3) { animation-delay: 0.2s; }
+    .swipeable-location-card:nth-child(4) { animation-delay: 0.25s; }
+    .swipeable-location-card:nth-child(5) { animation-delay: 0.3s; }
+
+    .swipeable-item {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .swipeable-item:last-of-type {
+        border-bottom: none;
+    }
+
     .swipeable-item .label {
         font-weight: 600;
-        color: #495057;
-        min-width: 100px;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        min-width: 90px;
     }
-    
+
     .swipeable-item .value {
         text-align: right;
         flex: 1;
+        font-size: 0.9375rem;
+        color: var(--text-primary);
     }
-    
+
     .swipeable-actions {
-        padding: 15px;
+        padding: 1rem;
         display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        background-color: #f8f9fa;
-        border-top: 1px solid #dee2e6;
+        gap: 0.5rem;
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--border-color);
     }
-    
+
     .swipeable-actions .btn {
         flex: 1;
-        min-width: 80px;
     }
-    
+
     .swipeable-actions form {
         flex: 1;
         margin: 0;
     }
-    
+
     .swipeable-actions form .btn {
         width: 100%;
     }
-    
-    /* Mobile responsiveness improvements */
+
+    /* Fullscreen Overlay */
+    .fullscreen-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 9999;
+        display: none;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    /* Animations */
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .main-layout {
+            grid-template-columns: 350px 1fr;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .container-fluid {
+            padding: 1.5rem 1.25rem;
+        }
+
+        .main-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .map-section {
+            position: relative;
+            top: 0;
+            height: 450px;
+            order: -1;
+        }
+
+        .map-container {
+            min-height: 350px;
+        }
+
+        .locations-list {
+            max-height: none;
+        }
+    }
+
     @media (max-width: 768px) {
-        .desktop-table {
+        .container-fluid {
+            padding: 1.25rem 1rem;
+        }
+
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+        }
+
+        .page-subtitle {
+            font-size: 0.9375rem;
+        }
+
+        .sidebar-header {
+            padding: 1.25rem;
+        }
+
+        .map-section {
+            padding: 1.5rem;
+            height: 400px;
+        }
+
+        .map-container {
+            min-height: 300px;
+        }
+
+        .map-btn {
+            width: 32px;
+            height: 32px;
+        }
+
+        .map-btn i {
+            font-size: 0.75rem;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn-primary {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .location-card {
+            padding: 1rem;
+        }
+
+        .location-actions {
+            flex-wrap: wrap;
+        }
+
+        .location-actions .btn {
+            flex: 1;
+        }
+
+        /* Hide sidebar view on mobile */
+        .locations-sidebar {
             display: none;
         }
-        
+
+        /* Show mobile swipeable view */
         .mobile-swipeable-view {
             display: block;
         }
-        
-        .swipeable-item {
-            padding: 10px 12px;
-        }
-        
-        .swipeable-item .label {
-            min-width: 90px;
-            font-size: 0.9rem;
-        }
-        
-        .swipeable-actions {
-            padding: 12px;
-        }
-        
-        .swipeable-actions .btn {
-            padding: 6px 10px;
-            font-size: 0.85rem;
-            min-width: 80px;
+
+        .data-table th,
+        .data-table td {
+            padding: 0.875rem 1rem;
+            font-size: 0.875rem;
         }
     }
-    
+
     @media (max-width: 576px) {
-        .swipeable-item {
-            padding: 8px 10px;
+        .container-fluid {
+            padding: 1rem 0.875rem;
         }
-        
+
+        .page-header {
+            padding: 1.25rem;
+        }
+
+        .page-title {
+            font-size: 1.375rem;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+        }
+
+        .map-section {
+            padding: 1.25rem;
+            height: 350px;
+        }
+
+        .map-container {
+            min-height: 250px;
+        }
+
+        .map-btn {
+            width: 28px;
+            height: 28px;
+        }
+
+        .location-card {
+            padding: 0.875rem;
+        }
+
+        .swipeable-item {
+            padding: 0.875rem;
+        }
+
         .swipeable-item .label {
-            font-size: 0.85rem;
+            font-size: 0.6875rem;
             min-width: 80px;
         }
-        
+
+        .swipeable-item .value {
+            font-size: 0.875rem;
+        }
+
         .swipeable-actions {
-            padding: 10px;
-            gap: 5px;
+            padding: 0.875rem;
+            gap: 0.375rem;
         }
-        
+
         .swipeable-actions .btn {
-            padding: 5px 8px;
-            font-size: 0.8rem;
-            min-width: 70px;
-        }
-    }
-    
-    @media (max-width: 400px) {
-        .swipeable-item {
-            padding: 6px 8px;
-        }
-        
-        .swipeable-item .label {
-            font-size: 0.8rem;
-            min-width: 70px;
-        }
-        
-        .swipeable-actions {
-            padding: 8px;
-            gap: 4px;
-        }
-        
-        .swipeable-actions .btn {
-            padding: 4px 6px;
+            padding: 0.5rem 0.625rem;
             font-size: 0.75rem;
-            min-width: 60px;
+        }
+
+        .empty-state {
+            padding: 3rem 1.5rem;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
         }
     }
-    
-    /* Desktop view */
+
+    /* Desktop - ensure sidebar shows */
     @media (min-width: 769px) {
         .mobile-swipeable-view {
             display: none !important;
         }
-        .desktop-table {
-            display: block !important;
+        .locations-sidebar {
+            display: flex !important;
         }
+    }
+
+    /* Smooth Scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Leaflet Popup Customization */
+    .leaflet-popup-content-wrapper {
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .leaflet-popup-content {
+        font-family: inherit;
     }
 </style>
 @endsection
 
 @section('content')
-<div class="content-section">
+<div class="container-fluid">
     <div class="page-header">
-        <h1 class="page-title">Vet Shop Locations</h1>
-        <p class="page-subtitle">Manage veterinarian locations and services</p>
+        <h1 class="page-title">Map Management</h1>
+        <p class="page-subtitle">Manage veterinary clinic and pet shop locations</p>
     </div>
 
-    <!-- Map Section -->
-    <div class="map-section">
-        <div class="section-header">
-            <h2 class="section-title">Location Map</h2>
-            <a href="{{ route('admin.map.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Add New Location
-            </a>
-        </div>
-        
-        <div class="map-container">
-            <div id="shelterMap" style="height: 100%; width: 100%;"></div>
-            <div class="map-controls">
-                <button id="fullscreen-btn" class="map-btn" title="Fullscreen">
-                    <i class="fas fa-expand"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Vet Shops List -->
-    <div class="content-section">
-        @if($shelters->count() > 0)
-            <!-- Desktop Table View -->
-            <div class="desktop-table">
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Type</th>
-                                <th>Address</th>
-                                <th>Contact</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($shelters as $shelter)
-                                <tr>
-                                    <td>
-                                        <div class="table-cell-content">
-                                            <strong>{{ $shelter->name }}</strong>
-                                            <small class="text-muted">{{ $shelter->city }}, {{ $shelter->province }}</small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-{{ $shelter->type === 'pet_shop' ? 'info' : ($shelter->type === 'veterinarian' ? 'success' : 'warning') }}">
-                                            {{ $shelter->getTypeNameAttribute() }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="table-cell-content">
-                                            <small>{{ $shelter->address }}</small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="contact-info">
-                                            @if($shelter->phone)
-                                                <div><i class="fas fa-phone"></i> {{ $shelter->phone }}</div>
-                                            @endif
-                                            @if($shelter->email)
-                                                <div><i class="fas fa-envelope"></i> {{ $shelter->email }}</div>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="status-badge {{ $shelter->is_active ? 'status-active' : 'status-inactive' }}">
-                                            {{ $shelter->is_active ? 'Active' : 'Inactive' }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <a href="{{ route('admin.map.show', $shelter) }}" class="btn btn-sm btn-info" title="View">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ route('admin.map.edit', $shelter) }}" class="btn btn-sm btn-warning" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form action="{{ route('admin.map.destroy', $shelter) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this location? This action cannot be undone.')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+    @if($shelters->count() > 0)
+        <div class="main-layout">
+            <!-- Left Sidebar - Locations List -->
+            <div class="locations-sidebar">
+                <div class="sidebar-header">
+                    <h2 class="sidebar-title">Locations</h2>
                 </div>
-            </div>
 
-            <!-- Mobile Swipeable View -->
-            <div class="mobile-swipeable-view">
-                @foreach($shelters as $shelter)
-                    <div class="swipeable-location-card">
-                        <div class="swipeable-item">
-                            <span class="label">Name:</span>
-                            <span class="value">
-                                <strong>{{ $shelter->name }}</strong>
-                                <br>
-                                <small class="text-muted">{{ $shelter->city }}, {{ $shelter->province }}</small>
-                            </span>
-                        </div>
-                        
-                        <div class="swipeable-item">
-                            <span class="label">Type:</span>
-                            <span class="value">
+                <div class="locations-list">
+                    @foreach($shelters as $shelter)
+                        <div class="location-card">
+                            <div class="location-card-header">
+                                <div>
+                                    <div class="location-name">{{ $shelter->name }}</div>
+                                    <div class="location-city">{{ $shelter->city }}, {{ $shelter->province }}</div>
+                                </div>
                                 <span class="badge badge-{{ $shelter->type === 'pet_shop' ? 'info' : ($shelter->type === 'veterinarian' ? 'success' : 'warning') }}">
                                     {{ $shelter->getTypeNameAttribute() }}
                                 </span>
-                            </span>
-                        </div>
-                        
-                        <div class="swipeable-item">
-                            <span class="label">Address:</span>
-                            <span class="value">
-                                {{ $shelter->address }}
-                            </span>
-                        </div>
-                        
-                        <div class="swipeable-item">
-                            <span class="label">Contact:</span>
-                            <span class="value">
+                            </div>
+
+                            <div class="location-info">
+                                <div class="location-info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>{{ Str::limit($shelter->address, 40) }}</span>
+                                </div>
                                 @if($shelter->phone)
-                                    <div><i class="fas fa-phone"></i> {{ $shelter->phone }}</div>
+                                    <div class="location-info-item">
+                                        <i class="fas fa-phone"></i>
+                                        <span>{{ $shelter->phone }}</span>
+                                    </div>
                                 @endif
-                                @if($shelter->email)
-                                    <div><i class="fas fa-envelope"></i> {{ $shelter->email }}</div>
-                                @endif
-                            </span>
+                                <div class="location-info-item">
+                                    <i class="fas fa-circle"></i>
+                                    <span class="status-badge {{ $shelter->is_active ? 'status-active' : 'status-inactive' }}" style="padding: 0.25rem 0.625rem;">
+                                        {{ $shelter->is_active ? 'Active' : 'Inactive' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="location-actions">
+                                <a href="{{ route('admin.map.show', $shelter) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ route('admin.map.edit', $shelter) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('admin.map.destroy', $shelter) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this location? This action cannot be undone.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        
-                        <div class="swipeable-item">
-                            <span class="label">Status:</span>
-                            <span class="value">
-                                <span class="status-badge {{ $shelter->is_active ? 'status-active' : 'status-inactive' }}">
-                                    {{ $shelter->is_active ? 'Active' : 'Inactive' }}
-                                </span>
-                            </span>
-                        </div>
-                        
-                        <div class="swipeable-actions">
-                            <a href="{{ route('admin.map.show', $shelter) }}" class="btn btn-sm btn-info" title="View">
-                                <i class="fas fa-eye"></i> View
-                            </a>
-                            <a href="{{ route('admin.map.edit', $shelter) }}" class="btn btn-sm btn-warning" title="Edit">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <form action="{{ route('admin.map.destroy', $shelter) }}" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('Are you sure you want to delete this location? This action cannot be undone.')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
 
-            <!-- Pagination -->
-            <div class="pagination-container">  
-                {{ $shelters->appends(request()->query())->links() }}
+            <!-- Right Side - Map -->
+            <div class="map-section">
+                <div class="section-header">
+                    <h2 class="section-title">Location Map</h2>
+                    <a href="{{ route('admin.map.create') }}" class="btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>Add Location</span>
+                    </a>
+                </div>
+                
+                <div class="map-container">
+                    <div id="shelterMap" style="height: 100%; width: 100%;"></div>
+                    <div class="map-controls">
+                        <button id="fullscreen-btn" class="map-btn" title="Fullscreen">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-        @endif
-    </div>
+        </div>
+
+        <!-- Mobile View Only -->
+        <div class="mobile-swipeable-view">
+            @foreach($shelters as $shelter)
+                <div class="swipeable-location-card">
+                    <div class="swipeable-item">
+                        <span class="label">Name</span>
+                        <span class="value">
+                            <strong>{{ $shelter->name }}</strong>
+                            <br>
+                            <small>{{ $shelter->city }}, {{ $shelter->province }}</small>
+                        </span>
+                    </div>
+                    
+                    <div class="swipeable-item">
+                        <span class="label">Type</span>
+                        <span class="value">
+                            <span class="badge badge-{{ $shelter->type === 'pet_shop' ? 'info' : ($shelter->type === 'veterinarian' ? 'success' : 'warning') }}">
+                                {{ $shelter->getTypeNameAttribute() }}
+                            </span>
+                        </span>
+                    </div>
+                    
+                    <div class="swipeable-item">
+                        <span class="label">Address</span>
+                        <span class="value">{{ $shelter->address }}</span>
+                    </div>
+                    
+                    <div class="swipeable-item">
+                        <span class="label">Contact</span>
+                        <span class="value">
+                            @if($shelter->phone)
+                                <div><i class="fas fa-phone"></i> {{ $shelter->phone }}</div>
+                            @endif
+                            @if($shelter->email)
+                                <div><i class="fas fa-envelope"></i> {{ $shelter->email }}</div>
+                            @endif
+                        </span>
+                    </div>
+                    
+                    <div class="swipeable-item">
+                        <span class="label">Status</span>
+                        <span class="value">
+                            <span class="status-badge {{ $shelter->is_active ? 'status-active' : 'status-inactive' }}">
+                                {{ $shelter->is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                        </span>
+                    </div>
+                    
+                    <div class="swipeable-actions">
+                        <a href="{{ route('admin.map.show', $shelter) }}" class="btn btn-sm btn-info">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        <a href="{{ route('admin.map.edit', $shelter) }}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <form action="{{ route('admin.map.destroy', $shelter) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this location? This action cannot be undone.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @else
+        <div class="empty-state">
+            <i class="fas fa-map-marker-alt"></i>
+            <h3>No locations added yet</h3>
+            <p>Start by adding your first location to the map</p>
+            <a href="{{ route('admin.map.create') }}" class="btn-primary" style="margin-top: 1.5rem;">
+                <i class="fas fa-plus"></i>
+                <span>Add First Location</span>
+            </a>
+        </div>
+    @endif
 </div>
 
 <!-- Fullscreen Overlay -->
@@ -574,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 fullscreenEnabled: true,
                 showViewDetails: true,
                 viewDetailsRoute: baseUrl + '/',
-                zoom: 15 // Focus more closely on locations
+                zoom: 15
             });
             
             // Store reference to map for potential future use
@@ -589,27 +1044,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fallback function for basic map initialization
 function initBasicMap() {
-    // Create map centered on San Francisco, Agusan del Sur
     const map = L.map('shelterMap', {
-        zoomControl: false // Disable zoom controls
+        zoomControl: false
     }).setView([8.504588, 125.975800], 15);
     
-    // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
     
-    // Add markers
     allLocations.forEach(location => {
         if (location.latitude && location.longitude) {
             const lat = parseFloat(location.latitude);
             const lng = parseFloat(location.longitude);
             
-            // Use only veterinarian icon for all locations
             let iconClass = 'fas fa-user-md';
             let iconColor = '#10b981';
             
-            // Create custom icon
             const customIcon = L.divIcon({
                 html: `<div style="background: ${iconColor}; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="${iconClass}" style="font-size: 12px;"></i></div>`,
                 iconSize: [36, 36],
@@ -618,10 +1068,8 @@ function initBasicMap() {
                 className: 'custom-marker'
             });
             
-            // Create marker
             const marker = L.marker([lat, lng], { icon: customIcon });
             
-            // Create popup content
             const popupContent = `
                 <div style="min-width: 250px;">
                     <div style="display: flex; align-items: center; margin-bottom: 10px;">
@@ -634,22 +1082,22 @@ function initBasicMap() {
                         </div>
                     </div>
                     <div style="margin-bottom: 8px; color: #4b5563;">
-                        <i class="fas fa-map-marker-alt" style="color: #667eea; margin-right: 6px;"></i>
+                        <i class="fas fa-map-marker-alt" style="color: #3b82f6; margin-right: 6px;"></i>
                         ${location.address}<br>
                         ${location.city}, ${location.province}
                     </div>
                     <div style="margin-bottom: 8px; color: #4b5563;">
-                        <i class="fas fa-phone" style="color: #667eea; margin-right: 6px;"></i>
+                        <i class="fas fa-phone" style="color: #3b82f6; margin-right: 6px;"></i>
                         ${location.phone || 'Not provided'}
                     </div>
                     ${location.email ? `
                         <div style="margin-bottom: 12px; color: #4b5563;">
-                            <i class="fas fa-envelope" style="color: #667eea; margin-right: 6px;"></i>
+                            <i class="fas fa-envelope" style="color: #3b82f6; margin-right: 6px;"></i>
                             ${location.email}
                         </div>
                     ` : ''}
                     <div style="display: flex; gap: 5px; margin-top: 12px;">
-                        <a href="${baseUrl}/${location.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+                        <a href="${baseUrl}/${location.id}" style="background: #3b82f6; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>
                     </div>
@@ -661,10 +1109,7 @@ function initBasicMap() {
         }
     });
     
-    // Store reference to map
     window.shelterMap = map;
-    
-    // Initialize fullscreen functionality manually if SharedMap is not available
     initFullscreenFunctionality();
 }
 
@@ -674,24 +1119,20 @@ function initFullscreenFunctionality() {
     const fullscreenOverlay = document.getElementById('fullscreen-overlay');
     
     if (fullscreenBtn) {
-        // Add both click and touch events for better mobile support
         fullscreenBtn.addEventListener('click', handleFullscreenToggle);
         fullscreenBtn.addEventListener('touchstart', handleFullscreenToggle);
     }
     
     if (exitFullscreenBtn) {
-        // Add both click and touch events for better mobile support
         exitFullscreenBtn.addEventListener('click', exitFullscreen);
         exitFullscreenBtn.addEventListener('touchstart', exitFullscreen);
     }
     
     if (fullscreenOverlay) {
-        // Add both click and touch events for better mobile support
         fullscreenOverlay.addEventListener('click', handleOverlayClick);
         fullscreenOverlay.addEventListener('touchstart', handleOverlayClick);
     }
     
-    // Exit fullscreen on ESC key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && fullscreenOverlay && fullscreenOverlay.style.display === 'block') {
             exitFullscreen();
@@ -726,24 +1167,21 @@ function initFullscreenMap() {
     const mapLocations = @json($shelters->items());
     
     window.fullscreenMap = L.map('fullscreen-map', {
-        zoomControl: false // Disable zoom controls
+        zoomControl: false
     }).setView([8.504588, 125.975800], 15);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(window.fullscreenMap);
     
-    // Add markers to fullscreen map
     mapLocations.forEach(location => {
         if (location.latitude && location.longitude) {
             const lat = parseFloat(location.latitude);
             const lng = parseFloat(location.longitude);
             
-            // Use only veterinarian icon for all locations
             let iconClass = 'fas fa-user-md';
             let iconColor = '#10b981';
             
-            // Create custom icon
             const customIcon = L.divIcon({
                 html: `<div style="background: ${iconColor}; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="${iconClass}" style="font-size: 12px;"></i></div>`,
                 iconSize: [36, 36],
@@ -752,10 +1190,8 @@ function initFullscreenMap() {
                 className: 'custom-marker'
             });
             
-            // Create marker
             const marker = L.marker([lat, lng], { icon: customIcon });
             
-            // Create popup content
             const popupContent = `
                 <div style="min-width: 250px;">
                     <div style="display: flex; align-items: center; margin-bottom: 10px;">
@@ -768,22 +1204,22 @@ function initFullscreenMap() {
                         </div>
                     </div>
                     <div style="margin-bottom: 8px; color: #4b5563;">
-                        <i class="fas fa-map-marker-alt" style="color: #667eea; margin-right: 6px;"></i>
+                        <i class="fas fa-map-marker-alt" style="color: #3b82f6; margin-right: 6px;"></i>
                         ${location.address}<br>
                         ${location.city}, ${location.province}
                     </div>
                     <div style="margin-bottom: 8px; color: #4b5563;">
-                        <i class="fas fa-phone" style="color: #667eea; margin-right: 6px;"></i>
+                        <i class="fas fa-phone" style="color: #3b82f6; margin-right: 6px;"></i>
                         ${location.phone || 'Not provided'}
                     </div>
                     ${location.email ? `
                         <div style="margin-bottom: 12px; color: #4b5563;">
-                            <i class="fas fa-envelope" style="color: #667eea; margin-right: 6px;"></i>
+                            <i class="fas fa-envelope" style="color: #3b82f6; margin-right: 6px;"></i>
                             ${location.email}
                         </div>
                     ` : ''}
                     <div style="display: flex; gap: 5px; margin-top: 12px;">
-                        <a href="${baseUrl}/${location.id}" style="background: #667eea; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
+                        <a href="${baseUrl}/${location.id}" style="background: #3b82f6; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
                         </a>
                     </div>
@@ -795,7 +1231,6 @@ function initFullscreenMap() {
         }
     });
     
-    // Add click handler to exit fullscreen when clicking on the map
     window.fullscreenMap.on('click', function() {
         exitFullscreen();
     });

@@ -6,305 +6,583 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
-    .shelter-header { background: #e74c3c; padding: 30px 0; color: white; text-align: center; border-bottom: 1px solid #ddd; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-    .shelter-title { font-size: 2rem; font-weight: 700; margin-bottom: 10px; }
-    .shelter-subtitle { font-size: 1rem; opacity: 0.9; }
-
-    .content-section { padding: 30px 15px; max-width: 1200px; margin: 0 auto; }
-    
-    .details-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .card-header { border-bottom: 2px solid #e5e7eb; margin-bottom: 20px; padding-bottom: 12px; }
-    .section-title { font-size: 1.3rem; font-weight: 700; color: #1f2937; margin: 0; display: flex; align-items: center; gap: 8px; }
-    
-    .shelter-overview { display: flex; flex-direction: column; gap: 20px; }
-    .shelter-info { }
-    .shelter-header-info { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-    .shelter-icon { width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; flex-shrink: 0; }
-    .icon-grooming { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .icon-veterinarian { background: linear-gradient(135deg, #10b981, #059669); }
-    .icon-pet-shop { background: linear-gradient(135deg, #667eea, #764ba2); }
-    .shelter-details h2 { font-size: 1.5rem; font-weight: 700; color: #1f2937; margin: 0 0 8px 0; }
-    .badge { padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: 600; margin-right: 8px; }
-    .badge-primary { background: #ddd6fe; color: #5b21b6; }
-    .badge-success { background: #dcfce7; color: #166534; }
-    .badge-info { background: #dbeafe; color: #1e40af; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
-    .badge-active { background: #d1fae5; color: #065f46; }
-    .badge-inactive { background: #fee2e2; color: #991b1b; }
-    
-    .shelter-description { color: #6b7280; margin: 12px 0; font-size: 1rem; line-height: 1.6; }
-    
-    .action-buttons { display: flex; flex-direction: column; gap: 8px; }
-    .btn { padding: 10px 16px; border-radius: 6px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.9rem; }
-    .btn-primary { background: #667eea; color: white; }
-    .btn-primary:hover { background: #5a67d8; }
-    .btn-secondary { background: #6b7280; color: white; }
-    .btn-secondary:hover { background: #4b5563; }
-    
-    .info-grid { display: flex; flex-direction: column; gap: 20px; }
-    .contact-info { }
-    .contact-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; }
-    .contact-icon { width: 20px; text-align: center; color: #667eea; font-size: 0.9rem; margin-top: 3px; }
-    .contact-details strong { color: #1f2937; display: block; margin-bottom: 3px; font-size: 0.95rem; }
-    .contact-details span { color: #6b7280; font-size: 0.9rem; }
-    .contact-details a { color: #667eea; text-decoration: none; font-size: 0.9rem; }
-    .contact-details a:hover { text-decoration: underline; }
-    
-    .hours-list { list-style: none; padding: 0; }
-    .hours-list li { padding: 6px 0; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; }
-    .hours-list li:last-child { border-bottom: none; }
-    .day-name { font-weight: 600; color: #1f2937; font-size: 0.9rem; }
-    .day-time { color: #6b7280; font-size: 0.9rem; }
-    
-    .map-container { 
-        height: 300px; 
-        border-radius: 10px; 
-        overflow: hidden; 
-        border: 2px solid #e5e7eb; 
-        position: relative; 
-        width: 100%;
-        /* Ensure the map is visible on all devices */
-        display: block !important;
-        min-height: 250px;
-        /* Add z-index to ensure map is visible */
-        z-index: 10;
+    :root {
+        --primary: #0f172a;
+        --primary-light: #1e293b;
+        --accent: #3b82f6;
+        --accent-light: #60a5fa;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --info: #06b6d4;
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-muted: #94a3b8;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --border-color: #e2e8f0;
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        --radius: 12px;
+        --radius-lg: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
-    .map-fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10000; border-radius: 0; border: none; }
-    .map-controls { position: absolute; top: 8px; right: 8px; z-index: 1000; display: flex; gap: 4px; }
-    .map-btn { background: white; border: 1px solid #ccc; border-radius: 4px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s; }
-    .map-btn:hover { background: #f5f5f5; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-    .map-btn i { font-size: 12px; color: #333; }
-    .fullscreen-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; display: none; }
-    .no-map { height: 200px; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #f8fafc; border-radius: 10px; color: #6b7280; }
-    .no-map i { font-size: 2rem; margin-bottom: 10px; }
-    
-    .alert { padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; }
-    .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-    .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-    
-    /* Mobile-specific styles */
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .content-section {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+    }
+
+    /* Back Button */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+        animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .back-link:hover {
+        color: var(--accent);
+        transform: translateX(-4px);
+    }
+
+    .back-link i {
+        font-size: 0.875rem;
+    }
+
+    /* Alert */
+    .alert {
+        padding: 1rem 1.25rem;
+        border-radius: var(--radius);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 500;
+        animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .alert-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: #065f46;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .alert-error {
+        background: rgba(239, 68, 68, 0.1);
+        color: #991b1b;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    /* Details Card */
+    .details-card {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+        animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    }
+
+    .details-card:nth-child(2) { animation-delay: 0.1s; }
+    .details-card:nth-child(3) { animation-delay: 0.2s; }
+
+    /* Location Header */
+    .location-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .location-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, var(--success), #34d399);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        flex-shrink: 0;
+        box-shadow: var(--shadow-lg);
+        transition: var(--transition);
+    }
+
+    .details-card:hover .location-icon {
+        transform: scale(1.05);
+    }
+
+    .location-info {
+        flex: 1;
+    }
+
+    .location-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.025em;
+    }
+
+    .location-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .badge {
+        padding: 0.375rem 0.875rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        letter-spacing: 0.025em;
+    }
+
+    .badge-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .badge-active {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .badge-inactive {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    .location-description {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    /* Section */
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        letter-spacing: -0.025em;
+    }
+
+    .section-title i {
+        color: var(--accent);
+        font-size: 1.125rem;
+    }
+
+    /* Contact Info */
+    .contact-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .contact-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: var(--radius);
+        background: var(--bg-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: var(--transition);
+    }
+
+    .contact-item:hover .contact-icon {
+        background: var(--accent);
+        color: white;
+    }
+
+    .contact-icon i {
+        color: var(--accent);
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+
+    .contact-item:hover .contact-icon i {
+        color: white;
+    }
+
+    .contact-details {
+        flex: 1;
+    }
+
+    .contact-label {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
+    }
+
+    .contact-value {
+        font-size: 0.9375rem;
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+
+    .contact-value a {
+        color: var(--accent);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .contact-value a:hover {
+        color: var(--accent-light);
+        text-decoration: underline;
+    }
+
+    /* Hours List */
+    .hours-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .hours-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .hours-item:last-child {
+        border-bottom: none;
+    }
+
+    .hours-day {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--text-primary);
+    }
+
+    .hours-time {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    /* Grid Layout */
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    /* Map */
+    .map-container {
+        height: 450px;
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+        position: relative;
+    }
+
+    .map-controls {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+    }
+
+    .map-btn {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+    }
+
+    .map-btn:hover {
+        background: var(--bg-secondary);
+        box-shadow: var(--shadow-md);
+    }
+
+    .map-btn i {
+        font-size: 0.875rem;
+        color: var(--text-primary);
+    }
+
+    .no-map {
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        background: var(--bg-secondary);
+        border-radius: var(--radius);
+        color: var(--text-muted);
+    }
+
+    .no-map i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    /* Fullscreen Overlay */
+    .fullscreen-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 9999;
+        display: none;
+    }
+
+    .map-fullscreen {
+        height: 100%;
+        border-radius: 0;
+        border: none;
+    }
+
+    /* Animations */
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
     @media (min-width: 768px) {
-        .shelter-header { padding: 40px 0; }
-        .shelter-title { font-size: 2.5rem; margin-bottom: 15px; }
-        .shelter-subtitle { font-size: 1.2rem; }
-        
-        .content-section { padding: 40px 20px; }
-        .details-card { padding: 30px; margin-bottom: 25px; }
-        .card-header { margin-bottom: 25px; padding-bottom: 15px; }
-        .section-title { font-size: 1.5rem; gap: 10px; }
-        
-        .shelter-overview { flex-direction: row; gap: 30px; }
-        .shelter-header-info { gap: 20px; margin-bottom: 20px; }
-        .shelter-icon { width: 80px; height: 80px; border-radius: 15px; font-size: 2rem; }
-        .shelter-details h2 { font-size: 2rem; margin: 0 0 10px 0; }
-        .badge { padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; margin-right: 10px; }
-        
-        .shelter-description { margin: 15px 0; font-size: 1.1rem; }
-        
-        .action-buttons { flex-direction: column; gap: 10px; }
-        .btn { padding: 12px 20px; border-radius: 8px; gap: 8px; font-size: 1rem; }
-        
-        .info-grid { flex-direction: row; gap: 25px; }
-        .contact-item { gap: 12px; margin-bottom: 20px; }
-        .contact-icon { width: 24px; font-size: 1rem; margin-top: 3px; }
-        .contact-details strong { margin-bottom: 4px; font-size: 1rem; }
-        .contact-details span { font-size: 1rem; }
-        .contact-details a { font-size: 1rem; }
-        
-        .hours-list li { padding: 8px 0; }
-        .day-name { font-size: 1rem; }
-        .day-time { font-size: 1rem; }
-        
-        .map-container { height: 400px; }
-        .no-map { height: 300px; }
-        .no-map i { font-size: 3rem; margin-bottom: 15px; }
-    }
-    
-    @media (min-width: 992px) {
-        .shelter-overview { display: grid; grid-template-columns: 1fr auto; gap: 30px; align-items: start; }
+        .info-grid {
+            grid-template-columns: 400px 1fr;
+        }
     }
 
-    /* Desktop-specific adjustments for wider map and contact sections */
-    @media (min-width: 1200px) {
-        .info-grid { 
-            flex-direction: row; 
-            gap: 30px; 
-        }
-        
-        .details-card { 
-            flex: 1; 
-            min-width: 0; 
-        }
-        
-        /* Make the map section wider on desktop */
-        .info-grid > .details-card:last-child { 
-            flex: 1.5; 
-        }
-        
-        .map-container { 
-            height: 450px; 
-        }
-    }
-    
-    /* Mobile-specific fix for map visibility */
-    @media (max-width: 767.98px) {
-        .map-container {
-            height: 300px;
-            min-height: 250px;
-            /* Additional mobile-specific properties */
-            max-width: 100vw;
-            box-sizing: border-box;
-            /* Ensure map is visible on top of other elements */
-            z-index: 100;
-        }
-        
+    @media (max-width: 1024px) {
         .content-section {
-            padding: 20px 10px;
+            padding: 1.5rem 1.25rem;
         }
-        
-        .details-card {
-            padding: 15px;
+
+        .location-title {
+            font-size: 1.625rem;
         }
-        
-        .map-controls {
-            top: 6px;
-            right: 6px;
-        }
-        
-        .map-btn {
-            width: 26px;
-            height: 26px;
-        }
-        
-        .map-btn i {
-            font-size: 10px;
-        }
-        
-        /* Ensure map is visible on mobile */
-        #shelter-map {
-            visibility: visible !important;
-            display: block !important;
-            /* Add specific mobile properties */
-            width: 100% !important;
-            height: 300px !important;
-            position: relative !important;
-            z-index: 100 !important;
-        }
-        
-        /* Fix for mobile Safari and other mobile browsers */
-        #shelter-map .leaflet-container {
-            width: 100% !important;
-            height: 300px !important;
-        }
-        
-        .shelter-header {
-            padding: 25px 0;
-        }
-        
-        .shelter-title {
-            font-size: 1.8rem;
-        }
-        
-        .shelter-subtitle {
-            font-size: 0.95rem;
+
+        .map-container {
+            height: 400px;
         }
     }
-    
-    @media (max-width: 576px) {
-        .map-container {
-            height: 250px;
+
+    @media (max-width: 768px) {
+        .content-section {
+            padding: 1.25rem 1rem;
         }
-        
-        .shelter-header {
-            padding: 20px 0;
+
+        .details-card {
+            padding: 1.5rem;
         }
-        
-        .shelter-title {
+
+        .location-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .location-icon {
+            width: 64px;
+            height: 64px;
             font-size: 1.75rem;
         }
-        
-        .shelter-subtitle {
-            font-size: 0.9rem;
+
+        .location-title {
+            font-size: 1.5rem;
         }
-        
-        /* Additional fix for very small screens */
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
         .map-container {
-            height: 230px;
-            min-height: 200px;
+            height: 350px;
         }
-        
-        #shelter-map {
-            height: 230px !important;
+
+        .map-btn {
+            width: 32px;
+            height: 32px;
         }
-        
-        #shelter-map .leaflet-container {
-            height: 230px !important;
+
+        .map-btn i {
+            font-size: 0.75rem;
         }
     }
-    
-    /* Mobile header styles to match sidebar */
-    @media (max-width: 768px) {
-        .shelter-header {
-            background: #e74c3c;
-            color: white;
-            border-bottom: 1px solid #ddd;
+
+    @media (max-width: 576px) {
+        .content-section {
+            padding: 1rem 0.875rem;
         }
+
+        .details-card {
+            padding: 1.25rem;
+        }
+
+        .location-icon {
+            width: 56px;
+            height: 56px;
+            font-size: 1.5rem;
+        }
+
+        .location-title {
+            font-size: 1.375rem;
+        }
+
+        .location-description {
+            font-size: 0.9375rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+        }
+
+        .contact-icon {
+            width: 38px;
+            height: 38px;
+        }
+
+        .contact-icon i {
+            font-size: 0.9375rem;
+        }
+
+        .map-container {
+            height: 300px;
+        }
+
+        .map-btn {
+            width: 28px;
+            height: 28px;
+        }
+
+        .no-map {
+            height: 300px;
+        }
+
+        .no-map i {
+            font-size: 2.5rem;
+        }
+    }
+
+    /* Smooth Scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Leaflet Popup Customization */
+    .leaflet-popup-content-wrapper {
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .leaflet-popup-content {
+        font-family: inherit;
     }
 </style>
 @endsection
 
 @section('content')
-<div class="shelter-header">
-    <div class="container">
-        <h1 class="shelter-title">Location Details</h1>
-        <p class="shelter-subtitle">Complete information about {{ $map->name }}</p>
-    </div>
-</div>
-
 <div class="content-section">
+    <a href="{{ route('admin.map.index') }}" class="back-link">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Map</span>
+    </a>
+
     @if(session('success'))
         <div class="alert alert-success">
-            <i class="fas fa-check-circle"></i> {{ session('success') }}
+            <i class="fas fa-check-circle"></i>
+            <span>{{ session('success') }}</span>
         </div>
     @endif
 
     @if(session('error'))
         <div class="alert alert-error">
-            <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ session('error') }}</span>
         </div>
     @endif
 
     <!-- Location Overview -->
     <div class="details-card">
-        <div class="shelter-overview">
-            <div class="shelter-info">
-                <div class="shelter-header-info">
-                    <div class="shelter-icon icon-veterinarian">
-                        <i class="fas fa-user-md"></i>
-                    </div>
-                    <div class="shelter-details">
-                        <h2>{{ $map->name }}</h2>
-                        <div>
-                            <span class="badge badge-success">
-                                Veterinarian
-                            </span>
-                            <span class="badge badge-{{ $map->is_active ? 'active' : 'inactive' }}">
-                                {{ $map->is_active ? 'Active' : 'Inactive' }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                
-                @if($map->description)
-                    <p class="shelter-description">{{ $map->description }}</p>
-                @endif
+        <div class="location-header">
+            <div class="location-icon">
+                <i class="fas fa-user-md"></i>
             </div>
-            
-            <div class="action-buttons">
-                <a href="{{ route('admin.map.index') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Back to Map
-                </a>
+            <div class="location-info">
+                <h1 class="location-title">{{ $map->name }}</h1>
+                <div class="location-badges">
+                    <span class="badge badge-success">Veterinarian</span>
+                    <span class="badge badge-{{ $map->is_active ? 'active' : 'inactive' }}">
+                        {{ $map->is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                </div>
+                @if($map->description)
+                    <p class="location-description">{{ $map->description }}</p>
+                @endif
             </div>
         </div>
     </div>
@@ -312,57 +590,75 @@
     <div class="info-grid">
         <!-- Contact & Location Info -->
         <div class="details-card">
-            <div class="card-header">
-                <h3 class="section-title"><i class="fas fa-info-circle"></i> Contact & Location</h3>
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    Contact & Location
+                </h2>
             </div>
             
-            <div class="contact-info">
+            <div class="contact-list">
                 <div class="contact-item">
-                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
                     <div class="contact-details">
-                        <strong>Address:</strong>
-                        <span>{{ $map->address }}</span>
+                        <div class="contact-label">Address</div>
+                        <div class="contact-value">{{ $map->address }}</div>
                     </div>
                 </div>
                 
                 @if($map->phone)
                     <div class="contact-item">
-                        <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
                         <div class="contact-details">
-                            <strong>Phone:</strong>
-                            <a href="tel:{{ $map->phone }}">{{ $map->phone }}</a>
+                            <div class="contact-label">Phone</div>
+                            <div class="contact-value">
+                                <a href="tel:{{ $map->phone }}">{{ $map->phone }}</a>
+                            </div>
                         </div>
                     </div>
                 @endif
 
                 @if($map->email)
                     <div class="contact-item">
-                        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
                         <div class="contact-details">
-                            <strong>Email:</strong>
-                            <a href="mailto:{{ $map->email }}">{{ $map->email }}</a>
+                            <div class="contact-label">Email</div>
+                            <div class="contact-value">
+                                <a href="mailto:{{ $map->email }}">{{ $map->email }}</a>
+                            </div>
                         </div>
                     </div>
                 @endif
 
                 @if($map->website)
                     <div class="contact-item">
-                        <div class="contact-icon"><i class="fas fa-globe"></i></div>
+                        <div class="contact-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
                         <div class="contact-details">
-                            <strong>Website:</strong>
-                            <a href="{{ $map->website }}" target="_blank">{{ $map->website }}</a>
+                            <div class="contact-label">Website</div>
+                            <div class="contact-value">
+                                <a href="{{ $map->website }}" target="_blank">{{ $map->website }}</a>
+                            </div>
                         </div>
                     </div>
                 @endif
 
                 @if($map->operating_hours)
                     <div class="contact-item">
-                        <div class="contact-icon"><i class="fas fa-clock"></i></div>
+                        <div class="contact-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
                         <div class="contact-details">
-                            <strong>Operating Hours:</strong>
+                            <div class="contact-label">Operating Hours</div>
                             @php
                                 $hours = is_string($map->operating_hours) ? json_decode($map->operating_hours, true) : $map->operating_hours;
-                                // Define default hours
                                 $defaultHours = [
                                     'monday' => '8 AM - 5 PM',
                                     'tuesday' => '8 AM - 5 PM',
@@ -373,11 +669,8 @@
                                     'sunday' => '9 AM - 4 PM'
                                 ];
                                 
-                                // Ensure proper ordering for display
                                 if (is_array($hours)) {
-                                    // Filter out any entries that look like address data instead of time data
                                     foreach ($hours as $day => $time) {
-                                        // If the time looks like an address (contains common address words), skip it
                                         if (is_string($time) && 
                                             (stripos($time, 'purok') !== false || 
                                              stripos($time, 'poblacion') !== false || 
@@ -385,7 +678,6 @@
                                              stripos($time, 'agusan') !== false || 
                                              stripos($time, 'caraga') !== false || 
                                              preg_match('/\d{4}/', $time))) {
-                                            // This looks like address data, not time data - remove it
                                             unset($hours[$day]);
                                         }
                                     }
@@ -393,34 +685,27 @@
                                     $hourOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
                                     $orderedHours = [];
                                     
-                                    // Add hours in the correct order, use defaults for missing days
                                     foreach ($hourOrder as $day) {
                                         if (isset($hours[$day]) && !empty($hours[$day])) {
                                             $orderedHours[$day] = $hours[$day];
                                         } else {
-                                            // Use default value for missing or empty days
                                             $orderedHours[$day] = $defaultHours[$day];
                                         }
                                     }
                                     
                                     $hours = $orderedHours;
                                 } else {
-                                    // If no hours data, use default entries for all days
                                     $hours = $defaultHours;
                                 }
                             @endphp
-                            @if($hours)
-                                <ul class="hours-list">
-                                    @foreach($hours as $day => $time)
-                                        <li>
-                                            <span class="day-name">{{ ucfirst($day) }}:</span>
-                                            <span class="day-time">{{ $time }}</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @else
-                                <span>Not specified</span>
-                            @endif
+                            <ul class="hours-list">
+                                @foreach($hours as $day => $time)
+                                    <li class="hours-item">
+                                        <span class="hours-day">{{ ucfirst($day) }}</span>
+                                        <span class="hours-time">{{ $time }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
                 @endif
@@ -429,8 +714,11 @@
 
         <!-- Map -->
         <div class="details-card">
-            <div class="card-header">
-                <h3 class="section-title"><i class="fas fa-map"></i> Location Map</h3>
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-map"></i>
+                    Location Map
+                </h2>
             </div>
             
             @if($map->latitude && $map->longitude)
@@ -459,7 +747,6 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @section('scripts')
@@ -468,12 +755,9 @@
 
 @if($map->latitude && $map->longitude)
 <script>
-    // Initialize map when document is ready
     document.addEventListener('DOMContentLoaded', function() {
-        // Wait a bit for the assets to load
         setTimeout(function() {
             if (typeof SharedMap !== 'undefined') {
-                // Create a single-item array for the shelter
                 const shelterData = [{
                     id: {{ $map->id }},
                     name: "{{ $map->name }}",
@@ -487,26 +771,21 @@
                     type: "veterinarian"
                 }];
                 
-                // Initialize the shared map component
                 const sharedMap = new SharedMap('shelter-map', shelterData, {
                     fullscreenEnabled: true,
                     showViewDetails: false,
-                    zoom: 16 // Focus more closely on single location
+                    zoom: 16
                 });
                 
-                // Store reference to map for potential future use
                 window.shelterMap = sharedMap;
             } else {
                 console.error('SharedMap is not available');
-                // Fallback to basic map initialization
                 initBasicMap();
             }
         }, 100);
     });
     
-    // Fallback function for basic map initialization
     function initBasicMap() {
-        // Parse coordinates
         const lat = parseFloat({{ $map->latitude }});
         const lng = parseFloat({{ $map->longitude }});
         
@@ -515,7 +794,6 @@
             return;
         }
         
-        // Create map with explicit options
         const map = L.map('shelter-map', {
             center: [lat, lng],
             zoom: 16,
@@ -523,13 +801,11 @@
             attributionControl: true
         });
         
-        // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 18
         }).addTo(map);
         
-        // Create custom icon
         const customIcon = L.divIcon({
             html: `<div style="background: #10b981; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="fas fa-user-md" style="font-size: 12px;"></i></div>`,
             iconSize: [36, 36],
@@ -538,10 +814,8 @@
             className: 'custom-marker'
         });
         
-        // Add marker
         const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
         
-        // Add popup
         marker.bindPopup(`
             <div style="min-width: 200px;">
                 <div style="display: flex; align-items: center; margin-bottom: 10px;">
@@ -554,34 +828,30 @@
                     </div>
                 </div>
                 <div style="margin-bottom: 8px; color: #4b5563;">
-                    <i class="fas fa-map-marker-alt" style="color: #667eea; margin-right: 6px;"></i>
+                    <i class="fas fa-map-marker-alt" style="color: #3b82f6; margin-right: 6px;"></i>
                     {{ $map->address }}<br>
                     {{ $map->city }}, {{ $map->province }}
                 </div>
                 @if($map->phone)
                 <div style="margin-bottom: 8px; color: #4b5563;">
-                    <i class="fas fa-phone" style="color: #667eea; margin-right: 6px;"></i>
+                    <i class="fas fa-phone" style="color: #3b82f6; margin-right: 6px;"></i>
                     {{ $map->phone }}
                 </div>
                 @endif
                 @if($map->email)
                 <div style="margin-bottom: 12px; color: #4b5563;">
-                    <i class="fas fa-envelope" style="color: #667eea; margin-right: 6px;"></i>
+                    <i class="fas fa-envelope" style="color: #3b82f6; margin-right: 6px;"></i>
                     {{ $map->email }}
                 </div>
                 @endif
             </div>
         `);
         
-        // Force resize
         setTimeout(() => {
             map.invalidateSize();
         }, 100);
         
-        // Store reference to map
         window.shelterMap = map;
-        
-        // Initialize fullscreen functionality
         initFullscreenFunctionality();
     }
     
@@ -591,24 +861,20 @@
         const fullscreenOverlay = document.getElementById('fullscreen-overlay');
         
         if (fullscreenBtn) {
-            // Add both click and touch events for better mobile support
             fullscreenBtn.addEventListener('click', handleFullscreenToggle);
             fullscreenBtn.addEventListener('touchstart', handleFullscreenToggle);
         }
         
         if (exitFullscreenBtn) {
-            // Add both click and touch events for better mobile support
             exitFullscreenBtn.addEventListener('click', exitFullscreen);
             exitFullscreenBtn.addEventListener('touchstart', exitFullscreen);
         }
         
         if (fullscreenOverlay) {
-            // Add both click and touch events for better mobile support
             fullscreenOverlay.addEventListener('click', handleOverlayClick);
             fullscreenOverlay.addEventListener('touchstart', handleOverlayClick);
         }
         
-        // Exit fullscreen on ESC key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && fullscreenOverlay && fullscreenOverlay.style.display === 'block') {
                 exitFullscreen();
@@ -640,7 +906,6 @@
     }
     
     function initFullscreenMap() {
-        // Parse coordinates
         const lat = parseFloat({{ $map->latitude }});
         const lng = parseFloat({{ $map->longitude }});
         
@@ -661,7 +926,6 @@
             maxZoom: 18
         }).addTo(window.fullscreenMap);
         
-        // Create custom icon
         const customIcon = L.divIcon({
             html: `<div style="background: #10b981; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"><i class="fas fa-user-md" style="font-size: 12px;"></i></div>`,
             iconSize: [36, 36],
@@ -670,10 +934,8 @@
             className: 'custom-marker'
         });
         
-        // Add marker
         const marker = L.marker([lat, lng], { icon: customIcon }).addTo(window.fullscreenMap);
         
-        // Add popup
         marker.bindPopup(`
             <div style="min-width: 200px;">
                 <div style="display: flex; align-items: center; margin-bottom: 10px;">
@@ -686,26 +948,25 @@
                     </div>
                 </div>
                 <div style="margin-bottom: 8px; color: #4b5563;">
-                    <i class="fas fa-map-marker-alt" style="color: #667eea; margin-right: 6px;"></i>
+                    <i class="fas fa-map-marker-alt" style="color: #3b82f6; margin-right: 6px;"></i>
                     {{ $map->address }}<br>
                     {{ $map->city }}, {{ $map->province }}
                 </div>
                 @if($map->phone)
                 <div style="margin-bottom: 8px; color: #4b5563;">
-                    <i class="fas fa-phone" style="color: #667eea; margin-right: 6px;"></i>
+                    <i class="fas fa-phone" style="color: #3b82f6; margin-right: 6px;"></i>
                     {{ $map->phone }}
                 </div>
                 @endif
                 @if($map->email)
                 <div style="margin-bottom: 12px; color: #4b5563;">
-                    <i class="fas fa-envelope" style="color: #667eea; margin-right: 6px;"></i>
+                    <i class="fas fa-envelope" style="color: #3b82f6; margin-right: 6px;"></i>
                     {{ $map->email }}
                 </div>
                 @endif
             </div>
         `);
         
-        // Add click handler to exit fullscreen when clicking on the map
         window.fullscreenMap.on('click', function() {
             exitFullscreen();
         });

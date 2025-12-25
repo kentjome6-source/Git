@@ -6,113 +6,118 @@
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-header bg-reddish-orange text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">
-                        <i class="fas fa-paw me-2"></i>Pet Management
-                    </h4>
-                    <a href="{{ route('admin.pets.create') }}" class="btn btn-light btn-sm">
-                        <i class="fas fa-plus-circle me-1"></i> Add New Pet
-                    </a>
+            <!-- Page Header -->
+            <div class="page-header mb-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <h2 class="page-title mb-1">Pet Management</h2>
+                        <p class="page-subtitle text-muted mb-0">Manage and organize your pet listings</p>
+                    </div>
                 </div>
+            </div>
 
-                <div class="card-body p-4">
+            <!-- Main Card -->
+            <div class="card">
+                <div class="card-body">
                     @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-3" role="alert">
-                            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <div class="d-flex align-items-start">
+                                <svg class="icon-sm me-2 flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                <div class="flex-grow-1">{{ session('success') }}</div>
+                            </div>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
 
                     @if($pets->isEmpty())
-                        <div class="alert alert-info text-center py-5 rounded-3 shadow-sm">
-                            <h5 class="mb-0"><i class="fas fa-dog me-2"></i>No pets found</h5>
-                            <small class="text-muted">Click "Add New Pet" to create your first pet listing.</small>
+                        <div class="empty-state">
+                            <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <h4 class="empty-state-title">No pets found</h4>
+                            <p class="empty-state-text">Get started by adding your first pet listing</p>
+                            <a href="{{ route('admin.pets.create') }}" class="btn btn-primary mt-3">
+                                Add Your First Pet
+                            </a>
                         </div>
                     @else
-                        <!-- Card-based layout for desktop -->
+                        <!-- Desktop Grid View -->
                         <div class="pets-grid">
                             @foreach($pets as $pet)
                                 <div class="pet-card">
-                                    <div class="pet-image">
+                                    <div class="pet-card-image">
                                         @if($pet->image_path)
                                             <img src="{{ asset('storage/' . $pet->image_path) }}" alt="{{ $pet->name }}">
                                         @else
-                                            <div class="no-image">
-                                                <i class="fas fa-paw"></i>
+                                            <div class="pet-card-placeholder">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                                </svg>
                                             </div>
                                         @endif
                                     </div>
-                                    <div class="pet-content">
-                                        <h3 class="pet-title">{{ $pet->name }}</h3>
-                                        <div class="pet-meta">
-                                            <div class="meta-item">
-                                                <i class="fas fa-user"></i>
-                                                {{ $pet->user->name }}
+                                    <div class="pet-card-body">
+                                        <h3 class="pet-card-title">{{ $pet->name }}</h3>
+                                        <div class="pet-card-meta">
+                                            <div class="meta-row">
+                                                <span class="meta-label">Owner</span>
+                                                <span class="meta-value">{{ $pet->user->name }}</span>
                                             </div>
-                                            <div class="meta-item">
-                                                <i class="fas fa-info-circle"></i>
-                                                {{ Str::limit($pet->description, 50) }}
+                                            <div class="meta-row">
+                                                <span class="meta-label">Description</span>
+                                                <span class="meta-value">{{ Str::limit($pet->description, 60) }}</span>
                                             </div>
-                                        </div>
-                                        <div class="pet-actions">
-                                            <a href="{{ route('admin.pets.edit', $pet) }}" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </a>
-                                            <form action="{{ route('admin.pets.destroy', $pet) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this pet?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                    <i class="fas fa-trash"></i> Delete
-                                                </button>
-                                            </form>
                                         </div>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
                         
-                        <!-- Swipeable table for mobile - consistent with other admin views -->
-                        <div class="swipeable-table-container">
+                        <!-- Mobile List View -->
+                        <div class="mobile-list">
                             @foreach($pets as $pet)
-                                <div class="swipeable-table-row">
-                                    <div class="swipeable-table-item">
-                                        <span class="swipeable-table-label">Name</span>
-                                        <span class="pet-name-value">{{ $pet->name }}</span>
-                                    </div>
-                                    <div class="swipeable-table-item">
-                                        <span class="swipeable-table-label">Owner</span>
-                                        <span class="swipeable-table-value">{{ $pet->user->name }}</span>
-                                    </div>
-                                    <div class="swipeable-table-item">
-                                        <span class="swipeable-table-label">Description</span>
-                                        <span class="swipeable-table-value">{{ Str::limit($pet->description, 50) }}</span>
-                                    </div>
-                                    <div class="swipeable-table-item">
-                                        <span class="swipeable-table-label">Image</span>
-                                        <span class="swipeable-table-value">
+                                <div class="mobile-card">
+                                    <div class="mobile-card-header">
+                                        <div class="mobile-card-image">
                                             @if($pet->image_path)
-                                                <img src="{{ asset('storage/' . $pet->image_path) }}" alt="{{ $pet->name }}" class="swipeable-pet-image">
+                                                <img src="{{ asset('storage/' . $pet->image_path) }}" alt="{{ $pet->name }}">
                                             @else
-                                                <i class="fas fa-paw"></i>
+                                                <div class="mobile-card-placeholder">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                                        <polyline points="21 15 16 10 5 21"></polyline>
+                                                    </svg>
+                                                </div>
                                             @endif
-                                        </span>
+                                        </div>
+                                        <div class="mobile-card-title-section">
+                                            <h4 class="mobile-card-title">{{ $pet->name }}</h4>
+                                            <p class="mobile-card-subtitle">{{ $pet->user->name }}</p>
+                                        </div>
                                     </div>
-                                    <div class="swipeable-action-buttons">
-                                        <a href="{{ route('admin.pets.edit', $pet) }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </a>
-                                        <form action="{{ route('admin.pets.destroy', $pet) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this pet?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                <i class="fas fa-trash"></i> Delete
-                                            </button>
-                                        </form>
+                                    <div class="mobile-card-body">
+                                        <div class="mobile-info-item">
+                                            <span class="mobile-info-label">Description</span>
+                                            <span class="mobile-info-value">{{ Str::limit($pet->description, 80) }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
+
+                        {{-- <!-- Pagination -->
+                        @if($pets->hasPages())
+                            <div class="pagination-wrapper mt-4">
+                                {{ $pets->links() }}
+                            </div>
+                        @endif --}}
                     @endif
                 </div>
             </div>
@@ -123,286 +128,573 @@
 
 @section('styles')
 <style>
-    /* Card-based layout for desktop */
+    /* CSS Variables for Theming */
+    :root {
+        --primary-color: #2563eb;
+        --primary-hover: #1d4ed8;
+        --primary-light: #3b82f6;
+        --danger-color: #dc2626;
+        --danger-hover: #b91c1c;
+        --success-color: #16a34a;
+        --success-bg: #f0fdf4;
+        --success-border: #bbf7d0;
+        --text-primary: #111827;
+        --text-secondary: #6b7280;
+        --text-tertiary: #9ca3af;
+        --border-color: #e5e7eb;
+        --bg-surface: #ffffff;
+        --bg-base: #f9fafb;
+        --border-radius: 12px;
+        --border-radius-sm: 8px;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        --transition: all 0.2s ease-in-out;
+    }
+
+    /* Icon Utilities */
+    .icon-xs {
+        width: 14px;
+        height: 14px;
+        vertical-align: middle;
+    }
+
+    .icon-sm {
+        width: 18px;
+        height: 18px;
+        vertical-align: middle;
+    }
+
+    .icon-md {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Page Header */
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .page-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    /* Card Styles */
+    .card {
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
+        background: var(--bg-surface);
+        overflow: hidden;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    /* Button Styles */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1.25rem;
+        border-radius: var(--border-radius-sm);
+        transition: var(--transition);
+        border: 1px solid transparent;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        color: #ffffff;
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+        background-color: transparent;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: #ffffff;
+        border-color: var(--primary-color);
+    }
+
+    .btn-outline-danger {
+        color: var(--danger-color);
+        border-color: var(--danger-color);
+        background-color: transparent;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: var(--danger-color);
+        color: #ffffff;
+        border-color: var(--danger-color);
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.8125rem;
+    }
+
+    /* Alert Styles */
+    .alert {
+        border-radius: var(--border-radius-sm);
+        border: 1px solid transparent;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background-color: var(--success-bg);
+        border-color: var(--success-border);
+        color: #15803d;
+    }
+
+    .alert .btn-close {
+        padding: 0.75rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-state-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        color: var(--text-tertiary);
+        stroke-width: 1.5;
+    }
+
+    .empty-state-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state-text {
+        color: var(--text-secondary);
+        font-size: 0.9375rem;
+        margin-bottom: 0;
+    }
+
+    /* Pet Cards Grid - Desktop */
     .pets-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 25px;
-        margin-bottom: 30px;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
     }
-    
+
     .pet-card {
-        background: #fff;
-        border-radius: 12px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        transition: all 0.3s ease;
-        border: 1px solid #eee;
+        transition: var(--transition);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
-    
+
     .pet-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-4px);
+        border-color: var(--primary-light);
     }
-    
-    .pet-image {
-        height: 200px;
+
+    .pet-card-image {
+        width: 100%;
+        height: 220px;
         overflow: hidden;
+        background-color: var(--bg-base);
         position: relative;
-        background: #f8f9fa;
     }
-    
-    .pet-image img {
+
+    .pet-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .pet-card:hover .pet-card-image img {
+        transform: scale(1.05);
+    }
+
+    .pet-card-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    }
+
+    .pet-card-placeholder svg {
+        width: 64px;
+        height: 64px;
+        color: var(--text-tertiary);
+    }
+
+    .pet-card-body {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pet-card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        line-height: 1.4;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .pet-card-meta {
+        margin-bottom: 1.25rem;
+        flex-grow: 1;
+    }
+
+    .meta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+        gap: 1rem;
+    }
+
+    .meta-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .meta-label {
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        flex-shrink: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .meta-value {
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        text-align: right;
+        line-height: 1.5;
+    }
+
+    .pet-card-actions {
+        display: flex;
+        gap: 0.75rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .pet-card-actions .btn {
+        flex: 1;
+    }
+
+    .pet-card-actions form {
+        flex: 1;
+    }
+
+    /* Mobile List View */
+    .mobile-list {
+        display: none;
+    }
+
+    .mobile-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        margin-bottom: 1rem;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .mobile-card-header {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        gap: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--bg-base);
+    }
+
+    .mobile-card-image {
+        width: 64px;
+        height: 64px;
+        border-radius: var(--border-radius-sm);
+        overflow: hidden;
+        background-color: var(--bg-base);
+        flex-shrink: 0;
+        border: 1px solid var(--border-color);
+    }
+
+    .mobile-card-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
-    
-    .pet-image .no-image {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+
+    .mobile-card-placeholder {
+        width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #e74c3c 0%, #ff6b6b 100%);
-        color: white;
-        font-size: 3rem;
-    }
-    
-    .pet-content {
-        padding: 20px;
-    }
-    
-    .pet-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 12px;
-    }
-    
-    .pet-meta {
-        margin-bottom: 20px;
-    }
-    
-    .meta-item {
         display: flex;
         align-items: center;
-        gap: 8px;
-        font-size: 0.9rem;
-        color: #666;
-        margin-bottom: 8px;
-    }
-    
-    .meta-item:last-child {
-        margin-bottom: 0;
-    }
-    
-    .pet-actions {
-        display: flex;
-        gap: 10px;
-    }
-    
-    .pet-actions .btn {
-        flex: 1;
         justify-content: center;
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
     }
-    
-    /* Swipeable table for mobile - consistent with other admin views */
-    .swipeable-table-container {
-        display: none;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        padding: 10px 0;
+
+    .mobile-card-placeholder svg {
+        width: 32px;
+        height: 32px;
+        color: var(--text-tertiary);
     }
-    
-    .swipeable-table-row {
+
+    .mobile-card-title-section {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .mobile-card-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mobile-card-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mobile-card-body {
+        padding: 1rem;
+    }
+
+    .mobile-info-item {
         display: flex;
         flex-direction: column;
-        border: 1px solid #eee;
-        border-radius: 10px;
-        margin-bottom: 15px;
-        background: #fff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        gap: 0.375rem;
     }
-    
-    .swipeable-table-item {
-        padding: 12px 15px;
-        border-bottom: 1px solid #f0f0f0;
+
+    .mobile-info-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .mobile-info-value {
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        line-height: 1.5;
+    }
+
+    .mobile-card-actions {
         display: flex;
-        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 1rem;
+        border-top: 1px solid var(--border-color);
+        background-color: var(--bg-base);
     }
-    
-    .swipeable-table-item:last-child {
-        border-bottom: none;
-    }
-    
-    .swipeable-table-label {
-        font-weight: 600;
-        color: #e74c3c;
-        min-width: 100px;
-    }
-    
-    .pet-name-value {
-        font-weight: 600;
-        color: #333;
-        text-align: right;
+
+    .mobile-card-actions .btn {
         flex: 1;
     }
-    
-    .swipeable-table-value {
-        text-align: right;
-        flex: 1;
-    }
-    
-    .swipeable-pet-image {
-        width: 40px;
-        height: 40px;
-        object-fit: cover;
-        border-radius: 6px;
-    }
-    
-    .swipeable-action-buttons {
+
+    /* Pagination */
+    .pagination-wrapper {
         display: flex;
-        gap: 8px;
-        padding: 10px 15px;
-    }
-    
-    .swipeable-action-buttons .btn {
-        flex: 1;
         justify-content: center;
-        padding: 8px;
-        font-size: 0.8rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
     }
-    
-    /* Responsive Improvements for All Devices */
-    .table-responsive {
-        border: none;
-    }
-    
-    /* Desktop Improvements */
-    @media (min-width: 769px) {
-        .card-header {
-            padding: 1rem 1.5rem;
-        }
-        
-        .btn {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.875rem;
-        }
-        
-        .pets-grid {
-            display: grid !important;
-        }
-        
-        .swipeable-table-container {
-            display: none !important;
-        }
-    }
-    
-    /* Tablet Improvements */
-    @media (max-width: 991px) {
-        .btn {
-            padding: 0.3rem 0.6rem;
-            font-size: 0.8rem;
-        }
-        
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
         .pets-grid {
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
         }
     }
 
-    /* Mobile Responsive Improvements */
+    @media (max-width: 992px) {
+        .page-title {
+            font-size: 1.5rem;
+        }
+
+        .pets-grid {
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .pet-card-body {
+            padding: 1.25rem;
+        }
+    }
+
     @media (max-width: 768px) {
         .card-body {
-            padding: 1rem !important;
+            padding: 1.5rem;
         }
-        
-        .card-header {
-            padding: 0.75rem 1rem;
+
+        .page-title {
+            font-size: 1.375rem;
         }
-        
-        .card-title {
-            font-size: 1.25rem;
+
+        .page-subtitle {
+            font-size: 0.8125rem;
         }
-        
-        .btn {
-            padding: 0.375rem 0.5rem !important;
-            font-size: 0.8rem;
-            white-space: nowrap;
-        }
-        
-        /* Hide card grid on mobile */
+
+        /* Hide grid, show mobile list */
         .pets-grid {
             display: none;
         }
-        
-        /* Show swipeable table on mobile */
-        .swipeable-table-container {
+
+        .mobile-list {
             display: block;
         }
-        
-        .swipeable-table-label {
-            font-size: 0.9rem;
+
+        .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
         }
-        
-        .swipeable-table-value {
-            font-size: 0.9rem;
+
+        .page-header .btn {
+            padding: 0.625rem 1.125rem;
         }
     }
 
     @media (max-width: 576px) {
+        .container-fluid {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
         .card-body {
-            padding: 0.75rem !important;
+            padding: 1rem;
         }
-        
-        .card-header {
-            padding: 0.6rem 0.8rem;
+
+        .page-title {
+            font-size: 1.25rem;
         }
-        
-        .card-title {
-            font-size: 1.1rem;
+
+        .page-header {
+            margin-bottom: 1rem;
         }
-        
-        .btn {
-            padding: 0.25rem 0.4rem !important;
-            font-size: 0.75rem;
-        }
-        
-        .swipeable-table-item {
-            padding: 10px 12px;
-        }
-        
-        .swipeable-table-label {
-            font-size: 0.85rem;
-        }
-        
-        .swipeable-table-value {
-            font-size: 0.85rem;
-        }
-        
-        .swipeable-action-buttons {
+
+        .page-header .d-flex {
             flex-direction: column;
+            align-items: stretch !important;
         }
-        
-        .swipeable-action-buttons .btn {
+
+        .page-header .btn {
             width: 100%;
         }
+
+        .empty-state {
+            padding: 3rem 1rem;
+        }
+
+        .empty-state-icon {
+            width: 64px;
+            height: 64px;
+        }
+
+        .mobile-card {
+            margin-bottom: 0.875rem;
+        }
+
+        .mobile-card-header {
+            padding: 0.875rem;
+        }
+
+        .mobile-card-body {
+            padding: 0.875rem;
+        }
+
+        .mobile-card-actions {
+            flex-direction: column;
+            padding: 0.875rem;
+        }
+
+        .mobile-card-actions .btn {
+            width: 100%;
+        }
+
+        .alert {
+            padding: 0.875rem 1rem;
+        }
     }
-    
-    /* Custom reddish-orange background */
-    .bg-reddish-orange {
-        background: #e74c3c !important;
+
+    /* Prevent horizontal scroll */
+    body {
+        overflow-x: hidden;
     }
-    
-    /* Ensure content fits within viewport */
+
     .container-fluid {
         max-width: 100%;
         overflow-x: hidden;
     }
-    
-    /* Prevent horizontal scrolling */
-    body {
-        overflow-x: hidden;
+
+    /* Focus states for accessibility */
+    .btn:focus,
+    .btn:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+
+    /* Print styles */
+    @media print {
+        .page-header .btn,
+        .pet-card-actions,
+        .mobile-card-actions {
+            display: none;
+        }
     }
 </style>
 @endsection

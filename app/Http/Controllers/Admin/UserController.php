@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Appointment;
-use App\Models\LostFound;
 use App\Models\Pet;
+use App\Models\User;
 use App\Models\Adoption;
+use App\Models\LostFound;
+use App\Models\Appointment;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -17,52 +18,132 @@ class UserController extends Controller
     /**
      * Display a listing of users with filters
      */
+    // public function index(Request $request)
+    // {
+    //     $query = User::legitimate()->with('pets');
+        
+    //     // Search filter
+    //     if ($request->filled('search')) {
+    //         $search = $request->search;
+    //         $query->where(function($q) use ($search) {
+    //             $q->where('name', 'like', "%{$search}%")
+    //               ->orWhere('email', 'like', "%{$search}%");
+    //         });
+    //     }
+        
+    //     // Role filter
+    //     if ($request->filled('role')) {
+    //         $query->where('role', $request->role);
+    //     }
+        
+    //     // Date filter
+    //     if ($request->filled('date_from')) {
+    //         $query->whereDate('created_at', '>=', $request->date_from);
+    //     }
+        
+    //     if ($request->filled('date_to')) {
+    //         $query->whereDate('created_at', '<=', $request->date_to);
+    //     }
+        
+    //     // Removed pagination to show all users at once
+    //     $users = $query->withCount(['pets'])
+    //                   ->orderBy('created_at', 'desc')
+    //                   ->get(); // Changed from paginate(15) to get()
+        
+    //     // Get stats for the dashboard
+    //     $stats = [
+    //         'total_users' => User::legitimate()->count(),
+    //         'admin_count' => User::legitimate()->where('role', 'admin')->count(),
+    //         'vet_count' => User::legitimate()->where('role', 'vet')->count(),
+    //         'user_count' => User::legitimate()->where('role', 'user')->count(),
+    //         'new_this_month' => User::legitimate()->whereMonth('created_at', now()->month)
+    //                                ->whereYear('created_at', now()->year)
+    //                                ->count(),
+    //     ];
+        
+    //     return view('admin.users.index', compact('users', 'stats'));
+    // }
+    
+    public function createVet()
+    {
+        return view('admin.users.create-vet');
+    }
+
+    public function storeVet(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'license_number' => 'required|string|max:255',
+            'specialization' => 'nullable|string|max:255',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'vet',
+            'is_verified_vet' => true,
+        ]);
+
+        if (Schema::hasTable('vet_profiles')) {
+            $user->vetProfile()->create([
+                'license_number' => $request->license_number,
+                'specialization' => $request->specialization,
+                'is_verified' => true,
+            ]);
+        } else {
+            $user->update([
+                'license_number' => $request->license_number,
+                'specialization' => $request->specialization,
+            ]);
+        }
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'Veterinarian added successfully!');
+    }
     public function index(Request $request)
     {
-        $query = User::legitimate()->with('pets');
-        
-        // Search filter
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
-        
-        // Role filter
-        if ($request->filled('role')) {
-            $query->where('role', $request->role);
-        }
-        
-        // Date filter
-        if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-        
-        if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
-        
-        // Removed pagination to show all users at once
-        $users = $query->withCount(['pets'])
-                      ->orderBy('created_at', 'desc')
-                      ->get(); // Changed from paginate(15) to get()
-        
-        // Get stats for the dashboard
-        $stats = [
-            'total_users' => User::legitimate()->count(),
-            'admin_count' => User::legitimate()->where('role', 'admin')->count(),
-            'vet_count' => User::legitimate()->where('role', 'vet')->count(),
-            'user_count' => User::legitimate()->where('role', 'user')->count(),
-            'new_this_month' => User::legitimate()->whereMonth('created_at', now()->month)
-                                   ->whereYear('created_at', now()->year)
-                                   ->count(),
-        ];
-        
-        return view('admin.users.index', compact('users', 'stats'));
+    // Start query excluding admin users
+    $query = User::where('role', '!=', 'admin')
+                ->withCount('pets');
+    
+    // Apply filters
+    if ($request->filled('search')) {
+        $query->where(function($q) use ($request) {
+            $q->where('name', 'like', '%' . $request->search . '%')
+              ->orWhere('email', 'like', '%' . $request->search . '%');
+        });
     }
     
+    if ($request->filled('role')) {
+        $query->where('role', $request->role);
+    }
+    
+    if ($request->filled('date_from')) {
+        $query->whereDate('created_at', '>=', $request->date_from);
+    }
+    
+    if ($request->filled('date_to')) {
+        $query->whereDate('created_at', '<=', $request->date_to);
+    }
+    
+    // Calculate stats (excluding admins)
+    $stats = [
+        'total_users' => User::where('role', '!=', 'admin')->count(),
+        'vet_count' => User::where('role', 'vet')->count(),
+        'user_count' => User::where('role', 'user')->count(),
+        'new_this_month' => User::where('role', '!=', 'admin')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count(),
+    ];
+    
+    $users = $query->orderBy('created_at', 'desc')->paginate(10);
+    
+    return view('admin.users.index', compact('users', 'stats'));
+}
     /**
      * Show form to create a new user
      */

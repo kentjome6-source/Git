@@ -58,6 +58,7 @@ Route::prefix('vet')->name('vet.')->middleware(['can:isVet', 'vet.verified'])->g
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');    
+
 });
 
 // Admin Routes
@@ -68,6 +69,9 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     Route::get('/admin/profile', [ProfileController::class, 'edit'])->name('admin.profile.edit');
     Route::patch('/admin/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
     Route::delete('/admin/profile', [ProfileController::class, 'destroy'])->name('admin.profile.destroy');
+
+    Route::get('/admin/users/create-vet', [UserController::class, 'createVet'])->name('admin.users.create-vet');
+    Route::post('/admin/users/store-vet', [UserController::class, 'storeVet'])->name('admin.users.store-vet');
     
     // Admin Pet Management
     Route::resource('admin/pets', AdminPetController::class)->names([

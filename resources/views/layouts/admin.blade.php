@@ -367,7 +367,7 @@
             <div class="sidebar-header">
                 <div class="logo d-flex align-items-center justify-content-center mb-2">
                     <img src="{{ asset('images/logo/logo.png') }}" alt="PawPortal Logo" class="img-fluid me-2" style="max-height: 40px; width: auto;">
-                    <span class="fs-5 fw-bold">PawPortal Admin</span>
+                    <span class="fs-5 fw-bold">PawPortal</span>
                 </div>
                 <div class="subtitle text-center">Administration Panel</div>
             </div>
