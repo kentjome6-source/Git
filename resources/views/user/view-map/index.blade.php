@@ -65,33 +65,107 @@
         color: var(--gray);
     }
 
-    /* Map Section */
-    .map-section {
+    /* Main Layout - Map on right, shelters on left */
+    .main-layout {
+        display: flex;
+        flex-wrap: wrap;
+        min-height: calc(100vh - 200px);
         padding: 0 20px 40px;
-        animation: fadeIn 0.8s ease-out;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    .map-wrapper {
-        max-width: 1400px;
+        gap: 24px;
+        max-width: 1800px;
         margin: 0 auto;
+        width: 100%;
+    }
+
+    /* Left Side - Shelters Section */
+    .shelters-column {
+        flex: 1;
+        min-width: 300px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .shelters-container {
         background: white;
         border-radius: 16px;
         padding: 24px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         border: 1px solid #e2e8f0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .section-header {
+        margin-bottom: 24px;
+        position: sticky;
+        top: 0;
+        background: white;
+        padding-bottom: 16px;
+        z-index: 10;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-size: clamp(1.25rem, 2vw, 1.75rem);
+        font-weight: 700;
+        color: var(--slate);
+        letter-spacing: -0.02em;
+        margin-bottom: 6px;
+    }
+
+    .section-subtitle {
+        font-size: 0.9rem;
+        color: var(--gray);
+    }
+
+    /* Right Side - Map Section */
+    .map-column {
+        flex: 1;
+        min-width: 400px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .map-wrapper {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .map-header {
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 16px;
+    }
+
+    .map-title {
+        font-size: clamp(1.25rem, 2vw, 1.75rem);
+        font-weight: 700;
+        color: var(--slate);
+        letter-spacing: -0.02em;
+        margin-bottom: 6px;
+    }
+
+    .map-subtitle {
+        font-size: 0.9rem;
+        color: var(--gray);
     }
 
     .map-container {
         position: relative;
-        height: 500px;
+        flex: 1;
         border-radius: 12px;
         overflow: hidden;
         border: 1px solid #e2e8f0;
+        min-height: 500px;
     }
 
     #shelterMap {
@@ -133,131 +207,134 @@
         stroke: var(--slate);
     }
 
-    /* Shelters Section */
-    .shelters-section {
-        padding: 40px 20px;
-    }
-
-    .shelters-container {
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-
-    .section-header {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-
-    .section-title {
-        font-size: clamp(1.75rem, 3vw, 2.25rem);
-        font-weight: 700;
-        color: var(--slate);
-        letter-spacing: -0.02em;
-    }
-
     /* Shelters Grid */
-    .shelters-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 24px;
+    .shelters-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        overflow-y: auto;
+        flex: 1;
+        padding-right: 4px;
     }
 
     .shelter-card {
         background: white;
-        border-radius: 16px;
-        padding: 24px;
+        border-radius: 12px;
+        padding: 16px;
         border: 1px solid #e2e8f0;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
     }
 
     .shelter-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         border-color: var(--green);
+    }
+
+    .shelter-card.active {
+        border-color: var(--blue);
+        background: rgba(59, 130, 246, 0.05);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
     }
 
     .shelter-header {
         display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 16px;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
     }
 
     .shelter-icon {
-        width: 56px;
-        height: 56px;
-        border-radius: 12px;
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
         background: linear-gradient(135deg, var(--green) 0%, #059669 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+        margin-top: 2px;
     }
 
     .shelter-icon svg {
-        width: 28px;
-        height: 28px;
+        width: 20px;
+        height: 20px;
         stroke: white;
     }
 
+    .shelter-info {
+        flex: 1;
+    }
+
     .shelter-info h3 {
-        font-size: 1.25rem;
+        font-size: 1.05rem;
         font-weight: 600;
         color: var(--slate);
         margin-bottom: 4px;
         letter-spacing: -0.01em;
+        line-height: 1.3;
     }
 
     .shelter-info p {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         color: var(--gray);
         margin: 0;
+        line-height: 1.2;
     }
 
     .vet-badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 6px 12px;
+        padding: 4px 10px;
         background: rgba(16, 185, 129, 0.1);
         color: var(--green);
-        border-radius: 8px;
-        font-size: 0.8rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
         font-weight: 600;
-        margin-bottom: 16px;
+        margin-bottom: 12px;
     }
 
     .vet-badge svg {
-        width: 14px;
-        height: 14px;
+        width: 12px;
+        height: 12px;
         stroke: currentColor;
     }
 
     .shelter-description {
         color: var(--gray);
-        font-size: 0.95rem;
-        line-height: 1.6;
-        margin-bottom: 20px;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin-bottom: 12px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        max-height: 2.8em;
     }
 
     .shelter-details {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        margin-bottom: 20px;
+        gap: 8px;
+        margin-bottom: 12px;
     }
 
     .detail-item {
         display: flex;
         align-items: flex-start;
-        gap: 12px;
+        gap: 8px;
         color: var(--gray);
-        font-size: 0.9rem;
+        font-size: 0.8rem;
+        line-height: 1.4;
     }
 
     .detail-item svg {
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
         stroke: var(--blue);
         flex-shrink: 0;
         margin-top: 2px;
@@ -265,55 +342,68 @@
 
     .detail-item span {
         word-break: break-word;
+        flex: 1;
     }
 
-    .map-link {
-        background: var(--gray-light);
-        padding: 16px;
-        border-radius: 10px;
-        text-align: center;
-        color: var(--gray);
-        font-size: 0.9rem;
-        display: flex;
+    .view-on-map {
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
-        gap: 8px;
+        gap: 6px;
+        color: var(--blue);
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 8px 0;
+        border-top: 1px solid #e2e8f0;
+        margin-top: 12px;
+        padding-top: 12px;
+        transition: color 0.2s;
     }
 
-    .map-link svg {
-        width: 16px;
-        height: 16px;
+    .view-on-map:hover {
+        color: #2563eb;
+    }
+
+    .view-on-map svg {
+        width: 14px;
+        height: 14px;
         stroke: currentColor;
     }
 
     /* Empty State */
     .empty-state {
         text-align: center;
-        padding: 80px 20px;
+        padding: 40px 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 
     .empty-icon {
-        margin-bottom: 24px;
+        margin-bottom: 16px;
         color: var(--gray);
         opacity: 0.4;
     }
 
     .empty-icon svg {
-        width: 80px;
-        height: 80px;
+        width: 60px;
+        height: 60px;
         stroke: currentColor;
     }
 
     .empty-title {
-        font-size: 1.75rem;
+        font-size: 1.25rem;
         font-weight: 600;
         color: var(--slate);
-        margin-bottom: 12px;
+        margin-bottom: 8px;
     }
 
     .empty-text {
-        font-size: 1.05rem;
+        font-size: 0.95rem;
         color: var(--gray);
+        max-width: 300px;
     }
 
     /* Success Notification */
@@ -367,10 +457,62 @@
         width: 100%;
     }
 
-    /* Responsive */
-    @media (max-width: 1024px) {
-        .shelters-grid {
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* Custom scrollbar */
+    .shelters-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .shelters-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .shelters-list::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+
+    .shelters-list::-webkit-scrollbar-thumb:hover {
+        background: #a1a1a1;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1200px) {
+        .main-layout {
+            gap: 20px;
+            padding: 0 20px 30px;
+        }
+        
+        .shelters-column,
+        .map-column {
+            min-width: 350px;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .main-layout {
+            flex-direction: column;
+            gap: 20px;
+            min-height: auto;
+        }
+        
+        .shelters-column,
+        .map-column {
+            min-width: 100%;
+            width: 100%;
+        }
+        
+        .shelters-container {
+            height: auto;
+            max-height: 500px;
+        }
+        
+        .shelters-list {
+            max-height: 350px;
+        }
+        
+        .map-container {
+            min-height: 450px;
         }
     }
 
@@ -387,49 +529,109 @@
             font-size: 1rem;
         }
 
-        .map-section {
-            padding: 0 15px 30px;
+        .main-layout {
+            padding: 0 15px 25px;
+            gap: 20px;
         }
 
+        .shelters-container,
         .map-wrapper {
             padding: 20px;
         }
 
+        .section-header,
+        .map-header {
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
         .map-container {
-            height: 400px;
+            min-height: 400px;
         }
 
-        .shelters-section {
-            padding: 30px 15px;
+        .section-title,
+        .map-title {
+            font-size: 1.3rem;
         }
 
-        .shelters-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
+        .shelter-card {
+            padding: 14px;
+        }
+
+        .shelter-header {
+            gap: 10px;
+        }
+
+        .shelter-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .shelter-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .map-controls {
+            top: 10px;
+            right: 10px;
+            gap: 6px;
+        }
+
+        .map-btn {
+            width: 34px;
+            height: 34px;
+        }
+
+        .map-btn svg {
+            width: 15px;
+            height: 15px;
         }
     }
 
     @media (max-width: 576px) {
         .page-header {
-            padding: 25px 10px;
+            padding: 25px 12px;
         }
 
-        .map-section {
-            padding: 0 10px 25px;
+        .page-title {
+            font-size: 1.5rem;
         }
 
+        .page-subtitle {
+            font-size: 0.95rem;
+        }
+
+        .main-layout {
+            padding: 0 12px 20px;
+            gap: 16px;
+        }
+
+        .shelters-container,
         .map-wrapper {
             padding: 16px;
+            border-radius: 12px;
         }
 
         .map-container {
-            height: 320px;
+            min-height: 350px;
+            border-radius: 8px;
+        }
+
+        .section-title,
+        .map-title {
+            font-size: 1.2rem;
+        }
+
+        .section-subtitle,
+        .map-subtitle {
+            font-size: 0.85rem;
         }
 
         .map-controls {
             top: 8px;
             right: 8px;
-            gap: 6px;
+            gap: 4px;
         }
 
         .map-btn {
@@ -442,26 +644,54 @@
             height: 14px;
         }
 
-        .shelters-section {
-            padding: 25px 10px;
-        }
-
         .shelter-card {
-            padding: 20px;
+            padding: 12px;
+            border-radius: 10px;
         }
 
         .shelter-header {
-            gap: 12px;
+            gap: 8px;
         }
 
         .shelter-icon {
-            width: 48px;
-            height: 48px;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
         }
 
         .shelter-icon svg {
-            width: 24px;
-            height: 24px;
+            width: 16px;
+            height: 16px;
+        }
+
+        .shelter-info h3 {
+            font-size: 1rem;
+        }
+
+        .shelter-info p {
+            font-size: 0.75rem;
+        }
+
+        .vet-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+        }
+
+        .shelter-description {
+            font-size: 0.8rem;
+        }
+
+        .detail-item {
+            font-size: 0.75rem;
+        }
+
+        .detail-item svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .view-on-map {
+            font-size: 0.75rem;
         }
 
         .notification {
@@ -472,13 +702,98 @@
         }
     }
 
-    @media (max-width: 400px) {
+    @media (max-width: 480px) {
+        .page-header {
+            padding: 20px 10px;
+        }
+
+        .main-layout {
+            padding: 0 10px 16px;
+            gap: 12px;
+        }
+
+        .shelters-container,
+        .map-wrapper {
+            padding: 14px;
+        }
+
         .map-container {
-            height: 280px;
+            min-height: 300px;
         }
 
         .shelter-card {
-            padding: 16px;
+            padding: 10px;
+        }
+
+        .shelter-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .shelter-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+        }
+
+        .shelter-icon svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .shelter-info h3 {
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .vet-badge {
+            font-size: 0.65rem;
+        }
+
+        .empty-icon svg {
+            width: 50px;
+            height: 50px;
+        }
+
+        .empty-title {
+            font-size: 1.1rem;
+        }
+
+        .empty-text {
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .map-container {
+            min-height: 280px;
+        }
+        
+        .shelters-container {
+            max-height: 450px;
+        }
+        
+        .shelters-list {
+            max-height: 300px;
+        }
+        
+        .shelter-card {
+            padding: 8px;
+        }
+        
+        .shelter-icon {
+            width: 28px;
+            height: 28px;
+        }
+        
+        .shelter-icon svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        .shelter-info h3 {
+            font-size: 0.9rem;
         }
     }
 </style>
@@ -488,120 +803,123 @@
 <div class="map-page">
     <!-- Page Header -->
     <div class="page-header">
-        <span class="label">Location Services</span>
         <h1 class="page-title">Find Vet Shops & Services</h1>
         <p class="page-subtitle">Discover veterinarians and pet services near you</p>
     </div>
 
-    <!-- Map Section -->
-    <div class="map-section">
-        <div class="map-wrapper">
-            <div class="map-container">
-                <div id="shelterMap"></div>
-                <div class="map-controls">
-                    <button id="fullscreen-btn" class="map-btn" title="Fullscreen">
-                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
-                        </svg>
-                    </button>
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Left Column - Available Veterinarians -->
+        <div class="shelters-column">
+            <div class="shelters-container">
+                <div class="section-header">
+                    <h2 class="section-title">Available Veterinarians</h2>
+                    <p class="section-subtitle">{{ $shelters->count() }} veterinarians found</p>
                 </div>
-            </div>
-        </div>
-    </div>
+                
+                @if($shelters->count() > 0)
+                    <div class="shelters-list" id="shelters-list">
+                        @foreach($shelters as $shelter)
+                            <div class="shelter-card" 
+                                 data-shelter-id="{{ $shelter->id }}"
+                                 data-latitude="{{ $shelter->latitude }}"
+                                 data-longitude="{{ $shelter->longitude }}">
+                                <div class="shelter-header">
+                                    <div class="shelter-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                                        </svg>
+                                    </div>
+                                    <div class="shelter-info">
+                                        <h3>{{ $shelter->name }}</h3>
+                                        <p>{{ $shelter->city }}, {{ $shelter->province }}</p>
+                                    </div>
+                                </div>
 
-    <!-- Shelters Section -->
-    <div class="shelters-section">
-        <div class="shelters-container">
-            <div class="section-header">
-                <h2 class="section-title">Available Veterinarians</h2>
-            </div>
-            
-            @if($shelters->count() > 0)
-                <div class="shelters-grid">
-                    @foreach($shelters as $shelter)
-                        <div class="shelter-card">
-                            <div class="shelter-header">
-                                <div class="shelter-icon">
+                                <span class="vet-badge">
                                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
                                         <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
                                     </svg>
+                                    Veterinarian
+                                </span>
+
+                                @if($shelter->description)
+                                    <p class="shelter-description">{{ $shelter->description }}</p>
+                                @endif
+
+                                <div class="shelter-details">
+                                    <div class="detail-item">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                            <circle cx="12" cy="10" r="3"/>
+                                        </svg>
+                                        <span>{{ $shelter->address }}</span>
+                                    </div>
+                                    @if($shelter->phone)
+                                        <div class="detail-item">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                            </svg>
+                                            <span>{{ $shelter->phone }}</span>
+                                        </div>
+                                    @endif
+                                    @if($shelter->email)
+                                        <div class="detail-item">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                                <polyline points="22,6 12,13 2,6"/>
+                                            </svg>
+                                            <span>{{ $shelter->email }}</span>
+                                        </div>
+                                    @endif
                                 </div>
-                                <div class="shelter-info">
-                                    <h3>{{ $shelter->name }}</h3>
-                                    <p>{{ $shelter->city }}, {{ $shelter->province }}</p>
-                                </div>
-                            </div>
 
-                            <span class="vet-badge">
-                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                                </svg>
-                                Veterinarian
-                            </span>
-
-                            @if($shelter->description)
-                                <p class="shelter-description">{{ $shelter->description }}</p>
-                            @endif
-
-                            <div class="shelter-details">
-                                <div class="detail-item">
+                                <div class="view-on-map" onclick="focusOnShelter('{{ $shelter->id }}', {{ $shelter->latitude }}, {{ $shelter->longitude }})">
                                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
                                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                                         <circle cx="12" cy="10" r="3"/>
                                     </svg>
-                                    <span>{{ $shelter->address }}</span>
+                                    <span>View on map</span>
                                 </div>
-                                <div class="detail-item">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                                    </svg>
-                                    <span>{{ $shelter->phone }}</span>
-                                </div>
-                                @if($shelter->email)
-                                    <div class="detail-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                            <polyline points="22,6 12,13 2,6"/>
-                                        </svg>
-                                        <span>{{ $shelter->email }}</span>
-                                    </div>
-                                @endif
-                                @if($shelter->operating_hours && isset($shelter->operating_hours['weekdays']))
-                                    <div class="detail-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                            <circle cx="12" cy="12" r="10"/>
-                                            <polyline points="12 6 12 12 16 14"/>
-                                        </svg>
-                                        <span>{{ $shelter->operating_hours['weekdays'] ?? 'Contact for hours' }}</span>
-                                    </div>
-                                @endif
                             </div>
-
-                            <div class="map-link">
-                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="12" y1="16" x2="12" y2="12"/>
-                                    <line x1="12" y1="8" x2="12.01" y2="8"/>
-                                </svg>
-                                <span>View location on map</span>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-                            <line x1="9" y1="9" x2="9.01" y2="9"/>
-                            <line x1="15" y1="9" x2="15.01" y2="9"/>
-                        </svg>
+                        @endforeach
                     </div>
-                    <h3 class="empty-title">No veterinarians available</h3>
-                    <p class="empty-text">Check back later for service locations</p>
+                @else
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                                <line x1="9" y1="9" x2="9.01" y2="9"/>
+                                <line x1="15" y1="9" x2="15.01" y2="9"/>
+                            </svg>
+                        </div>
+                        <h3 class="empty-title">No veterinarians available</h3>
+                        <p class="empty-text">Check back later for service locations</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Right Column - Map -->
+        <div class="map-column">
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h2 class="map-title">Interactive Map</h2>
+                    <p class="map-subtitle">Click on markers for details</p>
                 </div>
-            @endif
+                
+                <div class="map-container">
+                    <div id="shelterMap"></div>
+                    <div class="map-controls">
+                        <button id="fullscreen-btn" class="map-btn" title="Fullscreen">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -646,6 +964,8 @@
 const mapShelters = @json($shelters);
 const mapLostFoundItems = @json($lostFoundItems);
 const mapData = [...mapShelters, ...mapLostFoundItems];
+let shelterMarkers = new Map();
+let activeMarker = null;
 
 // Initialize map
 document.addEventListener('DOMContentLoaded', function() {
@@ -657,6 +977,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 viewDetailsRoute: '/view-map/'
             });
             
+            // Store markers for interaction
+            sharedMap.markersLayer.eachLayer(function(layer) {
+                if (layer._latlng) {
+                    const lat = layer._latlng.lat;
+                    const lng = layer._latlng.lng;
+                    
+                    // Find corresponding shelter
+                    mapShelters.forEach(shelter => {
+                        if (parseFloat(shelter.latitude) === lat && parseFloat(shelter.longitude) === lng) {
+                            shelterMarkers.set(shelter.id, layer);
+                            
+                            // Add click event to marker
+                            layer.on('click', function() {
+                                highlightShelterCard(shelter.id);
+                            });
+                        }
+                    });
+                }
+            });
+            
             const urlParams = new URLSearchParams(window.location.search);
             const focusShelterId = urlParams.get('shelter');
             
@@ -666,6 +1006,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (focusShelter) {
                     setTimeout(function() {
                         sharedMap.map.setView([parseFloat(focusShelter.latitude), parseFloat(focusShelter.longitude)], 15);
+                        highlightShelterCard(focusShelterId);
                         
                         sharedMap.markersLayer.eachLayer(function(layer) {
                             if (layer._latlng.lat === parseFloat(focusShelter.latitude) && 
@@ -681,6 +1022,46 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             initBasicMap();
         }
+        
+        // Add click events to shelter cards
+        document.querySelectorAll('.shelter-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Don't trigger if clicking on the view-on-map button
+                if (e.target.closest('.view-on-map')) return;
+                
+                const shelterId = this.dataset.shelterId;
+                const latitude = parseFloat(this.dataset.latitude);
+                const longitude = parseFloat(this.dataset.longitude);
+                
+                if (!isNaN(latitude) && !isNaN(longitude)) {
+                    focusOnShelter(shelterId, latitude, longitude);
+                }
+            });
+        });
+        
+        // Add click events to view-on-map buttons
+        document.querySelectorAll('.view-on-map').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const card = this.closest('.shelter-card');
+                const shelterId = card.dataset.shelterId;
+                const latitude = parseFloat(card.dataset.latitude);
+                const longitude = parseFloat(card.dataset.longitude);
+                
+                if (!isNaN(latitude) && !isNaN(longitude)) {
+                    focusOnShelter(shelterId, latitude, longitude);
+                }
+            });
+        });
+        
+        initFullscreenFunctionality();
+        
+        // Fix map size on load
+        setTimeout(() => {
+            if (window.shelterMap && window.shelterMap.map) {
+                window.shelterMap.map.invalidateSize();
+            }
+        }, 300);
     }, 100);
 });
 
@@ -744,6 +1125,14 @@ function initBasicMap() {
             
             marker.bindPopup(popupContent);
             marker.addTo(map);
+            
+            // Store marker for interaction
+            shelterMarkers.set(shelter.id, marker);
+            
+            // Add click event to marker
+            marker.on('click', function() {
+                highlightShelterCard(shelter.id);
+            });
         }
     });
     
@@ -795,14 +1184,6 @@ function initBasicMap() {
                         <i class="fas fa-tag" style="color: #3b82f6; margin-right: 6px;"></i>
                         ${item.pet_type}
                     </div>
-                    <div style="margin-bottom: 8px; color: #4b5563;">
-                        <i class="fas fa-calendar" style="color: #3b82f6; margin-right: 6px;"></i>
-                        Reported: ${new Date(item.created_at).toLocaleDateString()}
-                    </div>
-                    <div style="margin-bottom: 12px; color: #4b5563;">
-                        <i class="fas fa-user" style="color: #3b82f6; margin-right: 6px;"></i>
-                        ${item.user ? item.user.name : 'Anonymous'}
-                    </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
                         <a href="/lost-found/${item.id}" style="background: #8b5cf6; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">
                             <i class="fas fa-eye"></i> View Details
@@ -817,7 +1198,54 @@ function initBasicMap() {
     });
     
     window.shelterMap = map;
-    initFullscreenFunctionality();
+}
+
+// Function to focus on a specific shelter
+function focusOnShelter(shelterId, latitude, longitude) {
+    if (window.shelterMap && window.shelterMap.map) {
+        const map = window.shelterMap.map || window.shelterMap;
+        
+        // Center map on shelter
+        map.setView([latitude, longitude], 15);
+        
+        // Open marker popup if exists
+        const marker = shelterMarkers.get(parseInt(shelterId));
+        if (marker) {
+            marker.openPopup();
+            
+            // Pulse animation for marker
+            const icon = marker.getElement();
+            if (icon) {
+                icon.style.animation = 'pulse 0.5s 2';
+                setTimeout(() => {
+                    icon.style.animation = '';
+                }, 1000);
+            }
+        }
+        
+        // Highlight shelter card
+        highlightShelterCard(shelterId);
+    }
+}
+
+// Function to highlight shelter card
+function highlightShelterCard(shelterId) {
+    // Remove active class from all cards
+    document.querySelectorAll('.shelter-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
+    // Add active class to selected card
+    const selectedCard = document.querySelector(`.shelter-card[data-shelter-id="${shelterId}"]`);
+    if (selectedCard) {
+        selectedCard.classList.add('active');
+        
+        // Scroll to card
+        selectedCard.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
 }
 
 function initFullscreenFunctionality() {
@@ -942,5 +1370,14 @@ function exitFullscreen() {
         document.body.style.overflow = 'auto';
     }
 }
+
+// Handle window resize
+window.addEventListener('resize', function() {
+    if (window.shelterMap && window.shelterMap.map) {
+        setTimeout(() => {
+            window.shelterMap.map.invalidateSize();
+        }, 300);
+    }
+});
 </script>
 @endsection

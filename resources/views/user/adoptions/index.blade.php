@@ -10,8 +10,6 @@
             <div class="header-content">
                 <div class="header-text">
                     <span class="label">Adoption Center</span>
-                    <h1 class="page-title">Find Your New Companion</h1>
-                    <p class="page-subtitle">Give a loving pet their forever home</p>
                 </div>
                 <div class="header-actions">
                     <a href="{{ route('adoptions.history') }}" class="btn-secondary-action">
