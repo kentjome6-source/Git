@@ -1,413 +1,281 @@
 @extends('layouts.app')
 
-@section('title', 'Adoption Details - ' . $adoption->pet_name)
+@section('title', $adoption->pet_name . ' - Adoption Details')
 
 @section('content')
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                @if($adoption->image_path)
-                    <img src="{{ asset('storage/' . $adoption->image_path) }}" class="card-img-top" alt="Photo of {{ $adoption->pet_name }}" style="height: 400px; object-fit: cover;" loading="lazy">
-                @else
-                    <img src="{{ asset('images/pawpatrol.jpg') }}" class="card-img-top" alt="Default image for {{ $adoption->pet_name }}" style="height: 400px; object-fit: cover;">
-                @endif
-                <div class="card-body">
-                    <h2 class="card-title" id="pet-name-heading">{{ $adoption->pet_name }}</h2>
+<div class="pet-details-page">
+    <div class="container-fluid px-4 py-4">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="{{ route('adoptions.index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Adoption Center
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Column - Pet Image and Info -->
+            <div class="col-lg-5">
+                <!-- Pet Image -->
+                <div class="pet-image-card">
+                    @if($adoption->image_path)
+                        <img src="{{ asset('storage/' . $adoption->image_path) }}" 
+                             alt="{{ $adoption->pet_name }}" 
+                             class="pet-main-image">
+                    @else
+                        <img src="{{ asset('images/pawpatrol.jpg') }}" 
+                             alt="{{ $adoption->pet_name }}" 
+                             class="pet-main-image">
+                    @endif
                     
-                    <div class="mb-3">
-                        @if($adoption->breed)
-                        <span class="badge bg-secondary me-1">{{ $adoption->breed }}</span>
-                        @endif
-                        @if($adoption->age)
-                        <span class="badge bg-info me-1">{{ $adoption->age }} years old</span>
-                        @endif
-                        @if($adoption->gender)
-                        <span class="badge bg-primary">{{ ucfirst($adoption->gender) }}</span>
+                    <div class="pet-status-overlay">
+                        @if($adoption->status === 'published')
+                            <span class="badge bg-success">Available for Adoption</span>
+                        @else
+                            <span class="badge bg-secondary">{{ ucfirst($adoption->status) }}</span>
                         @endif
                     </div>
-                    
-                    <h5>Description</h5>
-                    @if($adoption->description)
-                        <p class="card-text">{{ $adoption->description }}</p>
-                    @else
-                        <p class="text-muted">No description provided.</p>
-                    @endif
-                    
-                    <p class="card-text">
-                        <small class="text-muted">
-                            Listed by {{ $adoption->user->name }} on 
-                            <time datetime="{{ $adoption->created_at->toIso8601String() }}">{{ $adoption->created_at->format('M d, Y') }}</time>
-                        </small>
-                    </p>
-                    
-                    @if(!$adoption->is_adopted)
-                        @if($adoption->user_id != auth()->id())
-                            @if($adoption->isAvailable())
-                                <div class="alert alert-info mt-3" role="alert">
-                                    You can adopt this pet by clicking the "Adopt Pet" button below.
-                                </div>
-                            @elseif($adoption->hasPendingRequest() && $adoption->pendingRequest()->adopter_id == auth()->id())
-                                <div class="alert alert-info mt-3" role="alert">
-                                    Your adoption request is pending approval from the pet owner.
-                                </div>
-                            @elseif($adoption->hasApprovedRequest() && $adoption->adoptionRequests()->where('status', 'approved')->where('adopter_id', auth()->id())->exists())
-                                <div class="alert alert-success mt-3" role="alert">
-                                    Your adoption request has been approved! Click "Complete Adoption" to finalize the process.
-                                    <br><small>Both you and the pet owner can now see this adoption in your history.</small>
-                                </div>
-                            @elseif($adoption->hasApprovedRequest())
-                                <div class="alert alert-warning mt-3" role="alert">
-                                    This pet has already been approved for adoption by another user.
-                                </div>
-                            @elseif($adoption->adoptionRequests()->where('status', 'rejected')->where('adopter_id', auth()->id())->exists())
-                                <div class="alert alert-danger mt-3" role="alert">
-                                    Your adoption request has been rejected by the pet owner.
-                                </div>
-                            @else
-                                <div class="alert alert-info mt-3" role="alert">
-                                    An adoption request for this pet is pending approval.
-                                </div>
-                            @endif
-                        @else
-                            <!-- Pet owner view -->
-                            @if($adoption->hasPendingRequest())
-                                <?php
-                                    $pendingRequest = $adoption->pendingRequest();
-                                    $adopter = $pendingRequest->adopter;
-                                ?>
-                                <div class="alert alert-info mt-3" role="alert">
-                                    <strong>{{ $adopter->name }}</strong> has requested to adopt this pet.
-                                </div>
-                            @else
-                                <div class="alert alert-info mt-3" role="alert">
-                                    This is your pet listing. You cannot adopt your own pet.
-                                </div>
-                            @endif
-                        @endif
-                    @else
-                        <div class="alert alert-warning mt-3" role="alert">
-                            This pet has already been adopted.
+                </div>
+
+                <!-- Pet Quick Info -->
+                <div class="info-card mt-4">
+                    <h5 class="info-card-title">Pet Information</h5>
+                    <div class="info-list">
+                        @if($adoption->species)
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fas fa-paw"></i>Species
+                            </span>
+                            <span class="info-value">{{ ucfirst($adoption->species) }}</span>
                         </div>
+                        @endif
+                        @if($adoption->breed)
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fas fa-tag"></i>Breed
+                            </span>
+                            <span class="info-value">{{ $adoption->breed }}</span>
+                        </div>
+                        @endif
+                        @if($adoption->age)
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fas fa-birthday-cake"></i>Age
+                            </span>
+                            <span class="info-value">{{ $adoption->age }} years old</span>
+                        </div>
+                        @endif
+                        @if($adoption->gender)
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fas fa-{{ $adoption->gender === 'male' ? 'mars' : 'venus' }}"></i>Gender
+                            </span>
+                            <span class="info-value">{{ ucfirst($adoption->gender) }}</span>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Owner Info -->
+                <div class="info-card mt-4">
+                    <h5 class="info-card-title">Pet Owner</h5>
+                    <div class="owner-info">
+                        <div class="owner-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <p class="owner-name mb-1">{{ $adoption->user->name }}</p>
+                            <p class="owner-email mb-0">{{ $adoption->user->email }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Application Form or Details -->
+            <div class="col-lg-7">
+                <div class="content-card">
+                    <div class="pet-header mb-4">
+                        <h1 class="pet-title">{{ $adoption->pet_name }}</h1>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Listed {{ $adoption->created_at->diffForHumans() }}
+                        </p>
+                    </div>
+
+                    @if($adoption->description)
+                    <div class="pet-description-section mb-4">
+                        <h5 class="section-title">About {{ $adoption->pet_name }}</h5>
+                        <p class="pet-description">{{ $adoption->description }}</p>
+                    </div>
                     @endif
-                    
-                    <!-- Action Buttons at Bottom -->
-                    @if(!$adoption->is_adopted)
-                        @if($adoption->user_id == auth()->id())
-                            <!-- Pet owner actions -->
-                            @if($adoption->hasPendingRequest())
-                                <?php
-                                    $pendingRequest = $adoption->pendingRequest();
-                                ?>
-                                <div class="mt-3">
-                                    <div class="d-flex gap-2 flex-wrap adoption-detail-buttons">
-                                        <!-- Approve button -->
-                                        <form action="{{ route('adoptions.approve', $adoption) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-success approve-btn" 
-                                                    onclick="return confirm('Are you sure you want to approve the adoption request for {{ $adoption->pet_name }}?')"
-                                                    aria-label="Approve adoption request for {{ $adoption->pet_name }}">
-                                                <i class="fas fa-check me-2" aria-hidden="true"></i>Approve
-                                            </button>
-                                        </form>
-                                        
-                                        <!-- Reject button -->
-                                        <form action="{{ route('adoptions.reject', $adoption) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-danger reject-btn" 
-                                                    onclick="return confirm('Are you sure you want to reject the adoption request for {{ $adoption->pet_name }}?')"
-                                                    aria-label="Reject adoption request for {{ $adoption->pet_name }}">
-                                                <i class="fas fa-times me-2" aria-hidden="true"></i>Reject
-                                            </button>
-                                        </form>
-                                        
-                                        <a href="{{ route('adoptions.index') }}" class="btn btn-secondary ms-auto back-btn" role="button" aria-label="Back to Adoptions">
-                                            Back to Adoptions
-                                        </a>
-                                    </div>
+
+                    @if($adoption->user_id != auth()->id() && $adoption->status === 'published')
+                        @if(!$adoption->adoptionRequests()->where('adopter_id', auth()->id())->exists())
+                            <!-- Application Form -->
+                            <div class="application-form-section">
+                                <div class="form-header mb-4">
+                                    <h4 class="form-title">Adoption Application</h4>
+                                    <p class="form-subtitle">Please fill out this form to apply for {{ $adoption->pet_name }}</p>
                                 </div>
-                            @else
-                                <div class="mt-3">
-                                    <div class="d-flex gap-2 flex-wrap adoption-detail-buttons">
-                                        <!-- Edit button -->
-                                        <a href="{{ route('adoptions.edit', $adoption) }}" class="btn btn-warning edit-btn" role="button" aria-label="Edit adoption post for {{ $adoption->pet_name }}" data-modal data-modal-title="Edit Adoption Listing">
-                                            <i class="fas fa-edit me-2" aria-hidden="true"></i>Edit
-                                        </a>
-                                        
-                                        <!-- Delete button -->
-                                        <form action="{{ route('adoptions.destroy', $adoption) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger delete-btn" 
-                                                    onclick="return confirm('Are you sure you want to delete the adoption post for {{ $adoption->pet_name }}? This action cannot be undone.')"
-                                                    aria-label="Delete adoption post for {{ $adoption->pet_name }}">
-                                                <i class="fas fa-trash me-2" aria-hidden="true"></i>Delete
-                                            </button>
-                                        </form>
-                                        
-                                        <a href="{{ route('adoptions.index') }}" class="btn btn-secondary ms-auto back-btn" role="button" aria-label="Back to Adoptions">
-                                            Back to Adoptions
-                                        </a>
-                                    </div>
-                                </div>
-                            @endif
-                        @elseif($adoption->hasPendingRequest() && $adoption->pendingRequest()->adopter_id == auth()->id())
-                            <!-- Adopter actions for pending request -->
-                            <div class="mt-3">
-                                <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">Back to Adoptions</a>
-                            </div>
-                        @elseif($adoption->hasApprovedRequest() && $adoption->adoptionRequests()->where('status', 'approved')->where('adopter_id', auth()->id())->exists())
-                            <!-- Adopter actions for approved request -->
-                            <div class="d-flex gap-2 flex-wrap mt-3 adoption-detail-buttons">
-                                <form action="{{ route('adoptions.complete', $adoption) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success adopt-btn" 
-                                            onclick="return confirm('Are you sure you want to complete the adoption of {{ $adoption->pet_name }}?')"
-                                            aria-label="Complete adoption of {{ $adoption->pet_name }}">
-                                        <i class="fas fa-paw me-2" aria-hidden="true"></i>Complete Adoption
-                                    </button>
-                                </form>
-                                <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">
-                                    Back to Adoptions
-                                </a>
-                            </div>
-                        @elseif($adoption->hasApprovedRequest())
-                            <!-- Adopter actions when pet is approved for someone else -->
-                            <div class="alert alert-warning mt-3" role="alert">
-                                This pet has already been approved for adoption by another user.
-                            </div>
-                            <div class="mt-3">
-                                <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">Back to Adoptions</a>
-                            </div>
-                        @elseif($adoption->adoptionRequests()->where('status', 'rejected')->where('adopter_id', auth()->id())->exists())
-                            <!-- Adopter actions for rejected request -->
-                            <div class="d-flex gap-2 flex-wrap mt-3 adoption-detail-buttons">
-                                <form action="{{ route('adoptions.adopt', $adoption) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success adopt-btn" 
-                                            onclick="return confirm('Are you sure you want to re-request adoption of {{ $adoption->pet_name }}?')"
-                                            aria-label="Re-request adoption of {{ $adoption->pet_name }}">
-                                        <i class="fas fa-paw me-2" aria-hidden="true"></i>Re-request Adoption
-                                    </button>
-                                </form>
-                                <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">
-                                    Back to Adoptions
-                                </a>
-                            </div>
-                        @elseif($adoption->isAvailable())
-                            <!-- Other user actions - Show Application Form -->
-                            <div class="mt-4">
-                                <h4>Adoption Application Form</h4>
-                                <p class="text-muted">Please fill out this application to adopt {{ $adoption->pet_name }}</p>
-                                
-                                <form action="{{ route('adoptions.adopt', $adoption) }}" method="POST" id="adoptionApplicationForm">
+
+                                <form action="{{ route('adoptions.adopt', $adoption) }}" method="POST" id="adoptionForm">
                                     @csrf
                                     
                                     <!-- Personal Information -->
-                                    <div class="card mb-3">
-                                        <div class="card-header bg-primary text-white">
-                                            <h5 class="mb-0">Personal Information</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="full_name" class="form-label">Full Name <span class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control" id="full_name" name="full_name" required value="{{ old('full_name', auth()->user()->name) }}">
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                                    <input type="email" class="form-control" id="email" name="email" required value="{{ old('email', auth()->user()->email) }}">
-                                                </div>
+                                    <div class="form-section">
+                                        <h6 class="form-section-title">Personal Information</h6>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Full Name <span class="required">*</span></label>
+                                                <input type="text" class="form-control" name="full_name" required value="{{ old('full_name', auth()->user()->name) }}">
                                             </div>
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
-                                                    <input type="tel" class="form-control" id="phone" name="phone" required value="{{ old('phone') }}">
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
-                                                    <textarea class="form-control" id="address" name="address" rows="2" required>{{ old('address') }}</textarea>
-                                                </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Email <span class="required">*</span></label>
+                                                <input type="email" class="form-control" name="email" required value="{{ old('email', auth()->user()->email) }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Phone Number <span class="required">*</span></label>
+                                                <input type="tel" class="form-control" name="phone" required value="{{ old('phone') }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Address <span class="required">*</span></label>
+                                                <input type="text" class="form-control" name="address" required value="{{ old('address') }}">
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Housing Information -->
-                                    <div class="card mb-3">
-                                        <div class="card-header bg-info text-white">
-                                            <h5 class="mb-0">Housing Information</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="housing_type" class="form-label">Housing Type <span class="text-danger">*</span></label>
-                                                    <select class="form-select" id="housing_type" name="housing_type" required>
-                                                        <option value="">Select...</option>
-                                                        <option value="house" {{ old('housing_type') == 'house' ? 'selected' : '' }}>House</option>
-                                                        <option value="apartment" {{ old('housing_type') == 'apartment' ? 'selected' : '' }}>Apartment</option>
-                                                        <option value="condo" {{ old('housing_type') == 'condo' ? 'selected' : '' }}>Condo</option>
-                                                        <option value="other" {{ old('housing_type') == 'other' ? 'selected' : '' }}>Other</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="has_yard" class="form-label">Do you have a yard? <span class="text-danger">*</span></label>
-                                                    <select class="form-select" id="has_yard" name="has_yard" required>
-                                                        <option value="">Select...</option>
-                                                        <option value="1" {{ old('has_yard') == '1' ? 'selected' : '' }}>Yes</option>
-                                                        <option value="0" {{ old('has_yard') == '0' ? 'selected' : '' }}>No</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="own_or_rent" class="form-label">Do you own or rent? <span class="text-danger">*</span></label>
-                                                    <select class="form-select" id="own_or_rent" name="own_or_rent" required onchange="toggleLandlordApproval()">
-                                                        <option value="">Select...</option>
-                                                        <option value="own" {{ old('own_or_rent') == 'own' ? 'selected' : '' }}>Own</option>
-                                                        <option value="rent" {{ old('own_or_rent') == 'rent' ? 'selected' : '' }}>Rent</option>
-                                                    </select>
-                                                </div>
+                                    <div class="form-section">
+                                        <h6 class="form-section-title">Housing Information</h6>
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label">Housing Type <span class="required">*</span></label>
+                                                <select class="form-select" name="housing_type" required>
+                                                    <option value="">Select...</option>
+                                                    <option value="house">House</option>
+                                                    <option value="apartment">Apartment</option>
+                                                    <option value="condo">Condo</option>
+                                                    <option value="other">Other</option>
+                                                </select>
                                             </div>
-                                            <div class="row" id="landlord_approval_field" style="display: none;">
-                                                <div class="col-12 mb-3">
-                                                    <label for="landlord_approval" class="form-label">Landlord Approval <span class="text-danger">*</span></label>
-                                                    <select class="form-select" id="landlord_approval" name="landlord_approval">
-                                                        <option value="">Select...</option>
-                                                        <option value="1" {{ old('landlord_approval') == '1' ? 'selected' : '' }}>Yes, I have landlord approval</option>
-                                                        <option value="0" {{ old('landlord_approval') == '0' ? 'selected' : '' }}>No</option>
-                                                    </select>
-                                                </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Have a Yard? <span class="required">*</span></label>
+                                                <select class="form-select" name="has_yard" required>
+                                                    <option value="">Select...</option>
+                                                    <option value="1">Yes</option>
+                                                    <option value="0">No</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">Own or Rent? <span class="required">*</span></label>
+                                                <select class="form-select" name="own_or_rent" id="ownOrRent" required>
+                                                    <option value="">Select...</option>
+                                                    <option value="own">Own</option>
+                                                    <option value="rent">Rent</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-12" id="landlordField" style="display:none;">
+                                                <label class="form-label">Landlord Approval <span class="required">*</span></label>
+                                                <select class="form-select" name="landlord_approval" id="landlordApproval">
+                                                    <option value="">Select...</option>
+                                                    <option value="1">Yes, I have approval</option>
+                                                    <option value="0">No</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Pet Experience -->
-                                    <div class="card mb-3">
-                                        <div class="card-header bg-success text-white">
-                                            <h5 class="mb-0">Pet Experience</h5>
+                                    <div class="form-section">
+                                        <h6 class="form-section-title">Pet Experience</h6>
+                                        <div class="mb-3">
+                                            <label class="form-label">Current Pets</label>
+                                            <textarea class="form-control" name="current_pets" rows="2" placeholder="Do you currently have any pets? Please describe...">{{ old('current_pets') }}</textarea>
                                         </div>
-                                        <div class="card-body">
-                                            <div class="mb-3">
-                                                <label for="current_pets" class="form-label">Do you currently have pets? (Please describe)</label>
-                                                <textarea class="form-control" id="current_pets" name="current_pets" rows="2">{{ old('current_pets') }}</textarea>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="veterinarian_info" class="form-label">Current Veterinarian Information (if applicable)</label>
-                                                <textarea class="form-control" id="veterinarian_info" name="veterinarian_info" rows="2">{{ old('veterinarian_info') }}</textarea>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="experience_with_pets" class="form-label">Previous Experience with Pets</label>
-                                                <textarea class="form-control" id="experience_with_pets" name="experience_with_pets" rows="3">{{ old('experience_with_pets') }}</textarea>
-                                            </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Veterinarian Information</label>
+                                            <textarea class="form-control" name="veterinarian_info" rows="2" placeholder="Current vet name and contact (if applicable)">{{ old('veterinarian_info') }}</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Previous Pet Experience</label>
+                                            <textarea class="form-control" name="experience_with_pets" rows="3" placeholder="Tell us about your experience with pets...">{{ old('experience_with_pets') }}</textarea>
                                         </div>
                                     </div>
 
                                     <!-- Adoption Details -->
-                                    <div class="card mb-3">
-                                        <div class="card-header bg-warning text-dark">
-                                            <h5 class="mb-0">Adoption Details</h5>
+                                    <div class="form-section">
+                                        <h6 class="form-section-title">Adoption Details</h6>
+                                        <div class="mb-3">
+                                            <label class="form-label">Why do you want to adopt {{ $adoption->pet_name }}? <span class="required">*</span></label>
+                                            <textarea class="form-control" name="reason_for_adoption" rows="3" required placeholder="Tell us why you'd like to adopt this pet...">{{ old('reason_for_adoption') }}</textarea>
                                         </div>
-                                        <div class="card-body">
-                                            <div class="mb-3">
-                                                <label for="reason_for_adoption" class="form-label">Why do you want to adopt {{ $adoption->pet_name }}? <span class="text-danger">*</span></label>
-                                                <textarea class="form-control" id="reason_for_adoption" name="reason_for_adoption" rows="3" required>{{ old('reason_for_adoption') }}</textarea>
+                                        <div class="mb-3">
+                                            <label class="form-label">Hours Alone Per Day</label>
+                                            <input type="number" class="form-control" name="hours_alone" min="0" max="24" value="{{ old('hours_alone', 0) }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="agree_to_home_visit" value="1" id="homeVisit" required>
+                                                <label class="form-check-label" for="homeVisit">
+                                                    I agree to a home visit if required <span class="required">*</span>
+                                                </label>
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="hours_alone" class="form-label">How many hours per day will the pet be alone?</label>
-                                                <input type="number" class="form-control" id="hours_alone" name="hours_alone" min="0" max="24" value="{{ old('hours_alone', 0) }}">
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="agree_to_home_visit" name="agree_to_home_visit" value="1" required {{ old('agree_to_home_visit') ? 'checked' : '' }}>
-                                                    <label class="form-check-label" for="agree_to_home_visit">
-                                                        I agree to a home visit if required <span class="text-danger">*</span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="additional_info" class="form-label">Additional Information</label>
-                                                <textarea class="form-control" id="additional_info" name="additional_info" rows="3">{{ old('additional_info') }}</textarea>
-                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Additional Information</label>
+                                            <textarea class="form-control" name="additional_info" rows="3" placeholder="Any additional information you'd like to share...">{{ old('additional_info') }}</textarea>
                                         </div>
                                     </div>
 
                                     <!-- Submit Buttons -->
-                                    <div class="d-flex gap-2 flex-wrap justify-content-end">
-                                        <a href="{{ route('adoptions.index') }}" class="btn btn-secondary">Cancel</a>
-                                        <button type="submit" class="btn btn-success">
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary btn-lg">
                                             <i class="fas fa-paper-plane me-2"></i>Submit Application
                                         </button>
+                                        <a href="{{ route('adoptions.index') }}" class="btn btn-outline-secondary btn-lg">
+                                            Cancel
+                                        </a>
                                     </div>
                                 </form>
                             </div>
-                            
-                            <script>
-                                function toggleLandlordApproval() {
-                                    const ownOrRent = document.getElementById('own_or_rent').value;
-                                    const landlordField = document.getElementById('landlord_approval_field');
-                                    const landlordInput = document.getElementById('landlord_approval');
-                                    
-                                    if (ownOrRent === 'rent') {
-                                        landlordField.style.display = 'block';
-                                        landlordInput.required = true;
-                                    } else {
-                                        landlordField.style.display = 'none';
-                                        landlordInput.required = false;
-                                        landlordInput.value = '';
-                                    }
-                                }
-                                
-                                // Initialize on page load
-                                document.addEventListener('DOMContentLoaded', function() {
-                                    toggleLandlordApproval();
-                                });
-                            </script>
                         @else
-                            <div class="mt-3">
-                                <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">Back to Adoptions</a>
+                            <!-- Already Applied -->
+                            <div class="alert-card alert-info">
+                                <div class="alert-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div>
+                                    <h5 class="alert-title">Application Submitted</h5>
+                                    <p class="mb-0">You have already submitted an application for {{ $adoption->pet_name }}. Check your applications page to track the status.</p>
+                                    <a href="{{ route('adoptions.my-applications') }}" class="btn btn-primary btn-sm mt-3">
+                                        <i class="fas fa-clipboard-list me-2"></i>View My Applications
+                                    </a>
+                                </div>
                             </div>
                         @endif
                     @else
-                        <div class="mt-3">
-                            <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">Back to Adoptions</a>
+                        <!-- Owner View or Not Available -->
+                        <div class="alert-card alert-warning">
+                            <div class="alert-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div>
+                                <h5 class="alert-title">
+                                    @if($adoption->user_id == auth()->id())
+                                        Your Pet Listing
+                                    @else
+                                        Not Available
+                                    @endif
+                                </h5>
+                                <p class="mb-0">
+                                    @if($adoption->user_id == auth()->id())
+                                        This is your pet listing. You can edit or remove it from your dashboard.
+                                    @else
+                                        This pet is currently not available for adoption.
+                                    @endif
+                                </p>
+                            </div>
                         </div>
                     @endif
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 id="owner-info-heading">Pet Owner Information</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Name:</strong> {{ $adoption->user->name }}</p>
-                    <p><strong>Email:</strong> {{ $adoption->user->email }}</p>
-                    <p><strong>Uploader Type:</strong> 
-                        @if($adoption->uploader_type === 'vet')
-                            <span class="badge bg-success">Verified Veterinarian</span>
-                        @elseif($adoption->uploader_type === 'user')
-                            <span class="badge bg-primary">Pet Parent</span>
-                        @else
-                            <span class="badge bg-secondary">Unknown</span>
-                        @endif
-                    </p>
-                    <!-- Add more owner information as needed -->
-                </div>
-            </div>
-            
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h5 id="process-heading">Adoption Process</h5>
-                </div>
-                <div class="card-body">
-                    <ol aria-labelledby="process-heading">
-                        <li>Review the pet's information</li>
-                        <li>Click the "Adopt Pet" button</li>
-                        <li>Wait for owner approval (history created at this point)</li>
-                        <li>Contact the owner to arrange pickup</li>
-                        <li>Complete the adoption process</li>
-                    </ol>
                 </div>
             </div>
         </div>
@@ -415,80 +283,347 @@
 </div>
 
 <style>
-@media (min-width: 768px) {
-    /* Desktop button size reduction */
-    .adopt-btn,
-    .approve-btn,
-    .reject-btn,
-    .back-btn,
-    .edit-btn,
-    .delete-btn {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.875rem;
-        min-height: 36px;
+:root {
+    --primary: #2563eb;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --dark: #1e293b;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+.pet-details-page {
+    background: var(--gray-50);
+    min-height: 100vh;
+    padding-bottom: 2rem;
+}
+
+/* Pet Image Card */
+.pet-image-card {
+    position: relative;
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.pet-main-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+}
+
+.pet-status-overlay {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.pet-status-overlay .badge {
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* Info Card */
+.info-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.info-card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.info-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 0.9375rem;
+}
+
+.info-label i {
+    color: var(--primary);
+    width: 20px;
+}
+
+.info-value {
+    color: var(--gray-600);
+    font-size: 0.9375rem;
+}
+
+/* Owner Info */
+.owner-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.owner-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.owner-name {
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 1rem;
+}
+
+.owner-email {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+/* Content Card */
+.content-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.pet-header {
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.pet-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+}
+
+.pet-description-section {
+    padding: 1.5rem 0;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 1rem;
+}
+
+.pet-description {
+    font-size: 1rem;
+    color: var(--gray-600);
+    line-height: 1.7;
+}
+
+/* Form Sections */
+.application-form-section {
+    padding-top: 1.5rem;
+}
+
+.form-header {
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.form-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.form-subtitle {
+    color: var(--gray-600);
+    margin: 0;
+}
+
+.form-section {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+}
+
+.form-section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 0.9375rem;
+    margin-bottom: 0.5rem;
+}
+
+.required {
+    color: var(--danger);
+}
+
+.form-control, .form-select {
+    border: 1px solid var(--gray-300);
+    border-radius: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9375rem;
+    transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    padding-top: 2rem;
+}
+
+/* Alert Cards */
+.alert-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid;
+}
+
+.alert-card.alert-info {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.alert-card.alert-warning {
+    background: #fef3c7;
+    border-color: #fde68a;
+}
+
+.alert-icon {
+    font-size: 2rem;
+}
+
+.alert-card.alert-info .alert-icon {
+    color: var(--info);
+}
+
+.alert-card.alert-warning .alert-icon {
+    color: var(--warning);
+}
+
+.alert-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    /* Align back button to the right on desktop */
-    .adoption-detail-buttons {
-        justify-content: flex-start;
-    }
-    
-    .back-btn {
-        margin-left: auto;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-@media (max-width: 767.98px) {
-    /* Mobile button size reduction */
-    .adopt-btn,
-    .approve-btn,
-    .reject-btn,
-    .back-btn,
-    .edit-btn,
-    .delete-btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-        min-height: 32px;
+/* Responsive */
+@media (max-width: 991px) {
+    .pet-main-image {
+        height: 400px;
     }
     
-    .adoption-detail-buttons {
-        gap: 0.5rem !important;
+    .pet-title {
+        font-size: 2rem;
+    }
+    
+    .content-card {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .pet-main-image {
+        height: 300px;
+    }
+    
+    .form-actions {
         flex-direction: column;
-        align-items: stretch;
     }
     
-    .approve-btn,
-    .reject-btn,
-    .back-btn,
-    .edit-btn,
-    .delete-btn {
+    .form-actions .btn {
         width: 100%;
     }
 }
-
-/* Focus indicators for keyboard navigation */
-.btn:focus, 
-a:focus {
-    outline: 2px solid #5b4b9b;
-    outline-offset: 2px;
-}
-
-/* Screen reader only class */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-/* Improved color contrast */
-.text-muted {
-    color: #6c757d !important;
-}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ownOrRent = document.getElementById('ownOrRent');
+    const landlordField = document.getElementById('landlordField');
+    const landlordApproval = document.getElementById('landlordApproval');
+    
+    if (ownOrRent) {
+        ownOrRent.addEventListener('change', function() {
+            if (this.value === 'rent') {
+                landlordField.style.display = 'block';
+                landlordApproval.required = true;
+            } else {
+                landlordField.style.display = 'none';
+                landlordApproval.required = false;
+                landlordApproval.value = '';
+            }
+        });
+    }
+});
+</script>
 @endsection

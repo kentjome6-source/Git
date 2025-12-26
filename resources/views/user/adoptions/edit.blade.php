@@ -3,120 +3,157 @@
 @section('title', 'Edit Adoption Listing')
 
 @section('content')
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0" id="form-heading">Edit Adoption Listing</h4>
-                </div>
-                <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert" aria-live="polite">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-                    
-                    @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert" aria-live="polite">
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+<div class="create-adoption-page">
+    <div class="container-fluid px-4 py-4">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="{{ route('adoptions.index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Adoption Center
+            </a>
+        </div>
 
-                    <form action="{{ route('adoptions.update', $adoption) }}" method="POST" enctype="multipart/form-data" aria-labelledby="form-heading">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="form-card">
+                    <!-- Form Header -->
+                    <div class="form-header">
+                        <h1 class="form-title">Edit Adoption Listing</h1>
+                        <p class="form-subtitle">Update the information for {{ $adoption->pet_name }}</p>
+                    </div>
+
+                    <form action="{{ route('adoptions.update', $adoption) }}" method="POST" enctype="multipart/form-data" id="createAdoptionForm">
                         @csrf
                         @method('PUT')
-                        
-                        <div class="mb-3">
-                            <label for="pet_name" class="form-label">Pet Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('pet_name') is-invalid @enderror" 
-                                   id="pet_name" name="pet_name" value="{{ old('pet_name', $adoption->pet_name) }}" required
-                                   aria-describedby="pet-name-help">
-                            <div id="pet-name-help" class="form-text">Enter the name of your pet</div>
-                            @error('pet_name')
-                                <div class="invalid-feedback" role="alert">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-12 col-md-6">
-                                <div class="mb-3">
-                                    <label for="breed" class="form-label">Breed</label>
+
+                        <!-- Pet Basic Information -->
+                        <div class="form-section">
+                            <h5 class="form-section-title">Basic Information</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Pet Name <span class="required">*</span></label>
+                                    <input type="text" class="form-control @error('pet_name') is-invalid @enderror" 
+                                           name="pet_name" value="{{ old('pet_name', $adoption->pet_name) }}" required>
+                                    @error('pet_name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Species <span class="required">*</span></label>
+                                    <select class="form-select @error('species') is-invalid @enderror" name="species" required>
+                                        <option value="">Select Species</option>
+                                        <option value="dog" {{ old('species', $adoption->species) == 'dog' ? 'selected' : '' }}>Dog</option>
+                                        <option value="cat" {{ old('species', $adoption->species) == 'cat' ? 'selected' : '' }}>Cat</option>
+                                        <option value="bird" {{ old('species', $adoption->species) == 'bird' ? 'selected' : '' }}>Bird</option>
+                                        <option value="rabbit" {{ old('species', $adoption->species) == 'rabbit' ? 'selected' : '' }}>Rabbit</option>
+                                        <option value="other" {{ old('species', $adoption->species) == 'other' ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                    @error('species')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Breed</label>
                                     <input type="text" class="form-control @error('breed') is-invalid @enderror" 
-                                           id="breed" name="breed" value="{{ old('breed', $adoption->breed) }}"
-                                           aria-describedby="breed-help">
-                                    <div id="breed-help" class="form-text">Enter your pet's breed (optional)</div>
+                                           name="breed" value="{{ old('breed', $adoption->breed) }}">
                                     @error('breed')
-                                        <div class="invalid-feedback" role="alert">{{ $message }}</div>
+                                        <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <div class="mb-3">
-                                    <label for="age" class="form-label">Age</label>
+                                <div class="col-md-3">
+                                    <label class="form-label">Age (years) <span class="required">*</span></label>
                                     <input type="number" class="form-control @error('age') is-invalid @enderror" 
-                                           id="age" name="age" value="{{ old('age', $adoption->age) }}" min="0"
-                                           aria-describedby="age-help">
-                                    <div id="age-help" class="form-text">Enter your pet's age in years</div>
+                                           name="age" min="0" value="{{ old('age', $adoption->age) }}" required>
                                     @error('age')
-                                        <div class="invalid-feedback" role="alert">{{ $message }}</div>
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Gender <span class="required">*</span></label>
+                                    <select class="form-select @error('gender') is-invalid @enderror" name="gender" required>
+                                        <option value="">Select</option>
+                                        <option value="male" {{ old('gender', $adoption->gender) == 'male' ? 'selected' : '' }}>Male</option>
+                                        <option value="female" {{ old('gender', $adoption->gender) == 'female' ? 'selected' : '' }}>Female</option>
+                                    </select>
+                                    @error('gender')
+                                        <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="gender" class="form-label">Gender</label>
-                            <select class="form-select @error('gender') is-invalid @enderror" id="gender" name="gender"
-                                    aria-describedby="gender-help">
-                                <option value="">Select gender</option>
-                                <option value="male" {{ old('gender', $adoption->gender) == 'male' ? 'selected' : '' }}>Male</option>
-                                <option value="female" {{ old('gender', $adoption->gender) == 'female' ? 'selected' : '' }}>Female</option>
-                            </select>
-                            <div id="gender-help" class="form-text">Select your pet's gender</div>
-                            @error('gender')
-                                <div class="invalid-feedback" role="alert">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control @error('description') is-invalid @enderror" 
-                                      id="description" name="description" rows="4"
-                                      aria-describedby="description-help">{{ old('description', $adoption->description) }}</textarea>
-                            <div id="description-help" class="form-text">Provide a detailed description of your pet's personality, behavior, and any special needs</div>
-                            @error('description')
-                                <div class="invalid-feedback" role="alert">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="image" class="form-label">Pet Image (optional)</label>
-                            <input type="file" class="form-control @error('image') is-invalid @enderror" 
-                                   id="image" name="image" accept="image/*"
-                                   aria-describedby="image-help">
-                            <div id="image-help" class="form-text">Upload an image of your pet (optional). Supported formats: JPG, PNG, GIF.</div>
-                            @error('image')
-                                <div class="invalid-feedback" role="alert">{{ $message }}</div>
-                            @enderror
-                            
-                            @if($adoption->image_path)
-                                <div class="mt-2">
-                                    <p class="form-text">Current image:</p>
-                                    <img src="{{ asset('storage/' . $adoption->image_path) }}" alt="Current pet image" class="img-thumbnail" style="max-height: 150px;">
-                                </div>
-                            @endif
                         </div>
 
-                        <div class="d-flex justify-content-between flex-wrap gap-2 adoption-form-buttons">
-                            <a href="{{ route('adoptions.show', $adoption) }}" class="btn btn-secondary cancel-btn" role="button" aria-label="Cancel and return to adoption details">
+                        <!-- Health Information -->
+                        <div class="form-section">
+                            <h5 class="form-section-title">Health Information</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Health Status</label>
+                                <textarea class="form-control @error('health_status') is-invalid @enderror" 
+                                          name="health_status" rows="3" 
+                                          placeholder="Describe the pet's current health condition...">{{ old('health_status', $adoption->health_status) }}</textarea>
+                                @error('health_status')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Vaccination Records</label>
+                                <textarea class="form-control @error('vaccination_records') is-invalid @enderror" 
+                                          name="vaccination_records" rows="3"
+                                          placeholder="List any vaccinations and dates...">{{ old('vaccination_records', $adoption->vaccination_records) }}</textarea>
+                                @error('vaccination_records')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-section">
+                            <h5 class="form-section-title">Description</h5>
+                            <div class="mb-3">
+                                <label class="form-label">About This Pet</label>
+                                <textarea class="form-control @error('description') is-invalid @enderror" 
+                                          name="description" rows="5"
+                                          placeholder="Tell potential adopters about this pet's personality, habits, and special needs...">{{ old('description', $adoption->description) }}</textarea>
+                                @error('description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Pet Image -->
+                        <div class="form-section">
+                            <h5 class="form-section-title">Pet Photo</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Upload New Photo (Optional)</label>
+                                <input type="file" class="form-control @error('image') is-invalid @enderror" 
+                                       name="image" accept="image/*" id="imageInput">
+                                @error('image')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text">Maximum file size: 2MB. Supported formats: JPG, PNG, GIF</div>
+                            </div>
+                            @if($adoption->image_path)
+                            <div class="mb-3">
+                                <label class="form-label">Current Photo</label>
+                                <div class="image-preview">
+                                    <img src="{{ asset('storage/' . $adoption->image_path) }}" alt="{{ $adoption->pet_name }}">
+                                </div>
+                            </div>
+                            @endif
+                            <div id="imagePreview" class="image-preview" style="display: none;">
+                                <img id="previewImg" src="" alt="Preview">
+                                <button type="button" class="btn btn-sm btn-danger remove-preview" onclick="removePreview()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Update Listing
+                            </button>
+                            <a href="{{ route('adoptions.index') }}" class="btn btn-outline-secondary btn-lg">
                                 Cancel
                             </a>
-                            <button type="submit" class="btn btn-primary submit-btn" aria-label="Update adoption listing">
-                                Update Listing
-                            </button>
                         </div>
                     </form>
                 </div>
@@ -126,152 +163,181 @@
 </div>
 
 <style>
-@media (min-width: 768px) {
-    /* Desktop button size reduction */
-    .cancel-btn,
-    .submit-btn {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.875rem;
-        min-height: 36px;
-    }
+:root {
+    --primary: #2563eb;
+    --danger: #ef4444;
+    --dark: #1e293b;
+    --gray-50: #f8fafc;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 767.98px) {
-    /* Mobile button size reduction */
-    .cancel-btn,
-    .submit-btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8125rem;
-        min-height: 36px;
+.create-adoption-page {
+    background: var(--gray-50);
+    min-height: 100vh;
+    padding-bottom: 2rem;
+}
+
+.form-card {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-md);
+    padding: 2.5rem;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.form-header {
+    text-align: center;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.form-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+}
+
+.form-subtitle {
+    color: var(--gray-600);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.form-section {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+}
+
+.form-section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 0.9375rem;
+    margin-bottom: 0.5rem;
+}
+
+.required {
+    color: var(--danger);
+}
+
+.form-control, .form-select {
+    border: 1px solid var(--gray-300);
+    border-radius: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9375rem;
+    transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-text {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin-top: 0.5rem;
+}
+
+.image-preview {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 2px solid var(--gray-300);
+    margin-top: 1rem;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-preview {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    padding-top: 2rem;
+    justify-content: center;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    .adoption-form-buttons {
-        gap: 0.5rem !important;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
 @media (max-width: 768px) {
-    .container {
-        padding: 1rem;
+    .form-card {
+        padding: 1.5rem;
     }
     
-    .card {
-        margin: 0;
+    .form-title {
+        font-size: 1.5rem;
     }
     
-    h4 {
-        font-size: 1.25rem;
+    .form-actions {
+        flex-direction: column;
     }
     
-    .btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .d-flex {
-        flex-direction: column !important;
-    }
-    
-    .row {
-        margin-bottom: 1rem;
-    }
-    
-    .adoption-form-buttons {
-        width: 100%;
-        justify-content: flex-end !important;
-    }
-    
-    .cancel-btn,
-    .submit-btn {
-        width: auto;
-        min-width: 44px;
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-    }
-    
-    .col-md-6 {
-        flex: 0 0 100%;
-        max-width: 100%;
-        margin-bottom: 1rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .card-body {
-        padding: 1rem;
-    }
-    
-    .form-label {
-        font-weight: 600;
-    }
-    
-    .form-text {
-        font-size: 0.8rem;
-    }
-    
-    .mt-5 {
-        margin-top: 1rem !important;
-    }
-    
-    .adoption-form-buttons {
-        flex-direction: column !important;
-        align-items: flex-end !important;
-    }
-    
-    .cancel-btn,
-    .submit-btn {
+    .form-actions .btn {
         width: 100%;
     }
-}
-
-/* Focus indicators for keyboard navigation */
-.btn:focus, 
-a:focus, 
-.form-control:focus, 
-.form-select:focus {
-    outline: 2px solid #5b4b9b;
-    outline-offset: 2px;
-}
-
-/* Screen reader only class */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-/* Improved color contrast */
-.text-danger {
-    color: #dc3545 !important;
-}
-
-.text-muted {
-    color: #6c757d !important;
-}
-
-/* Form validation improvements */
-.is-invalid {
-    border-color: #dc3545;
-}
-
-.invalid-feedback {
-    display: block;
-    width: 100%;
-    margin-top: 0.25rem;
-    font-size: 0.875em;
-    color: #dc3545;
 }
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // No veterinary appointment functionality needed
+document.getElementById('imageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('previewImg').src = e.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    }
 });
+
+function removePreview() {
+    document.getElementById('imageInput').value = '';
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('previewImg').src = '';
+}
 </script>
 @endsection

@@ -3,615 +3,317 @@
 @section('title', 'Adoption History')
 
 @section('content')
-<div class="container-fluid px-0">
-    <div class="row justify-content-center mx-0">
-        <div class="col-12 col-lg-10 px-0">
-            <!-- Header Section -->
-            <div class="row mb-4 mx-0 mx-md-2">
-                <div class="col-12">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div>
-                            <h2 class="mb-1" id="page-heading">Adoption History</h2>
-                            <p class="text-muted mb-0">View your adoption activities within the Adoption Center</p>
+<div class="history-page">
+    <div class="container-fluid px-4 py-4">
+        <!-- Header -->
+        <div class="page-header mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h1 class="page-title mb-1">Adoption History</h1>
+                    <p class="page-subtitle text-muted mb-0">View your adoption activity</p>
+                </div>
+                <a href="{{ route('adoptions.index') }}" class="btn btn-primary">
+                    <i class="fas fa-heart me-2"></i>Browse Pets
+                </a>
+            </div>
+        </div>
+
+        @if($adoptions->count() > 0)
+        <!-- History Grid -->
+        <div class="row g-4">
+            @foreach($adoptions as $adoption)
+            <div class="col-lg-4 col-md-6">
+                <div class="history-card">
+                    <!-- Pet Image -->
+                    <div class="history-image">
+                        @if($adoption->image_path)
+                            <img src="{{ asset('storage/' . $adoption->image_path) }}" alt="{{ $adoption->pet_name }}">
+                        @else
+                            <img src="{{ asset('images/pawpatrol.jpg') }}" alt="{{ $adoption->pet_name }}">
+                        @endif
+                        <div class="history-status">
+                            @if($adoption->status === 'completed')
+                                <span class="badge bg-success">Completed</span>
+                            @elseif($adoption->status === 'published')
+                                <span class="badge bg-primary">Active</span>
+                            @else
+                                <span class="badge bg-secondary">{{ ucfirst($adoption->status) }}</span>
+                            @endif
                         </div>
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('adoptions.index') }}" class="btn btn-primary" role="button" aria-label="Back to Adoption Center">
-                                <i class="fas fa-heart me-2" aria-hidden="true"></i>Back to Adoption Center
+                    </div>
+
+                    <!-- Pet Info -->
+                    <div class="history-content">
+                        <h5 class="history-pet-name">{{ $adoption->pet_name }}</h5>
+                        
+                        <div class="history-meta mb-3">
+                            @if($adoption->breed)
+                            <span class="meta-item">
+                                <i class="fas fa-tag"></i>
+                                {{ $adoption->breed }}
+                            </span>
+                            @endif
+                            <span class="meta-item">
+                                <i class="fas fa-birthday-cake"></i>
+                                {{ $adoption->age }} years
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                {{ $adoption->created_at->format('M d, Y') }}
+                            </span>
+                        </div>
+
+                        @if($adoption->description)
+                        <p class="history-description">
+                            {{ Str::limit($adoption->description, 80) }}
+                        </p>
+                        @endif
+
+                        <!-- Actions -->
+                        <div class="history-actions mt-3">
+                            <a href="{{ route('adoptions.show', $adoption) }}" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="fas fa-eye me-2"></i>View Details
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Tabs for different history views -->
-            <div class="row mx-0 mx-md-2 mb-4">
-                <div class="col-12">
-                    <ul class="nav nav-tabs" id="adoptionHistoryTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="adopter-tab" data-bs-toggle="tab" data-bs-target="#adopter" type="button" role="tab" aria-controls="adopter" aria-selected="true">
-                                My Adopted Pets
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="uploader-tab" data-bs-toggle="tab" data-bs-target="#uploader" type="button" role="tab" aria-controls="uploader" aria-selected="false">
-                                My Uploaded Pets
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Tab Content -->
-            <div class="tab-content" id="adoptionHistoryTabsContent">
-                <!-- Adopter History Tab -->
-                <div class="tab-pane fade show active" id="adopter" role="tabpanel" aria-labelledby="adopter-tab">
-                    <div class="row mx-0 mx-md-2">
-                        <div class="col-12">
-                            <div class="card border-0 shadow-sm">
-                                <div class="card-body">
-                                    <!-- Desktop Table View -->
-                                    <div class="table-responsive d-none d-md-block" role="region" aria-labelledby="adoption-table-desc" tabindex="0">
-                                        <p id="adoption-table-desc" class="sr-only">Adoption records table with sortable columns</p>
-                                        
-                                        <!-- Pets adopted by the user -->
-                                        <h5 class="mb-3">My Adopted Pets</h5>
-                                        <table class="table table-hover" aria-describedby="adoption-table-desc">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">Pet Name</th>
-                                                    <th scope="col">Listed By</th>
-                                                    <th scope="col">Adoption Date</th>
-                                                    <th scope="col">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse($adoptedPetsAsAdopter as $history)
-                                                <tr>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            @if($history->adoption->image_path)
-                                                            <img src="{{ asset('storage/' . $history->adoption->image_path) }}" 
-                                                                 class="me-2 rounded" 
-                                                                 alt="Photo of {{ $history->adoption->pet_name }}" 
-                                                                 width="40" height="40"
-                                                                 style="object-fit: cover;" loading="lazy">
-                                                            @else
-                                                            <div class="bg-light d-flex align-items-center justify-content-center me-2 rounded" 
-                                                                 style="width: 40px; height: 40px;" role="img" aria-label="No image available">
-                                                                <i class="fas fa-paw text-muted" aria-hidden="true"></i>
-                                                            </div>
-                                                            @endif
-                                                            <div>
-                                                                <div class="fw-bold">{{ $history->adoption->pet_name }}</div>
-                                                                @if($history->adoption->breed)
-                                                                <small class="text-muted">{{ $history->adoption->breed }}</small>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        @if($history->uploader)
-                                                        <div class="fw-bold">{{ $history->uploader->name }}</div>
-                                                        <small class="text-muted">{{ $history->uploader->email }}</small>
-                                                        @else
-                                                        <span class="text-muted">N/A</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        <time datetime="{{ $history->adopted_at->toIso8601String() }}">
-                                                            {{ $history->adopted_at->format('M d, Y') }}
-                                                        </time>
-                                                        <br>
-                                                        <small class="text-muted">{{ $history->adopted_at->format('h:i A') }}</small>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge bg-success" role="status" aria-label="Adopted">Adopted</span>
-                                                    </td>
-                                                </tr>
-                                                @empty
-                                                <tr>
-                                                    <td colspan="4" class="text-center py-5">
-                                                        <i class="fas fa-heart fa-3x text-muted mb-3" aria-hidden="true"></i>
-                                                        <h5 id="no-records-heading">No adopted pets</h5>
-                                                        <p class="text-muted">You haven't adopted any pets yet.</p>
-                                                    </td>
-                                                </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    
-                                    <!-- Mobile Card View -->
-                                    <div class="d-md-none">
-                                        <!-- Pets adopted by the user -->
-                                        <h5 class="mb-3">My Adopted Pets</h5>
-                                        @forelse($adoptedPetsAsAdopter as $history)
-                                        <div class="card mb-3 border shadow-sm">
-                                            <div class="card-body">
-                                                <div class="d-flex align-items-center mb-3">
-                                                    @if($history->adoption->image_path)
-                                                    <img src="{{ asset('storage/' . $history->adoption->image_path) }}" 
-                                                         class="me-3 rounded" 
-                                                         alt="Photo of {{ $history->adoption->pet_name }}" 
-                                                         width="60" height="60"
-                                                         style="object-fit: cover;" loading="lazy">
-                                                    @else
-                                                    <div class="bg-light d-flex align-items-center justify-content-center me-3 rounded" 
-                                                         style="width: 60px; height: 60px;" role="img" aria-label="No image available">
-                                                        <i class="fas fa-paw text-muted" aria-hidden="true"></i>
-                                                    </div>
-                                                    @endif
-                                                    <div>
-                                                        <h5 class="mb-1">{{ $history->adoption->pet_name }}</h5>
-                                                        @if($history->adoption->breed)
-                                                        <small class="text-muted">{{ $history->adoption->breed }}</small>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="row g-2">
-                                                    <div class="col-12">
-                                                        <div class="d-flex justify-content-between">
-                                                            <span class="text-muted">Listed By:</span>
-                                                            <span>
-                                                                @if($history->uploader)
-                                                                <div class="fw-bold">{{ $history->uploader->name }}</div>
-                                                                <small class="text-muted">{{ $history->uploader->email }}</small>
-                                                                @else
-                                                                <span class="text-muted">N/A</span>
-                                                                @endif
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div class="col-12">
-                                                        <div class="d-flex justify-content-between">
-                                                            <span class="text-muted">Adoption Date:</span>
-                                                            <span>
-                                                                <time datetime="{{ $history->adopted_at->toIso8601String() }}">
-                                                                    {{ $history->adopted_at->format('M d, Y') }}
-                                                                </time>
-                                                                <br>
-                                                                <small class="text-muted">{{ $history->adopted_at->format('h:i A') }}</small>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div class="col-12">
-                                                        <div class="d-flex justify-content-between">
-                                                            <span class="text-muted">Status:</span>
-                                                            <span>
-                                                                <span class="badge bg-success" role="status" aria-label="Adopted">Adopted</span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @empty
-                                        <div class="text-center py-5">
-                                            <i class="fas fa-heart fa-3x text-muted mb-3" aria-hidden="true"></i>
-                                            <h5 id="no-records-heading">No adopted pets</h5>
-                                            <p class="text-muted">You haven't adopted any pets yet.</p>
-                                        </div>
-                                        @endforelse
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Uploader History Tab -->
-                <div class="tab-pane fade" id="uploader" role="tabpanel" aria-labelledby="uploader-tab">
-                    <div class="row mx-0 mx-md-2">
-                        <div class="col-12">
-                            <div class="card border-0 shadow-sm">
-                                <div class="card-body">
-                                    <!-- Desktop Table View -->
-                                    <div class="table-responsive d-none d-md-block" role="region" aria-labelledby="adoption-uploader-table-desc" tabindex="0">
-                                        <p id="adoption-uploader-table-desc" class="sr-only">Uploaded adoption records table with sortable columns</p>
-                                        
-                                        <!-- Pets uploaded by the user -->
-                                        <h5 class="mb-3">My Uploaded Pets</h5>
-                                        @if(isset($uploadedPets) && count($uploadedPets) > 0)
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">Pet Name</th>
-                                                    <th scope="col">Status</th>
-                                                    <th scope="col">Requests</th>
-                                                    <th scope="col">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($uploadedPets as $adoption)
-                                                <tr>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            @if($adoption->image_path)
-                                                            <img src="{{ asset('storage/' . $adoption->image_path) }}" 
-                                                                 class="me-2 rounded" 
-                                                                 alt="Photo of {{ $adoption->pet_name }}" 
-                                                                 width="40" height="40"
-                                                                 style="object-fit: cover;" loading="lazy">
-                                                            @else
-                                                            <div class="bg-light d-flex align-items-center justify-content-center me-2 rounded" 
-                                                                 style="width: 40px; height: 40px;" role="img" aria-label="No image available">
-                                                                <i class="fas fa-paw text-muted" aria-hidden="true"></i>
-                                                            </div>
-                                                            @endif
-                                                            <div>
-                                                                <div class="fw-bold">{{ $adoption->pet_name }}</div>
-                                                                @if($adoption->breed)
-                                                                <small class="text-muted">{{ $adoption->breed }}</small>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        @php
-                                                            $statusClass = 'secondary';
-                                                            $statusIcon = 'fas fa-circle';
-                                                            
-                                                            switch($adoption->listing_status) {
-                                                                case 'vet_review':
-                                                                    $statusClass = 'warning';
-                                                                    $statusIcon = 'fas fa-clock';
-                                                                    break;
-                                                                case 'vet_rejected':
-                                                                    $statusClass = 'danger';
-                                                                    $statusIcon = 'fas fa-times-circle';
-                                                                    break;
-                                                                case 'admin_review':
-                                                                    $statusClass = 'info';
-                                                                    $statusIcon = 'fas fa-hourglass-half';
-                                                                    break;
-                                                                case 'admin_rejected':
-                                                                    $statusClass = 'danger';
-                                                                    $statusIcon = 'fas fa-times-circle';
-                                                                    break;
-                                                                case 'published':
-                                                                    $statusClass = 'success';
-                                                                    $statusIcon = 'fas fa-check-circle';
-                                                                    break;
-                                                                case 'adopted':
-                                                                    $statusClass = 'primary';
-                                                                    $statusIcon = 'fas fa-heart';
-                                                                    break;
-                                                            }
-                                                        @endphp
-                                                        <span class="badge bg-{{ $statusClass }}">
-                                                            <i class="{{ $statusIcon }} me-1"></i>{{ $adoption->status }}
-                                                        </span>
-                                                        @if($adoption->listing_status == 'vet_review')
-                                                            <br><small class="text-muted">Pending vet certification</small>
-                                                        @elseif($adoption->listing_status == 'admin_review')
-                                                            <br><small class="text-muted">Pending admin approval</small>
-                                                        @elseif($adoption->listing_status == 'vet_rejected')
-                                                            <br><small class="text-danger">Rejected by vet</small>
-                                                        @elseif($adoption->listing_status == 'admin_rejected')
-                                                            <br><small class="text-danger">Rejected by admin</small>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        {{ $adoption->adoptionRequests->count() }} request(s)
-                                                    </td>
-                                                    <td>
-                                                        <a href="{{ route('adoptions.show', $adoption) }}" class="btn btn-sm btn-outline-primary">View</a>
-                                                    </td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                        @else
-                                        <div class="text-center py-5">
-                                            <i class="fas fa-heart fa-3x text-muted mb-3" aria-hidden="true"></i>
-                                            <h5 id="no-records-heading">No uploaded pets</h5>
-                                            <p class="text-muted">You haven't uploaded any pets for adoption yet.</p>
-                                        </div>
-                                        @endif
-                                        
-                                        <!-- Adopted Pets Section (only show if there are any) -->
-                                        @if(count($adoptedPetsAsUploader) > 0)
-                                        <div class="mt-4">
-                                            <h5 class="mb-3">Adopted Pets</h5>
-                                            <table class="table table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">Pet Name</th>
-                                                        <th scope="col">Adopted By</th>
-                                                        <th scope="col">Adoption Date</th>
-                                                        <th scope="col">Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($adoptedPetsAsUploader as $history)
-                                                    <tr>
-                                                        <td>
-                                                            <div class="d-flex align-items-center">
-                                                                @if($history->adoption->image_path)
-                                                                <img src="{{ asset('storage/' . $history->adoption->image_path) }}" 
-                                                                     class="me-2 rounded" 
-                                                                     alt="Photo of {{ $history->adoption->pet_name }}" 
-                                                                     width="40" height="40"
-                                                                     style="object-fit: cover;" loading="lazy">
-                                                                @else
-                                                                <div class="bg-light d-flex align-items-center justify-content-center me-2 rounded" 
-                                                                     style="width: 40px; height: 40px;" role="img" aria-label="No image available">
-                                                                    <i class="fas fa-paw text-muted" aria-hidden="true"></i>
-                                                                </div>
-                                                                @endif
-                                                                <div>
-                                                                    <div class="fw-bold">{{ $history->adoption->pet_name }}</div>
-                                                                    @if($history->adoption->breed)
-                                                                    <small class="text-muted">{{ $history->adoption->breed }}</small>
-                                                                    @endif
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            @if($history->adopter)
-                                                            <div class="fw-bold">{{ $history->adopter->name }}</div>
-                                                            <small class="text-muted">{{ $history->adopter->email }}</small>
-                                                            @else
-                                                            <span class="text-muted">N/A</span>
-                                                            @endif
-                                                        </td>
-                                                        <td>
-                                                            <time datetime="{{ $history->adopted_at->toIso8601String() }}">
-                                                                {{ $history->adopted_at->format('M d, Y') }}
-                                                            </time>
-                                                            <br>
-                                                            <small class="text-muted">{{ $history->adopted_at->format('h:i A') }}</small>
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge bg-success" role="status" aria-label="Adopted">Adopted</span>
-                                                        </td>
-                                                    </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        @endif
-                                    </div>
-                                    
-                                    <!-- Mobile Card View -->
-                                    <div class="d-md-none">
-                                        <!-- Pets uploaded by the user -->
-                                        <h5 class="mb-3">My Uploaded Pets</h5>
-                                        @if(isset($uploadedPets) && count($uploadedPets) > 0)
-                                        @foreach($uploadedPets as $adoption)
-                                        <div class="card mb-3 border shadow-sm">
-                                            <div class="card-body">
-                                                <div class="d-flex align-items-center mb-3">
-                                                    @if($adoption->image_path)
-                                                    <img src="{{ asset('storage/' . $adoption->image_path) }}" 
-                                                         class="me-3 rounded" 
-                                                         alt="Photo of {{ $adoption->pet_name }}" 
-                                                         width="60" height="60"
-                                                         style="object-fit: cover;" loading="lazy">
-                                                    @else
-                                                    <div class="bg-light d-flex align-items-center justify-content-center me-3 rounded" 
-                                                         style="width: 60px; height: 60px;" role="img" aria-label="No image available">
-                                                        <i class="fas fa-paw text-muted" aria-hidden="true"></i>
-                                                    </div>
-                                                    @endif
-                                                    <div>
-                                                        <h5 class="mb-1">{{ $adoption->pet_name }}</h5>
-                                                        @if($adoption->breed)
-                                                        <small class="text-muted">{{ $adoption->breed }}</small>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="row g-2">
-                                                    <div class="col-12">
-                                                        <div class="d-flex justify-content-between">
-                                                            <span class="text-muted">Status:</span>
-                                                            <span>
-                                                                <span class="badge bg-info">{{ $adoption->status }}</span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div class="col-12">
-                                                        <div class="d-flex justify-content-between">
-                                                            <span class="text-muted">Requests:</span>
-                                                            <span>{{ $adoption->adoptionRequests->count() }} request(s)</span>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div class="col-12 mt-2">
-                                                        <a href="{{ route('adoptions.show', $adoption) }}" class="btn btn-sm btn-outline-primary w-100">View Details</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @endforeach
-                                        @else
-                                        <div class="text-center py-5">
-                                            <i class="fas fa-heart fa-3x text-muted mb-3" aria-hidden="true"></i>
-                                            <h5 id="no-records-heading">No uploaded pets</h5>
-                                            <p class="text-muted">You haven't uploaded any pets for adoption yet.</p>
-                                        </div>
-                                        @endif
-                                        
-                                        <!-- Adopted Pets Section (only show if there are any) -->
-                                        @if(count($adoptedPetsAsUploader) > 0)
-                                        <div class="mt-4">
-                                            <h5 class="mb-3">Adopted Pets</h5>
-                                            @foreach($adoptedPetsAsUploader as $history)
-                                            <div class="card mb-3 border shadow-sm">
-                                                <div class="card-body">
-                                                    <div class="d-flex align-items-center mb-3">
-                                                        @if($history->adoption->image_path)
-                                                        <img src="{{ asset('storage/' . $history->adoption->image_path) }}" 
-                                                             class="me-3 rounded" 
-                                                             alt="Photo of {{ $history->adoption->pet_name }}" 
-                                                             width="60" height="60"
-                                                             style="object-fit: cover;" loading="lazy">
-                                                        @else
-                                                        <div class="bg-light d-flex align-items-center justify-content-center me-3 rounded" 
-                                                             style="width: 60px; height: 60px;" role="img" aria-label="No image available">
-                                                            <i class="fas fa-paw text-muted" aria-hidden="true"></i>
-                                                        </div>
-                                                        @endif
-                                                        <div>
-                                                            <h5 class="mb-1">{{ $history->adoption->pet_name }}</h5>
-                                                            @if($history->adoption->breed)
-                                                            <small class="text-muted">{{ $history->adoption->breed }}</small>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div class="row g-2">
-                                                        <div class="col-12">
-                                                            <div class="d-flex justify-content-between">
-                                                                <span class="text-muted">Adopted By:</span>
-                                                                <span>
-                                                                    @if($history->adopter)
-                                                                    <div class="fw-bold">{{ $history->adopter->name }}</div>
-                                                                    <small class="text-muted">{{ $history->adopter->email }}</small>
-                                                                    @else
-                                                                    <span class="text-muted">N/A</span>
-                                                                    @endif
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div class="col-12">
-                                                            <div class="d-flex justify-content-between">
-                                                                <span class="text-muted">Adoption Date:</span>
-                                                                <span>
-                                                                    <time datetime="{{ $history->adopted_at->toIso8601String() }}">
-                                                                        {{ $history->adopted_at->format('M d, Y') }}
-                                                                    </time>
-                                                                    <br>
-                                                                    <small class="text-muted">{{ $history->adopted_at->format('h:i A') }}</small>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div class="col-12">
-                                                            <div class="d-flex justify-content-between">
-                                                                <span class="text-muted">Status:</span>
-                                                                <span>
-                                                                    <span class="badge bg-success" role="status" aria-label="Adopted">Adopted</span>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endforeach
-                                        </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
+
+        <!-- Pagination -->
+        @if($adoptions->hasPages())
+        <div class="pagination-wrapper mt-5">
+            {{ $adoptions->links() }}
+        </div>
+        @endif
+
+        @else
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <h3 class="empty-state-title">No Adoption History</h3>
+            <p class="empty-state-text">
+                You don't have any adoption history yet.<br>
+                Start by listing a pet for adoption or applying to adopt.
+            </p>
+            <a href="{{ route('adoptions.index') }}" class="btn btn-primary mt-3">
+                <i class="fas fa-heart me-2"></i>Browse Available Pets
+            </a>
+        </div>
+        @endif
     </div>
 </div>
 
 <style>
-/* Mobile-specific styles */
-@media (max-width: 767.98px) {
-    .card-body {
-        padding: 1rem;
+:root {
+    --primary: #2563eb;
+    --success: #10b981;
+    --dark: #1e293b;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-600: #475569;
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+.history-page {
+    background: var(--gray-50);
+    min-height: 100vh;
+    padding-bottom: 2rem;
+}
+
+.page-header {
+    animation: fadeInDown 0.5s ease-out;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.page-subtitle {
+    color: var(--gray-600);
+}
+
+.history-card {
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s;
+    animation: fadeInUp 0.5s ease-out backwards;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.col-lg-4:nth-child(1) .history-card { animation-delay: 0.05s; }
+.col-lg-4:nth-child(2) .history-card { animation-delay: 0.1s; }
+.col-lg-4:nth-child(3) .history-card { animation-delay: 0.15s; }
+.col-lg-4:nth-child(4) .history-card { animation-delay: 0.2s; }
+.col-lg-4:nth-child(5) .history-card { animation-delay: 0.25s; }
+.col-lg-4:nth-child(6) .history-card { animation-delay: 0.3s; }
+
+.history-image {
+    position: relative;
+    width: 100%;
+    padding-top: 75%;
+    overflow: hidden;
+    background: var(--gray-100);
+}
+
+.history-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.history-card:hover .history-image img {
+    transform: scale(1.05);
+}
+
+.history-status {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+}
+
+.history-status .badge {
+    padding: 0.375rem 0.75rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    border-radius: 0.375rem;
+    text-transform: uppercase;
+}
+
+.history-content {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-pet-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 0.75rem;
+}
+
+.history-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+.meta-item i {
+    color: var(--primary);
+}
+
+.history-description {
+    font-size: 0.9375rem;
+    color: var(--gray-600);
+    line-height: 1.6;
+    flex: 1;
+}
+
+.history-actions {
+    margin-top: auto;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.empty-state-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-100);
+    border-radius: 50%;
+}
+
+.empty-state-icon i {
+    font-size: 2.5rem;
+    color: var(--gray-600);
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.empty-state-text {
+    color: var(--gray-600);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
     }
-    
-    .d-flex.align-items-center {
-        flex-direction: row;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    
-    .d-flex.align-items-center .me-3 {
-        margin-right: 1rem !important;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    h2 {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .page-title {
         font-size: 1.5rem;
     }
-    
-    h5 {
-        font-size: 1.1rem;
-    }
-    
-    .btn {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.875rem;
-    }
-    
-    .row.g-2 {
-        --bs-gutter-x: 0.5rem;
-        --bs-gutter-y: 0.5rem;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .card-body {
-        padding: 0.75rem;
-    }
-    
-    h2 {
-        font-size: 1.35rem;
-    }
-    
-    .btn {
-        padding: 0.375rem 0.625rem;
-        font-size: 0.8125rem;
-    }
-}
-
-/* Focus indicators for keyboard navigation */
-.btn:focus, 
-a:focus, 
-table a:focus {
-    outline: 2px solid #5b4b9b;
-    outline-offset: 2px;
-}
-
-/* Screen reader only class */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-/* Improved color contrast */
-.text-muted {
-    color: #6c757d !important;
-}
-
-.badge.bg-success {
-    color: #fff !important;
-}
-
-/* Tab styles */
-.nav-tabs .nav-link {
-    border: 1px solid transparent;
-    border-top-left-radius: 0.375rem;
-    border-top-right-radius: 0.375rem;
-}
-
-.nav-tabs .nav-link.active {
-    color: #495057;
-    background-color: #fff;
-    border-color: #dee2e6 #dee2e6 #fff;
-}
-
-.nav-tabs .nav-link:hover {
-    border-color: #e9ecef #e9ecef #dee2e6;
 }
 </style>
 @endsection

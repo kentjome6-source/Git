@@ -154,12 +154,12 @@ class VetController extends Controller
      */
     public function pendingOrientations()
     {
-        $adoptionRequests = \App\Models\AdoptionRequest::where('status', 'vet_orientation')
-            ->with(['adoption', 'adopter'])
+        $requests = \App\Models\AdoptionRequest::where('status', 'vet_orientation')
+            ->with(['adoption.user', 'adopter'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
         
-        return view('vet.adoptions.orientations', compact('adoptionRequests'));
+        return view('vet.adoptions.orientations', compact('requests'));
     }
     
     /**

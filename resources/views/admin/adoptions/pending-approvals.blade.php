@@ -1,223 +1,279 @@
 @extends('layouts.admin')
 
+@section('title', 'Pending Adoption Approvals')
+
 @section('content')
-<div class="container-fluid px-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-danger text-white">
-                    <h4 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Pending Adoption Listing Approvals</h4>
-                </div>
-                <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show">
-                            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+<div class="admin-adoptions-page">
+    <div class="container-fluid px-4 py-4">
+        <!-- Header -->
+        <div class="page-header mb-4">
+            <h1 class="page-title">Listing Approvals</h1>
+            <p class="page-subtitle text-muted">Review and approve pet listings for adoption</p>
+        </div>
 
-                    @if($adoptions->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Pet Name</th>
-                                        <th>Breed</th>
-                                        <th>Owner</th>
-                                        <th>Vet Certified By</th>
-                                        <th>Certified Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($adoptions as $adoption)
-                                        <tr>
-                                            <td>
-                                                <strong>{{ $adoption->pet_name }}</strong>
-                                            </td>
-                                            <td>{{ $adoption->breed ?? 'Not specified' }}</td>
-                                            <td>
-                                                {{ $adoption->user->name }}<br>
-                                                <small class="text-muted">{{ $adoption->user->email }}</small>
-                                            </td>
-                                            <td>
-                                                @if($adoption->vet)
-                                                    {{ $adoption->vet->name }}
-                                                @else
-                                                    <span class="text-muted">N/A</span>
-                                                @endif
-                                            </td>
-                                            <td>{{ $adoption->vet_certification_date ? $adoption->vet_certification_date->format('M d, Y') : 'N/A' }}</td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-primary" 
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#reviewModal{{ $adoption->id }}">
-                                                    <i class="fas fa-search me-1"></i>Review
-                                                </button>
-                                            </td>
-                                        </tr>
-
-                                        <!-- Review Modal -->
-                                        <div class="modal fade" id="reviewModal{{ $adoption->id }}" tabindex="-1">
-                                            <div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-lg-down">
-                                                <div class="modal-content">
-                                                    <div class="modal-header bg-danger text-white">
-                                                        <h5 class="modal-title">Review Adoption Listing</h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <h5 class="mb-3">Pet Information</h5>
-                                                                @if($adoption->image_path)
-                                                                    <img src="{{ asset('storage/' . $adoption->image_path) }}" 
-                                                                         class="img-fluid rounded mb-3" 
-                                                                         alt="{{ $adoption->pet_name }}">
-                                                                @endif
-                                                                <table class="table table-sm">
-                                                                    <tr>
-                                                                        <th width="40%">Name:</th>
-                                                                        <td>{{ $adoption->pet_name }}</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th>Breed:</th>
-                                                                        <td>{{ $adoption->breed ?? 'Not specified' }}</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th>Age:</th>
-                                                                        <td>{{ $adoption->age ?? 'Unknown' }}</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th>Gender:</th>
-                                                                        <td>{{ ucfirst($adoption->gender ?? 'Unknown') }}</td>
-                                                                    </tr>
-                                                                </table>
-                                                                @if($adoption->description)
-                                                                    <div class="mb-3">
-                                                                        <strong>Description:</strong>
-                                                                        <p class="text-muted">{{ $adoption->description }}</p>
-                                                                    </div>
-                                                                @endif
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <h5 class="mb-3">Owner Information</h5>
-                                                                <table class="table table-sm">
-                                                                    <tr>
-                                                                        <th width="40%">Name:</th>
-                                                                        <td>{{ $adoption->user->name }}</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th>Email:</th>
-                                                                        <td>{{ $adoption->user->email }}</td>
-                                                                    </tr>
-                                                                    @if($adoption->user->phone)
-                                                                        <tr>
-                                                                            <th>Phone:</th>
-                                                                            <td>{{ $adoption->user->phone }}</td>
-                                                                        </tr>
-                                                                    @endif
-                                                                </table>
-
-                                                                <h5 class="mb-3 mt-4">Veterinary Certification</h5>
-                                                                <div class="card bg-success text-white mb-3">
-                                                                    <div class="card-body">
-                                                                        <h6 class="card-title">
-                                                                            <i class="fas fa-check-circle me-2"></i>Certified by {{ $adoption->vet->name ?? 'Veterinarian' }}
-                                                                        </h6>
-                                                                        <small>{{ $adoption->vet_certification_date ? $adoption->vet_certification_date->format('F d, Y') : '' }}</small>
-                                                                    </div>
-                                                                </div>
-                                                                
-                                                                @if($adoption->vet_health_notes)
-                                                                    <div class="alert alert-info">
-                                                                        <strong>Health Assessment Notes:</strong>
-                                                                        <p class="mb-0 mt-2">{{ $adoption->vet_health_notes }}</p>
-                                                                    </div>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-
-                                                        <hr>
-
-                                                        <!-- Decision Forms -->
-                                                        <ul class="nav nav-tabs mb-3" role="tablist">
-                                                            <li class="nav-item">
-                                                                <a class="nav-link active" data-bs-toggle="tab" href="#approve{{ $adoption->id }}">
-                                                                    <i class="fas fa-check-circle text-success me-1"></i>Approve Listing
-                                                                </a>
-                                                            </li>
-                                                            <li class="nav-item">
-                                                                <a class="nav-link" data-bs-toggle="tab" href="#reject{{ $adoption->id }}">
-                                                                    <i class="fas fa-times-circle text-danger me-1"></i>Reject Listing
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-
-                                                        <div class="tab-content">
-                                                            <!-- Approve Tab -->
-                                                            <div class="tab-pane fade show active" id="approve{{ $adoption->id }}">
-                                                                <form action="{{ route('admin.adoptions.approve', $adoption) }}" method="POST">
-                                                                    @csrf
-                                                                    <div class="alert alert-success">
-                                                                        <i class="fas fa-info-circle me-2"></i>
-                                                                        By approving this listing, the pet will be published and visible to potential adopters.
-                                                                    </div>
-                                                                    <div class="d-flex justify-content-end gap-2">
-                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                        <button type="submit" class="btn btn-success">
-                                                                            <i class="fas fa-check me-1"></i>Approve & Publish
-                                                                        </button>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-
-                                                            <!-- Reject Tab -->
-                                                            <div class="tab-pane fade" id="reject{{ $adoption->id }}">
-                                                                <form action="{{ route('admin.adoptions.reject', $adoption) }}" method="POST">
-                                                                    @csrf
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label fw-bold">Rejection Reason <span class="text-danger">*</span></label>
-                                                                        <textarea name="admin_rejection_reason" 
-                                                                                  class="form-control" 
-                                                                                  rows="5" 
-                                                                                  required
-                                                                                  placeholder="Please provide detailed reasons for rejecting this listing. The owner will be notified."></textarea>
-                                                                    </div>
-                                                                    <div class="alert alert-warning">
-                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                        The pet owner will be notified of the rejection and can address the concerns.
-                                                                    </div>
-                                                                    <div class="d-flex justify-content-end gap-2">
-                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                        <button type="submit" class="btn btn-danger">
-                                                                            <i class="fas fa-times me-1"></i>Reject Listing
-                                                                        </button>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+        @if($adoptions->count() > 0)
+        <!-- Adoptions Table -->
+        <div class="card table-card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Pet</th>
+                            <th>Details</th>
+                            <th>Owner</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($adoptions as $adoption)
+                        <tr class="table-row-animated">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="pet-thumb">
+                                        @if($adoption->image_path)
+                                            <img src="{{ asset('storage/' . $adoption->image_path) }}" alt="{{ $adoption->pet_name }}">
+                                        @else
+                                            <div class="pet-thumb-placeholder">
+                                                <i class="fas fa-paw"></i>
                                             </div>
-                                        </div>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="mt-3">
-                            {{ $adoptions->links() }}
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-clipboard-check fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No Pending Approvals</h5>
-                            <p class="text-muted">All vet-certified listings have been reviewed.</p>
-                        </div>
-                    @endif
-                </div>
+                                        @endif
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">{{ $adoption->pet_name }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-muted small">
+                                    <div><i class="fas fa-tag me-1"></i>{{ ucfirst($adoption->species) }}</div>
+                                    @if($adoption->breed)
+                                    <div><i class="fas fa-paw me-1"></i>{{ $adoption->breed }}</div>
+                                    @endif
+                                    <div><i class="fas fa-birthday-cake me-1"></i>{{ $adoption->age }} years</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold">{{ $adoption->user->name }}</div>
+                                <div class="text-muted small">{{ $adoption->user->email }}</div>
+                            </td>
+                            <td>
+                                @if($adoption->status === 'vet_review')
+                                    <span class="badge bg-info">Vet Review</span>
+                                @elseif($adoption->status === 'admin_review')
+                                    <span class="badge bg-warning">Pending Approval</span>
+                                @else
+                                    <span class="badge bg-secondary">{{ ucfirst($adoption->status) }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="text-muted small">{{ $adoption->created_at->diffForHumans() }}</span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    @if($adoption->status === 'admin_review')
+                                    <form action="{{ route('admin.adoptions.approve', $adoption) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.adoptions.reject', $adoption) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Reject">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                    @else
+                                    <button class="btn btn-sm btn-secondary" disabled>
+                                        <i class="fas fa-clock"></i>
+                                    </button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
+
+        <!-- Pagination -->
+        @if($adoptions->hasPages())
+        <div class="mt-4">
+            {{ $adoptions->links() }}
+        </div>
+        @endif
+
+        @else
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <h3 class="empty-state-title">No Pending Approvals</h3>
+            <p class="empty-state-text">There are no adoption listings pending your approval at this time.</p>
+        </div>
+        @endif
     </div>
 </div>
+
+<style>
+:root {
+    --primary: #2563eb;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --dark: #1e293b;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-600: #475569;
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.admin-adoptions-page {
+    background: var(--gray-50);
+    min-height: 100vh;
+}
+
+.page-header {
+    animation: fadeInDown 0.5s ease-out;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.page-subtitle {
+    font-size: 1rem;
+    color: var(--gray-600);
+}
+
+.table-card {
+    border: none;
+    box-shadow: var(--shadow-md);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background: var(--gray-100);
+    color: var(--dark);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.table-row-animated {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.pet-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.pet-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pet-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-600);
+    font-size: 1.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.empty-state-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-100);
+    border-radius: 50%;
+}
+
+.empty-state-icon i {
+    font-size: 2.5rem;
+    color: var(--gray-600);
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.empty-state-text {
+    color: var(--gray-600);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 1.5rem;
+    }
+}
+</style>
 @endsection

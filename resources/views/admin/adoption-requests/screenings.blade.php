@@ -1,306 +1,357 @@
 @extends('layouts.admin')
 
+@section('title', 'Adopter Screening')
+
 @section('content')
-<div class="container-fluid px-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-danger text-white">
-                    <h4 class="mb-0"><i class="fas fa-user-check me-2"></i>Pending Adopter Screenings</h4>
-                </div>
-                <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show">
-                            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+<div class="admin-screening-page">
+    <div class="container-fluid px-4 py-4">
+        <!-- Header -->
+        <div class="page-header mb-4">
+            <h1 class="page-title">Adopter Screening</h1>
+            <p class="page-subtitle text-muted">Review adoption applications and screen potential adopters</p>
+        </div>
 
-                    @if($adoptionRequests->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Adopter</th>
-                                        <th>Pet</th>
-                                        <th>Housing</th>
-                                        <th>Experience</th>
-                                        <th>Applied</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($adoptionRequests as $request)
-                                        <tr>
-                                            <td>
-                                                <strong>{{ $request->full_name }}</strong><br>
-                                                <small class="text-muted">{{ $request->email }}</small>
-                                            </td>
-                                            <td>
-                                                <strong>{{ $request->adoption->pet_name }}</strong><br>
-                                                <small class="text-muted">{{ $request->adoption->breed }}</small>
-                                            </td>
-                                            <td>
-                                                {{ ucfirst($request->housing_type) }}<br>
-                                                <small class="text-muted">{{ ucfirst($request->own_or_rent) }}</small>
-                                            </td>
-                                            <td>
-                                                @if($request->experience_with_pets)
-                                                    <span class="badge bg-success">Has Experience</span>
-                                                @else
-                                                    <span class="badge bg-warning">First Time</span>
-                                                @endif
-                                            </td>
-                                            <td>{{ $request->created_at->diffForHumans() }}</td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-primary" 
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#screenModal{{ $request->id }}">
-                                                    <i class="fas fa-search me-1"></i>Screen
-                                                </button>
-                                            </td>
-                                        </tr>
+        @if($adoptionRequests->count() > 0)
+        <!-- Requests Table -->
+        <div class="card table-card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Adopter</th>
+                            <th>Pet</th>
+                            <th>Contact</th>
+                            <th>Housing</th>
+                            <th>Status</th>
+                            <th>Applied</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($adoptionRequests as $request)
+                        <tr class="table-row-animated">
+                            <td>
+                                <div class="fw-bold">{{ $request->full_name }}</div>
+                                <div class="text-muted small">{{ $request->adopter->email }}</div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="pet-thumb-sm">
+                                        @if($request->adoption->image_path)
+                                            <img src="{{ asset('storage/' . $request->adoption->image_path) }}" alt="{{ $request->adoption->pet_name }}">
+                                        @else
+                                            <i class="fas fa-paw"></i>
+                                        @endif
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">{{ $request->adoption->pet_name }}</div>
+                                        <div class="text-muted small">{{ ucfirst($request->adoption->species) }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-muted small">
+                                    <div><i class="fas fa-phone me-1"></i>{{ $request->phone }}</div>
+                                    <div><i class="fas fa-map-marker-alt me-1"></i>{{ Str::limit($request->address, 30) }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-muted small">
+                                    <div><i class="fas fa-home me-1"></i>{{ ucfirst($request->housing_type) }}</div>
+                                    <div><i class="fas fa-tree me-1"></i>Yard: {{ $request->has_yard ? 'Yes' : 'No' }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                @if($request->status === 'pending')
+                                    <span class="badge bg-warning">Pending</span>
+                                @elseif($request->status === 'admin_screening')
+                                    <span class="badge bg-info">Screening</span>
+                                @elseif($request->status === 'approved')
+                                    <span class="badge bg-success">Approved</span>
+                                @else
+                                    <span class="badge bg-secondary">{{ ucfirst($request->status) }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="text-muted small">{{ $request->created_at->diffForHumans() }}</span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#viewModal{{ $request->id }}" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    @if($request->status === 'pending')
+                                    <form action="{{ route('admin.adoption-requests.approve', $request) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.adoption-requests.reject', $request) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Reject">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
 
-                                        <!-- Screening Modal -->
-                                        <div class="modal fade" id="screenModal{{ $request->id }}" tabindex="-1">
-                                            <div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-lg-down">
-                                                <div class="modal-content">
-                                                    <div class="modal-header bg-danger text-white">
-                                                        <h5 class="modal-title">Adopter Screening - {{ $request->full_name }}</h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        <!-- View Modal -->
+                        <div class="modal fade" id="viewModal{{ $request->id }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Application Details - {{ $request->full_name }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold mb-3">Personal Information</h6>
+                                                <div class="info-group">
+                                                    <div class="info-item">
+                                                        <span class="info-label">Name:</span>
+                                                        <span>{{ $request->full_name }}</span>
                                                     </div>
-                                                    <div class="modal-body">
-                                                        <div class="row">
-                                                            <!-- Pet Information -->
-                                                            <div class="col-md-6">
-                                                                <h5 class="mb-3"><i class="fas fa-paw me-2"></i>Pet Being Adopted</h5>
-                                                                <div class="card mb-3">
-                                                                    <div class="card-body">
-                                                                        @if($request->adoption->image_path)
-                                                                            <img src="{{ asset('storage/' . $request->adoption->image_path) }}" 
-                                                                                 class="img-fluid rounded mb-3" 
-                                                                                 alt="{{ $request->adoption->pet_name }}">
-                                                                        @endif
-                                                                        <h6>{{ $request->adoption->pet_name }}</h6>
-                                                                        <p class="text-muted mb-2">{{ $request->adoption->breed }} • {{ $request->adoption->age }} years • {{ ucfirst($request->adoption->gender ?? 'Unknown') }}</p>
-                                                                        @if($request->adoption->description)
-                                                                            <p class="small">{{ $request->adoption->description }}</p>
-                                                                        @endif
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Application Details -->
-                                                            <div class="col-md-6">
-                                                                <h5 class="mb-3"><i class="fas fa-user me-2"></i>Adopter Information</h5>
-                                                                <div class="card mb-3">
-                                                                    <div class="card-body">
-                                                                        <table class="table table-sm">
-                                                                            <tr>
-                                                                                <th width="40%">Full Name:</th>
-                                                                                <td>{{ $request->full_name }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Email:</th>
-                                                                                <td>{{ $request->email }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Phone:</th>
-                                                                                <td>{{ $request->phone }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Address:</th>
-                                                                                <td>{{ $request->address }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Housing Type:</th>
-                                                                                <td>{{ ucfirst($request->housing_type) }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Own/Rent:</th>
-                                                                                <td>{{ ucfirst($request->own_or_rent) }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Has Yard:</th>
-                                                                                <td>
-                                                                                    @if($request->has_yard)
-                                                                                        <span class="badge bg-success">Yes</span>
-                                                                                    @else
-                                                                                        <span class="badge bg-secondary">No</span>
-                                                                                    @endif
-                                                                                </td>
-                                                                            </tr>
-                                                                            @if($request->own_or_rent === 'rent')
-                                                                                <tr>
-                                                                                    <th>Landlord Approval:</th>
-                                                                                    <td>
-                                                                                        @if($request->landlord_approval)
-                                                                                            <span class="badge bg-success">Approved</span>
-                                                                                        @else
-                                                                                            <span class="badge bg-danger">Not Obtained</span>
-                                                                                        @endif
-                                                                                    </td>
-                                                                                </tr>
-                                                                            @endif
-                                                                            <tr>
-                                                                                <th>Hours Alone:</th>
-                                                                                <td>{{ $request->hours_alone }} hours/day</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Home Visit:</th>
-                                                                                <td>
-                                                                                    @if($request->agree_to_home_visit)
-                                                                                        <span class="badge bg-success">Agreed</span>
-                                                                                    @else
-                                                                                        <span class="badge bg-warning">Not Agreed</span>
-                                                                                    @endif
-                                                                                </td>
-                                                                            </tr>
-                                                                        </table>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Additional Information -->
-                                                        <div class="row mt-3">
-                                                            <div class="col-md-6">
-                                                                @if($request->current_pets)
-                                                                    <div class="card mb-3">
-                                                                        <div class="card-header">
-                                                                            <strong>Current Pets</strong>
-                                                                        </div>
-                                                                        <div class="card-body">
-                                                                            <p class="mb-0">{{ $request->current_pets }}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                @endif
-
-                                                                @if($request->veterinarian_info)
-                                                                    <div class="card mb-3">
-                                                                        <div class="card-header">
-                                                                            <strong>Veterinarian Information</strong>
-                                                                        </div>
-                                                                        <div class="card-body">
-                                                                            <p class="mb-0">{{ $request->veterinarian_info }}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                @endif
-                                                            </div>
-
-                                                            <div class="col-md-6">
-                                                                @if($request->experience_with_pets)
-                                                                    <div class="card mb-3">
-                                                                        <div class="card-header">
-                                                                            <strong>Experience with Pets</strong>
-                                                                        </div>
-                                                                        <div class="card-body">
-                                                                            <p class="mb-0">{{ $request->experience_with_pets }}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                @endif
-
-                                                                <div class="card mb-3">
-                                                                    <div class="card-header">
-                                                                        <strong>Reason for Adoption</strong>
-                                                                    </div>
-                                                                    <div class="card-body">
-                                                                        <p class="mb-0">{{ $request->reason_for_adoption }}</p>
-                                                                    </div>
-                                                                </div>
-
-                                                                @if($request->additional_info)
-                                                                    <div class="card mb-3">
-                                                                        <div class="card-header">
-                                                                            <strong>Additional Information</strong>
-                                                                        </div>
-                                                                        <div class="card-body">
-                                                                            <p class="mb-0">{{ $request->additional_info }}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-
-                                                        <hr>
-
-                                                        <!-- Screening Form -->
-                                                        <form action="{{ route('admin.adoption-requests.screen', $request) }}" method="POST">
-                                                            @csrf
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-bold">Screening Notes <span class="text-danger">*</span></label>
-                                                                <textarea name="admin_screening_notes" 
-                                                                          class="form-control" 
-                                                                          rows="5" 
-                                                                          required
-                                                                          placeholder="Document your screening assessment including:&#10;- Background check results&#10;- Residence verification&#10;- Financial capability&#10;- Experience assessment&#10;- Overall readiness for adoption"></textarea>
-                                                            </div>
-
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-bold">Decision <span class="text-danger">*</span></label>
-                                                                <div class="btn-group w-100" role="group">
-                                                                    <input type="radio" class="btn-check" name="action" value="approve" id="approve{{ $request->id }}" required>
-                                                                    <label class="btn btn-outline-success" for="approve{{ $request->id }}">
-                                                                        <i class="fas fa-check me-1"></i>Approve for Vet Orientation
-                                                                    </label>
-                                                                    
-                                                                    <input type="radio" class="btn-check" name="action" value="reject" id="reject{{ $request->id }}">
-                                                                    <label class="btn btn-outline-danger" for="reject{{ $request->id }}">
-                                                                        <i class="fas fa-times me-1"></i>Reject Application
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-
-                                                            <div id="rejectionReason{{ $request->id }}" style="display: none;">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label fw-bold">Rejection Reason <span class="text-danger">*</span></label>
-                                                                    <textarea name="admin_screening_rejection" 
-                                                                              class="form-control" 
-                                                                              rows="4" 
-                                                                              placeholder="Provide detailed reasons for rejection. This will be shared with the applicant."></textarea>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="d-flex justify-content-end gap-2">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                <button type="submit" class="btn btn-primary">
-                                                                    <i class="fas fa-save me-1"></i>Submit Screening
-                                                                </button>
-                                                            </div>
-                                                        </form>
+                                                    <div class="info-item">
+                                                        <span class="info-label">Email:</span>
+                                                        <span>{{ $request->email }}</span>
+                                                    </div>
+                                                    <div class="info-item">
+                                                        <span class="info-label">Phone:</span>
+                                                        <span>{{ $request->phone }}</span>
+                                                    </div>
+                                                    <div class="info-item">
+                                                        <span class="info-label">Address:</span>
+                                                        <span>{{ $request->address }}</span>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold mb-3">Housing Information</h6>
+                                                <div class="info-group">
+                                                    <div class="info-item">
+                                                        <span class="info-label">Type:</span>
+                                                        <span>{{ ucfirst($request->housing_type) }}</span>
+                                                    </div>
+                                                    <div class="info-item">
+                                                        <span class="info-label">Has Yard:</span>
+                                                        <span>{{ $request->has_yard ? 'Yes' : 'No' }}</span>
+                                                    </div>
+                                                    <div class="info-item">
+                                                        <span class="info-label">Own/Rent:</span>
+                                                        <span>{{ ucfirst($request->own_or_rent) }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <h6 class="fw-bold mb-3">Adoption Reason</h6>
+                                                <p>{{ $request->reason_for_adoption }}</p>
+                                            </div>
+                                            @if($request->current_pets)
+                                            <div class="col-12">
+                                                <h6 class="fw-bold mb-3">Current Pets</h6>
+                                                <p>{{ $request->current_pets }}</p>
+                                            </div>
+                                            @endif
                                         </div>
-
-                                        <script>
-                                            document.getElementById('reject{{ $request->id }}').addEventListener('change', function() {
-                                                document.getElementById('rejectionReason{{ $request->id }}').style.display = 'block';
-                                                document.querySelector('#rejectionReason{{ $request->id }} textarea').required = true;
-                                            });
-                                            document.getElementById('approve{{ $request->id }}').addEventListener('change', function() {
-                                                document.getElementById('rejectionReason{{ $request->id }}').style.display = 'none';
-                                                document.querySelector('#rejectionReason{{ $request->id }} textarea').required = false;
-                                            });
-                                        </script>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        @if($request->status === 'pending')
+                                        <form action="{{ route('admin.adoption-requests.approve', $request) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-check me-2"></i>Approve
+                                            </button>
+                                        </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="mt-3">
-                            {{ $adoptionRequests->links() }}
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-user-check fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No Pending Screenings</h5>
-                            <p class="text-muted">All adoption applications have been screened.</p>
-                        </div>
-                    @endif
-                </div>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
+
+        <!-- Pagination -->
+        @if($adoptionRequests->hasPages())
+        <div class="mt-4">
+            {{ $adoptionRequests->links() }}
+        </div>
+        @endif
+
+        @else
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <h3 class="empty-state-title">No Pending Screenings</h3>
+            <p class="empty-state-text">There are no adoption applications pending screening at this time.</p>
+        </div>
+        @endif
     </div>
 </div>
+
+<style>
+:root {
+    --primary: #2563eb;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --dark: #1e293b;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-600: #475569;
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.admin-screening-page {
+    background: var(--gray-50);
+    min-height: 100vh;
+}
+
+.page-header {
+    animation: fadeInDown 0.5s ease-out;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.page-subtitle {
+    color: var(--gray-600);
+}
+
+.table-card {
+    border: none;
+    box-shadow: var(--shadow-md);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.table thead th {
+    background: var(--gray-100);
+    color: var(--dark);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.pet-thumb-sm {
+    width: 40px;
+    height: 40px;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pet-thumb-sm img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pet-thumb-sm i {
+    color: var(--gray-600);
+}
+
+.info-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.info-item {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.info-label {
+    font-weight: 600;
+    color: var(--dark);
+    min-width: 100px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.empty-state-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-100);
+    border-radius: 50%;
+}
+
+.empty-state-icon i {
+    font-size: 2.5rem;
+    color: var(--gray-600);
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.empty-state-text {
+    color: var(--gray-600);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
 @endsection
