@@ -228,7 +228,7 @@ class AdoptionController extends Controller
         $validated = $request->validate([
             'admin_screening_notes' => 'required|string|max:2000',
             'action' => 'required|in:approve,reject',
-            'admin_screening_rejection' => 'required_if:action,reject|string|max:1000'
+            'admin_screening_rejection' => 'required_if:action,reject|nullable|string|max:1000'
         ]);
         
         $adoptionRequest->admin_screened = true;
@@ -240,7 +240,7 @@ class AdoptionController extends Controller
             $adoptionRequest->status = 'vet_orientation';
         } else {
             $adoptionRequest->status = 'admin_rejected';
-            $adoptionRequest->admin_screening_rejection = $validated['admin_screening_rejection'];
+            $adoptionRequest->admin_screening_rejection = $validated['admin_screening_rejection'] ?? null;
         }
         
         $adoptionRequest->save();
@@ -320,6 +320,27 @@ class AdoptionController extends Controller
     }
     
     /**
+     * Get adoption request details
+     */
+    public function getRequestDetails(\App\Models\AdoptionRequest $adoptionRequest)
+    {
+        return response()->json([
+            'full_name' => $adoptionRequest->full_name,
+            'email' => $adoptionRequest->email,
+            'phone' => $adoptionRequest->phone,
+            'address' => $adoptionRequest->address,
+            'housing_type' => $adoptionRequest->housing_type,
+            'has_yard' => $adoptionRequest->has_yard,
+            'own_or_rent' => $adoptionRequest->own_or_rent,
+            'current_pets' => $adoptionRequest->current_pets,
+            'experience_with_pets' => $adoptionRequest->experience_with_pets,
+            'reason_for_adoption' => $adoptionRequest->reason_for_adoption,
+            'admin_screening_notes' => $adoptionRequest->admin_screening_notes,
+            'vet_orientation_notes' => $adoptionRequest->vet_orientation_notes,
+        ]);
+    }
+    
+    /**
      * Approve an adoption request
      */
     public function approveRequest(Request $request, \App\Models\AdoptionRequest $adoptionRequest)
@@ -364,6 +385,24 @@ class AdoptionController extends Controller
             'success' => true,
             'message' => 'Adoption request approved successfully! Adoption agreement created.'
         ]);
+    }
+    
+    /**
+     * Reject an adoption request
+     */
+    public function rejectRequest(Request $request, \App\Models\AdoptionRequest $adoptionRequest)
+    {
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|max:1000'
+        ]);
+        
+        $adoptionRequest->status = 'rejected';
+        $adoptionRequest->rejection_reason = $validated['rejection_reason'];
+        $adoptionRequest->rejected_by = auth()->id();
+        $adoptionRequest->rejected_at = now();
+        $adoptionRequest->save();
+        
+        return redirect()->back()->with('success', 'Adoption request rejected.');
     }
     
     /**

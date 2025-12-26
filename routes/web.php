@@ -65,6 +65,7 @@ Route::prefix('vet')->name('vet.')->middleware(['can:isVet', 'vet.verified'])->g
     Route::post('/adoptions/{adoption}/reject-listing', [VetController::class, 'rejectPetListing'])->name('adoptions.reject');
     Route::get('/adoptions/orientations', [VetController::class, 'pendingOrientations'])->name('adoptions.orientations');
     Route::post('/adoption-requests/{adoptionRequest}/orientation', [VetController::class, 'conductOrientation'])->name('adoptions.orientation.conduct');
+    Route::post('/adoption-requests/{adoptionRequest}/complete-orientation', [VetController::class, 'completeOrientation'])->name('adoptions.complete-orientation');
     Route::post('/adoption-agreements/{agreement}/final-clearance', [VetController::class, 'provideFinalClearance'])->name('adoptions.final-clearance');
 
 });
@@ -121,6 +122,7 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     Route::get('admin/adoption-requests/pending-screening', [AdoptionController::class, 'pendingScreenings'])->name('admin.adoption-requests.screening');
     Route::post('admin/adoption-requests/{adoptionRequest}/screen', [AdoptionController::class, 'screenAdopter'])->name('admin.adoption-requests.screen');
     Route::get('admin/adoption-requests/pending-final-approval', [AdoptionController::class, 'pendingFinalApproval'])->name('admin.adoption-requests.final-approval');
+    Route::get('admin/adoption-requests/{adoptionRequest}/details', [AdoptionController::class, 'getRequestDetails'])->name('admin.adoption-requests.details');
     Route::post('admin/adoption-requests/{adoptionRequest}/approve', [AdoptionController::class, 'approveRequest'])->name('admin.adoption-requests.approve');
     Route::post('admin/adoption-requests/{adoptionRequest}/reject', [AdoptionController::class, 'rejectRequest'])->name('admin.adoption-requests.reject');
     Route::post('admin/adoption-requests/{adoptionRequest}/schedule-interview', [AdoptionController::class, 'scheduleInterview'])->name('admin.adoption-requests.schedule-interview');

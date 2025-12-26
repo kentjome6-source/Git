@@ -96,12 +96,9 @@
                             <a href="{{ route('messages.conversation', $request->adopter) }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-comment me-2"></i>Message Adopter
                             </a>
-                            <form action="{{ route('vet.adoptions.complete-orientation', $request) }}" method="POST" class="d-inline">
-                                @csrf
-                                <button type="submit" class="btn btn-success btn-sm">
-                                    <i class="fas fa-check me-2"></i>Complete Orientation
-                                </button>
-                            </form>
+                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#completeOrientationModal{{ $request->id }}">
+                                <i class="fas fa-check me-2"></i>Complete Orientation
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -181,13 +178,56 @@
                                 <a href="{{ route('messages.conversation', $request->adopter) }}" class="btn btn-primary">
                                     <i class="fas fa-comment me-2"></i>Message Adopter
                                 </a>
-                                <form action="{{ route('vet.adoptions.complete-orientation', $request) }}" method="POST" class="d-inline">
-                                    @csrf
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Complete Orientation Modal -->
+                <div class="modal fade" id="completeOrientationModal{{ $request->id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="{{ route('vet.adoptions.complete-orientation', $request) }}" method="POST">
+                                @csrf
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Complete Orientation</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Please provide notes about the orientation session with {{ $request->full_name }}.
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="vet_orientation_notes{{ $request->id }}" class="form-label">Orientation Notes <span class="text-danger">*</span></label>
+                                        <textarea 
+                                            class="form-control" 
+                                            id="vet_orientation_notes{{ $request->id }}" 
+                                            name="vet_orientation_notes" 
+                                            rows="4" 
+                                            required
+                                            placeholder="Document the orientation session, topics covered, adopter's understanding, concerns addressed, etc."
+                                        ></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="vet_orientation_date{{ $request->id }}" class="form-label">Orientation Date <span class="text-danger">*</span></label>
+                                        <input 
+                                            type="date" 
+                                            class="form-control" 
+                                            id="vet_orientation_date{{ $request->id }}" 
+                                            name="vet_orientation_date" 
+                                            value="{{ date('Y-m-d') }}"
+                                            required
+                                        >
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                     <button type="submit" class="btn btn-success">
                                         <i class="fas fa-check me-2"></i>Complete Orientation
                                     </button>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

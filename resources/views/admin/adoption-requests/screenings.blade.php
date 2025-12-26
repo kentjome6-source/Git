@@ -81,18 +81,9 @@
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     @if($request->status === 'pending')
-                                    <form action="{{ route('admin.adoption-requests.approve', $request) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-success" title="Approve">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    </form>
-                                    <form action="{{ route('admin.adoption-requests.reject', $request) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Reject">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#screenModal{{ $request->id }}" title="Screen Application">
+                                        <i class="fas fa-check"></i>
+                                    </button>
                                     @endif
                                     <a href="{{ route('messages.conversation', $request->adopter) }}" class="btn btn-sm btn-primary" title="Message Adopter">
                                         <i class="fas fa-comment"></i>
@@ -167,12 +158,9 @@
                                             <i class="fas fa-comment me-2"></i>Message Adopter
                                         </a>
                                         @if($request->status === 'pending')
-                                        <form action="{{ route('admin.adoption-requests.approve', $request) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-success">
-                                                <i class="fas fa-check me-2"></i>Approve
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#screenModal{{ $request->id }}">
+                                            <i class="fas fa-check me-2"></i>Screen Application
+                                        </button>
                                         @endif
                                     </div>
                                 </div>
@@ -183,6 +171,61 @@
                 </table>
             </div>
         </div>
+
+        <!-- Screen Modals -->
+        @foreach($adoptionRequests as $request)
+        <div class="modal fade" id="screenModal{{ $request->id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Screen Application - {{ $request->full_name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="{{ route('admin.adoption-requests.screen', $request) }}" method="POST">
+                        @csrf
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Screening Notes <span class="text-danger">*</span></label>
+                                <textarea name="admin_screening_notes" class="form-control" rows="4" required 
+                                    placeholder="Enter your screening notes (background check, requirements verification, etc.)"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Decision <span class="text-danger">*</span></label>
+                                <select name="action" class="form-select" required onchange="toggleRejectionField{{ $request->id }}(this)">
+                                    <option value="">Select decision</option>
+                                    <option value="approve">Approve for Vet Orientation</option>
+                                    <option value="reject">Reject Application</option>
+                                </select>
+                            </div>
+                            <div class="mb-3 d-none" id="rejectionField{{ $request->id }}">
+                                <label class="form-label fw-bold">Rejection Reason <span class="text-danger">*</span></label>
+                                <textarea name="admin_screening_rejection" class="form-control" rows="3" 
+                                    placeholder="Explain why this application is being rejected"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit Screening</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+        function toggleRejectionField{{ $request->id }}(select) {
+            const field = document.getElementById('rejectionField{{ $request->id }}');
+            const textarea = field.querySelector('textarea');
+            if (select.value === 'reject') {
+                field.classList.remove('d-none');
+                textarea.required = true;
+            } else {
+                field.classList.add('d-none');
+                textarea.required = false;
+            }
+        }
+        </script>
+        @endforeach
 
         <!-- Pagination -->
         @if($adoptionRequests->hasPages())

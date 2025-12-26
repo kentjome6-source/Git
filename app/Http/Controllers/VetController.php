@@ -186,6 +186,14 @@ class VetController extends Controller
     }
     
     /**
+     * Complete orientation - alias for conductOrientation
+     */
+    public function completeOrientation(Request $request, \App\Models\AdoptionRequest $adoptionRequest)
+    {
+        return $this->conductOrientation($request, $adoptionRequest);
+    }
+    
+    /**
      * Provide final medical clearance for adoption
      */
     public function provideFinalClearance(Request $request, \App\Models\AdoptionAgreement $agreement)
