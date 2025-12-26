@@ -13,6 +13,8 @@
 
     {{-- ✅ Bootstrap CSS --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    {{-- Responsive CSS --}}
+    <link href="{{ asset('css/responsive.css') }}" rel="stylesheet">
     {{-- Vite --}}
     @vite(['resources/js/app.js'])
 
@@ -230,8 +232,15 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 998;
+            background: rgba(0,0,0,0.4);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .overlay.active {
+            display: block;
+            opacity: 1;
         }
         
         /* Prevent background scrolling when sidebar is open on mobile */
@@ -247,7 +256,8 @@
             
             .sidebar {
                 transform: translateX(-100%);
-                width: 250px; /* Keep fixed width even on mobile */
+                width: 280px;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.2);
             }
             
             .sidebar.active {
@@ -263,10 +273,6 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-            }
-            
-            .overlay.active {
-                display: block;
             }
             
             h1, .h1 { font-size: 2rem; }

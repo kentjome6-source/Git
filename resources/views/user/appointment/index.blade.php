@@ -150,6 +150,15 @@
                                     View Details
                                 </a>
                                 
+                                @if($appointment->vet)
+                                    <a href="{{ route('messages.index', ['user_id' => $appointment->vet_id]) }}" class="btn-message">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                        </svg>
+                                        Message Vet
+                                    </a>
+                                @endif
+                                
                                 @if($appointment->status === 'pending')
                                     <button type="button" class="btn-edit" 
                                             onclick="openEditModal({{ $appointment->id }})">
@@ -752,6 +761,7 @@
     }
 
     .btn-view,
+    .btn-message,
     .btn-edit {
         display: flex;
         align-items: center;
@@ -776,6 +786,19 @@
         background: #7c3aed;
         transform: translateY(-1px);
         color: white;
+    }
+
+    .btn-message {
+        background: white;
+        color: var(--blue);
+        border: 1px solid var(--blue);
+        text-decoration: none;
+    }
+
+    .btn-message:hover {
+        background: var(--blue);
+        color: white;
+        transform: translateY(-1px);
     }
 
     .btn-edit {

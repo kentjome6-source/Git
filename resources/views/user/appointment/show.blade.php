@@ -116,6 +116,12 @@
                             @if($appointment->vet_notes)
                                 <p><strong>Vet Notes:</strong> {{ $appointment->vet_notes }}</p>
                             @endif
+                            
+                            <div class="mt-3">
+                                <a href="{{ route('messages.index', ['user_id' => $appointment->vet_id]) }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-comments me-2"></i>Message Veterinarian
+                                </a>
+                            </div>
                         @else
                             <div class="alert alert-warning">
                                 <i class="fas fa-hourglass-half me-2"></i>
@@ -137,6 +143,12 @@
                         <p><strong>Phone:</strong> {{ $appointment->owner_phone }}</p>
                         <p><strong>Email:</strong> {{ $appointment->email }}</p>
                         <p><strong>Address:</strong> {{ $appointment->owner_address ?? '' }}</p>
+                        
+                        <div class="mt-3">
+                            <a href="{{ route('vet.messages.index', ['user_id' => $appointment->user_id]) }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-comments me-2"></i>Message Pet Owner
+                            </a>
+                        </div>
                     </div>
                 </div>
             @endif

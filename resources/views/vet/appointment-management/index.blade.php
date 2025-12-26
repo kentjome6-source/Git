@@ -82,6 +82,10 @@
             <i class="fas fa-eye"></i> View
         </a>
         
+        <a href="{{ route('vet.messages.index', ['user_id' => $appointment->user_id]) }}" class="btn btn-primary btn-sm me-1" title="Message Owner">
+            <i class="fas fa-comments"></i> Message
+        </a>
+        
         {{-- Show Accept/Reject buttons for pending appointments --}}
         @if($appointment->status === 'pending')
             <form action="{{ route('vet.appointments.accept', $appointment) }}" method="POST" class="d-inline">
@@ -208,6 +212,10 @@
                                     <div class="swipeable-actions">
                                         <a href="{{ route('vet.appointments.show', $appointment) }}" class="btn btn-info btn-sm" title="View Details">
                                             <i class="fas fa-eye"></i> View
+                                        </a>
+                                        
+                                        <a href="{{ route('vet.messages.index', ['user_id' => $appointment->user_id]) }}" class="btn btn-primary btn-sm" title="Message Owner">
+                                            <i class="fas fa-comments"></i> Message
                                         </a>
                                         
                                         {{-- Show Accept/Reject buttons for pending appointments --}}

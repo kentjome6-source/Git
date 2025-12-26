@@ -1,0 +1,400 @@
+/* ========================================
+   RESPONSIVE DESIGN - MOBILE FIRST
+   ======================================== */
+
+/* ========================================
+   MOBILE DEVICES (up to 576px)
+   ======================================== */
+@media (max-width: 576px) {
+    /* Typography adjustments */
+    html {
+        font-size: 14px;
+    }
+    
+    h1, .page-title {
+        font-size: 1.5rem !important;
+    }
+    
+    h2 {
+        font-size: 1.3rem !important;
+    }
+    
+    h3 {
+        font-size: 1.15rem !important;
+    }
+    
+    .page-subtitle {
+        font-size: 0.85rem !important;
+    }
+    
+    /* Container padding */
+    .container-fluid {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+    
+    /* Page header */
+    .page-header .header-content {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 15px !important;
+    }
+    
+    .header-actions {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+    
+    .header-actions .btn,
+    .header-actions a {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Button adjustments */
+    .btn {
+        padding: 10px 15px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .btn-sm {
+        padding: 8px 12px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    /* Cards and grids */
+    .pets-grid,
+    .posts-container,
+    .appointments-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    
+    .card {
+        margin-bottom: 15px;
+    }
+    
+    .card-body {
+        padding: 15px !important;
+    }
+    
+    /* Tables */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 10px 8px !important;
+        white-space: nowrap;
+    }
+    
+    /* Hide some table columns on mobile */
+    .table .hide-mobile {
+        display: none !important;
+    }
+    
+    /* Forms */
+    .form-label {
+        font-size: 0.9rem !important;
+        margin-bottom: 5px !important;
+    }
+    
+    .form-control,
+    .form-select {
+        font-size: 0.9rem !important;
+        padding: 10px 12px !important;
+    }
+    
+    .input-group-text {
+        padding: 10px 12px !important;
+    }
+    
+    /* Filter cards */
+    .filter-card .row {
+        gap: 10px !important;
+    }
+    
+    .filter-card .col-md-2,
+    .filter-card .col-md-3,
+    .filter-card .col-md-4 {
+        width: 100%;
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    /* Modals */
+    .modal-dialog {
+        margin: 10px !important;
+        max-width: calc(100% - 20px) !important;
+    }
+    
+    .modal-body {
+        padding: 20px 15px !important;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+    }
+    
+    /* Pet cards */
+    .pet-card {
+        margin-bottom: 15px;
+    }
+    
+    .pet-card-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .pet-card-actions .btn {
+        width: 100%;
+    }
+    
+    /* Adoption cards */
+    .adoption-card {
+        flex-direction: column;
+    }
+    
+    .adoption-card-image {
+        width: 100% !important;
+        height: 200px !important;
+    }
+    
+    .adoption-card-content {
+        width: 100% !important;
+    }
+    
+    /* Status badges */
+    .badge {
+        font-size: 0.75rem !important;
+        padding: 4px 8px !important;
+    }
+    
+    /* Messages/Chat */
+    .conversations-list {
+        height: 300px !important;
+    }
+    
+    .chat-messages {
+        height: 400px !important;
+    }
+    
+    .message-bubble {
+        max-width: 85% !important;
+    }
+    
+    /* Search and filters */
+    .search-filters {
+        flex-direction: column !important;
+    }
+    
+    /* Stats cards */
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Image uploads */
+    .image-preview {
+        max-width: 100% !important;
+    }
+    
+    /* Navigation tabs */
+    .nav-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .nav-tabs .nav-link {
+        font-size: 0.85rem !important;
+        padding: 8px 12px !important;
+    }
+    
+    /* Alerts */
+    .alert {
+        font-size: 0.9rem !important;
+        padding: 12px !important;
+    }
+    
+    /* Pagination */
+    .pagination {
+        font-size: 0.85rem !important;
+    }
+    
+    .pagination .page-link {
+        padding: 6px 10px !important;
+    }
+}
+
+/* ========================================
+   TABLET DEVICES (577px to 768px)
+   ======================================== */
+@media (min-width: 577px) and (max-width: 768px) {
+    html {
+        font-size: 15px;
+    }
+    
+    h1, .page-title {
+        font-size: 1.8rem !important;
+    }
+    
+    .pets-grid,
+    .posts-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .appointments-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .container-fluid {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+    
+    .table th,
+    .table td {
+        padding: 12px 10px !important;
+    }
+}
+
+/* ========================================
+   MEDIUM DEVICES (769px to 992px)
+   ======================================== */
+@media (min-width: 769px) and (max-width: 992px) {
+    .pets-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .posts-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .appointments-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* ========================================
+   LARGE DEVICES (993px to 1200px)
+   ======================================== */
+@media (min-width: 993px) and (max-width: 1200px) {
+    .pets-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+    
+    .posts-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* ========================================
+   EXTRA LARGE DEVICES (1201px+)
+   ======================================== */
+@media (min-width: 1201px) {
+    .pets-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+    
+    .posts-container {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+/* ========================================
+   LANDSCAPE MODE ADJUSTMENTS
+   ======================================== */
+@media (max-width: 768px) and (orientation: landscape) {
+    .conversations-list {
+        height: 250px !important;
+    }
+    
+    .chat-messages {
+        height: 300px !important;
+    }
+    
+    .modal-dialog {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
+
+/* ========================================
+   TOUCH DEVICE OPTIMIZATIONS
+   ======================================== */
+@media (hover: none) and (pointer: coarse) {
+    /* Larger touch targets */
+    .btn,
+    .menu-link,
+    .nav-link {
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+    
+    /* Remove hover effects */
+    .btn:hover,
+    .menu-link:hover,
+    .card:hover {
+        transform: none !important;
+    }
+    
+    /* Add active states for touch feedback */
+    .btn:active {
+        transform: scale(0.98);
+    }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+@media print {
+    .sidebar,
+    .header-actions,
+    .btn,
+    .modal,
+    .alert {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    
+    .card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+
+/* ========================================
+   DARK MODE SUPPORT (Optional)
+   ======================================== */
+@media (prefers-color-scheme: dark) {
+    /* Add dark mode styles if needed in the future */
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
