@@ -23,51 +23,55 @@ window.Toast = Toast;
 /**
  * Show success message
  */
-window.showSuccess = function(message, title = 'Success!') {
+const showSuccess = function(message, title = 'Success!') {
     Toast.fire({
         icon: 'success',
         title: title,
         text: message
     });
 };
+window.showSuccess = showSuccess;
 
 /**
  * Show error message
  */
-window.showError = function(message, title = 'Error!') {
+const showError = function(message, title = 'Error!') {
     Toast.fire({
         icon: 'error',
         title: title,
         text: message
     });
 };
+window.showError = showError;
 
 /**
  * Show info message
  */
-window.showInfo = function(message, title = 'Info') {
+const showInfo = function(message, title = 'Info') {
     Toast.fire({
         icon: 'info',
         title: title,
         text: message
     });
 };
+window.showInfo = showInfo;
 
 /**
  * Show warning message
  */
-window.showWarning = function(message, title = 'Warning!') {
+const showWarning = function(message, title = 'Warning!') {
     Toast.fire({
         icon: 'warning',
         title: title,
         text: message
     });
 };
+window.showWarning = showWarning;
 
 /**
  * Show confirmation dialog
  */
-window.showConfirm = function(message, title = 'Are you sure?', confirmButtonText = 'Yes', cancelButtonText = 'No') {
+const showConfirm = function(message, title = 'Are you sure?', confirmButtonText = 'Yes', cancelButtonText = 'No') {
     return Swal.fire({
         title: title,
         text: message,
@@ -80,11 +84,12 @@ window.showConfirm = function(message, title = 'Are you sure?', confirmButtonTex
         reverseButtons: true
     });
 };
+window.showConfirm = showConfirm;
 
 /**
  * Show delete confirmation
  */
-window.showDeleteConfirm = function(itemName = 'this item') {
+const showDeleteConfirm = function(itemName = 'this item') {
     return Swal.fire({
         title: 'Are you sure?',
         text: `Do you want to delete ${itemName}? This action cannot be undone!`,
@@ -97,11 +102,12 @@ window.showDeleteConfirm = function(itemName = 'this item') {
         reverseButtons: true
     });
 };
+window.showDeleteConfirm = showDeleteConfirm;
 
 /**
  * Show loading spinner
  */
-window.showLoading = function(message = 'Please wait...') {
+const showLoading = function(message = 'Please wait...') {
     Swal.fire({
         title: message,
         allowOutsideClick: false,
@@ -111,18 +117,20 @@ window.showLoading = function(message = 'Please wait...') {
         }
     });
 };
+window.showLoading = showLoading;
 
 /**
  * Close loading spinner
  */
-window.closeLoading = function() {
+const closeLoading = function() {
     Swal.close();
 };
+window.closeLoading = closeLoading;
 
 /**
  * Show modal with custom content
  */
-window.showModal = function(title, content, options = {}) {
+const showModal = function(title, content, options = {}) {
     return Swal.fire({
         title: title,
         html: content,
@@ -134,11 +142,12 @@ window.showModal = function(title, content, options = {}) {
         ...options
     });
 };
+window.showModal = showModal;
 
 /**
  * Universal Form Modal Handler
  */
-window.openFormModal = function(url, title, onSuccess = null) {
+const openFormModal = function(url, title, onSuccess = null) {
     showLoading('Loading form...');
     
     fetch(url)
@@ -241,7 +250,7 @@ window.openFormModal = function(url, title, onSuccess = null) {
 /**
  * Handle delete action with confirmation
  */
-window.handleDelete = function(url, itemName = 'this item', onSuccess = null) {
+const handleDelete = function(url, itemName = 'this item', onSuccess = null) {
     showDeleteConfirm(itemName).then((result) => {
         if (result.isConfirmed) {
             showLoading('Deleting...');
@@ -278,6 +287,7 @@ window.handleDelete = function(url, itemName = 'this item', onSuccess = null) {
         }
     });
 };
+window.handleDelete = handleDelete;
 
 /**
  * Replace all standard alerts on page load

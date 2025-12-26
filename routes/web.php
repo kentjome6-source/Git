@@ -202,6 +202,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('appointments', AppointmentController::class);
     
     // Adoption Routes
+    Route::get('/adoptions/my-applications', [UserAdoptionController::class, 'myApplications'])->name('adoptions.my-applications');
     Route::get('/adoptions/history', [UserAdoptionController::class, 'history'])->name('adoptions.history');
     Route::get('/adoptions/followups', [UserAdoptionController::class, 'viewFollowups'])->name('adoptions.followups');
     Route::resource('adoptions', UserAdoptionController::class);

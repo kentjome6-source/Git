@@ -395,6 +395,65 @@
 {{-- Bootstrap JS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+{{-- SweetAlert2 JS --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{{-- SweetAlert2 Helper Functions --}}
+<script>
+    function showSuccess(message) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: message,
+            confirmButtonColor: '#10b981',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    function showError(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: message,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    function showWarning(message) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Warning!',
+            text: message,
+            confirmButtonColor: '#f59e0b',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    function showInfo(message) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Information',
+            text: message,
+            confirmButtonColor: '#3b82f6',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    function showConfirm(message, title = 'Are you sure?', confirmText = 'Yes', cancelText = 'No') {
+        return Swal.fire({
+            title: title,
+            text: message,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3b82f6',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: confirmText,
+            cancelButtonText: cancelText
+        });
+    }
+</script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const menuToggle = document.getElementById('menu-toggle');

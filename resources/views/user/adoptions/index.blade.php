@@ -246,12 +246,16 @@ function openImageModal(src) {
 }
 
 function handleAdoptSubmit(adoptionId, petName) {
-    showConfirm(
-        `Do you want to submit an adoption application for ${petName}? You'll need to fill out an application form.`,
-        'Submit Application?',
-        'Continue',
-        'Cancel'
-    ).then((result) => {
+    Swal.fire({
+        title: 'Submit Application?',
+        text: `Do you want to submit an adoption application for ${petName}? You'll need to fill out an application form.`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Continue',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
         if (result.isConfirmed) {
             // Redirect to application page or show application form
             window.location.href = `/adoptions/${adoptionId}`;

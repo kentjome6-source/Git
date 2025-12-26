@@ -195,20 +195,171 @@
                                 </a>
                             </div>
                         @elseif($adoption->isAvailable())
-                            <!-- Other user actions -->
-                            <div class="d-flex gap-2 flex-wrap mt-3 adoption-detail-buttons">
-                                <form action="{{ route('adoptions.adopt', $adoption) }}" method="POST" class="d-inline">
+                            <!-- Other user actions - Show Application Form -->
+                            <div class="mt-4">
+                                <h4>Adoption Application Form</h4>
+                                <p class="text-muted">Please fill out this application to adopt {{ $adoption->pet_name }}</p>
+                                
+                                <form action="{{ route('adoptions.adopt', $adoption) }}" method="POST" id="adoptionApplicationForm">
                                     @csrf
-                                    <button type="submit" class="btn btn-success adopt-btn" 
-                                            onclick="return confirm('Are you sure you want to adopt {{ $adoption->pet_name }}?')"
-                                            aria-label="Adopt {{ $adoption->pet_name }}">
-                                        <i class="fas fa-paw me-2" aria-hidden="true"></i>Adopt Pet
-                                    </button>
+                                    
+                                    <!-- Personal Information -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">Personal Information</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="full_name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" id="full_name" name="full_name" required value="{{ old('full_name', auth()->user()->name) }}">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                                    <input type="email" class="form-control" id="email" name="email" required value="{{ old('email', auth()->user()->email) }}">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                                    <input type="tel" class="form-control" id="phone" name="phone" required value="{{ old('phone') }}">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
+                                                    <textarea class="form-control" id="address" name="address" rows="2" required>{{ old('address') }}</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Housing Information -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-info text-white">
+                                            <h5 class="mb-0">Housing Information</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="housing_type" class="form-label">Housing Type <span class="text-danger">*</span></label>
+                                                    <select class="form-select" id="housing_type" name="housing_type" required>
+                                                        <option value="">Select...</option>
+                                                        <option value="house" {{ old('housing_type') == 'house' ? 'selected' : '' }}>House</option>
+                                                        <option value="apartment" {{ old('housing_type') == 'apartment' ? 'selected' : '' }}>Apartment</option>
+                                                        <option value="condo" {{ old('housing_type') == 'condo' ? 'selected' : '' }}>Condo</option>
+                                                        <option value="other" {{ old('housing_type') == 'other' ? 'selected' : '' }}>Other</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="has_yard" class="form-label">Do you have a yard? <span class="text-danger">*</span></label>
+                                                    <select class="form-select" id="has_yard" name="has_yard" required>
+                                                        <option value="">Select...</option>
+                                                        <option value="1" {{ old('has_yard') == '1' ? 'selected' : '' }}>Yes</option>
+                                                        <option value="0" {{ old('has_yard') == '0' ? 'selected' : '' }}>No</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="own_or_rent" class="form-label">Do you own or rent? <span class="text-danger">*</span></label>
+                                                    <select class="form-select" id="own_or_rent" name="own_or_rent" required onchange="toggleLandlordApproval()">
+                                                        <option value="">Select...</option>
+                                                        <option value="own" {{ old('own_or_rent') == 'own' ? 'selected' : '' }}>Own</option>
+                                                        <option value="rent" {{ old('own_or_rent') == 'rent' ? 'selected' : '' }}>Rent</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row" id="landlord_approval_field" style="display: none;">
+                                                <div class="col-12 mb-3">
+                                                    <label for="landlord_approval" class="form-label">Landlord Approval <span class="text-danger">*</span></label>
+                                                    <select class="form-select" id="landlord_approval" name="landlord_approval">
+                                                        <option value="">Select...</option>
+                                                        <option value="1" {{ old('landlord_approval') == '1' ? 'selected' : '' }}>Yes, I have landlord approval</option>
+                                                        <option value="0" {{ old('landlord_approval') == '0' ? 'selected' : '' }}>No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Pet Experience -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-success text-white">
+                                            <h5 class="mb-0">Pet Experience</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label for="current_pets" class="form-label">Do you currently have pets? (Please describe)</label>
+                                                <textarea class="form-control" id="current_pets" name="current_pets" rows="2">{{ old('current_pets') }}</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="veterinarian_info" class="form-label">Current Veterinarian Information (if applicable)</label>
+                                                <textarea class="form-control" id="veterinarian_info" name="veterinarian_info" rows="2">{{ old('veterinarian_info') }}</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="experience_with_pets" class="form-label">Previous Experience with Pets</label>
+                                                <textarea class="form-control" id="experience_with_pets" name="experience_with_pets" rows="3">{{ old('experience_with_pets') }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Adoption Details -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-warning text-dark">
+                                            <h5 class="mb-0">Adoption Details</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label for="reason_for_adoption" class="form-label">Why do you want to adopt {{ $adoption->pet_name }}? <span class="text-danger">*</span></label>
+                                                <textarea class="form-control" id="reason_for_adoption" name="reason_for_adoption" rows="3" required>{{ old('reason_for_adoption') }}</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="hours_alone" class="form-label">How many hours per day will the pet be alone?</label>
+                                                <input type="number" class="form-control" id="hours_alone" name="hours_alone" min="0" max="24" value="{{ old('hours_alone', 0) }}">
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="agree_to_home_visit" name="agree_to_home_visit" value="1" required {{ old('agree_to_home_visit') ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="agree_to_home_visit">
+                                                        I agree to a home visit if required <span class="text-danger">*</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="additional_info" class="form-label">Additional Information</label>
+                                                <textarea class="form-control" id="additional_info" name="additional_info" rows="3">{{ old('additional_info') }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Buttons -->
+                                    <div class="d-flex gap-2 flex-wrap justify-content-end">
+                                        <a href="{{ route('adoptions.index') }}" class="btn btn-secondary">Cancel</a>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-paper-plane me-2"></i>Submit Application
+                                        </button>
+                                    </div>
                                 </form>
-                                <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">
-                                    Back to Adoptions
-                                </a>
                             </div>
+                            
+                            <script>
+                                function toggleLandlordApproval() {
+                                    const ownOrRent = document.getElementById('own_or_rent').value;
+                                    const landlordField = document.getElementById('landlord_approval_field');
+                                    const landlordInput = document.getElementById('landlord_approval');
+                                    
+                                    if (ownOrRent === 'rent') {
+                                        landlordField.style.display = 'block';
+                                        landlordInput.required = true;
+                                    } else {
+                                        landlordField.style.display = 'none';
+                                        landlordInput.required = false;
+                                        landlordInput.value = '';
+                                    }
+                                }
+                                
+                                // Initialize on page load
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    toggleLandlordApproval();
+                                });
+                            </script>
                         @else
                             <div class="mt-3">
                                 <a href="{{ route('adoptions.index') }}" class="btn btn-secondary back-btn" role="button" aria-label="Back to Adoptions">Back to Adoptions</a>

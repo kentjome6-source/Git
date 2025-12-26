@@ -155,7 +155,7 @@ class AdoptionController extends Controller
         $adoptionRequest->fill($validated);
         $adoptionRequest->save();
 
-        return redirect()->route('adoptions.index')->with('success', 'Adoption application submitted successfully! The pet owner will review your application.');
+        return redirect()->route('adoptions.my-applications')->with('success', 'Your adoption request is in process. The admin will screen your application and a veterinarian will conduct orientation.');
     }
     
     /**
@@ -413,6 +413,19 @@ class AdoptionController extends Controller
             ->get();
         
         return view('user.adoptions.history', compact('adoptedPetsAsUploader', 'adoptedPetsAsAdopter', 'uploadedPets'));
+    }
+
+    /**
+     * Display the user's adoption applications.
+     */
+    public function myApplications()
+    {
+        $applications = AdoptionRequest::with(['adoption.user', 'adoption.vet', 'adopter'])
+            ->where('adopter_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return view('user.adoptions.my-applications', compact('applications'));
     }
 
     /**
