@@ -11,19 +11,29 @@ class LostFoundController extends Controller
 {
     public function index(Request $request)
     {
-        $query = LostFound::with('user')
-            ->where('is_resolved', false);
+        $query = LostFound::with('user')->where('status', 'approved');
 
         // Apply filter if provided
         if ($request->has('filter') && $request->filter !== 'all') {
-            $query->where('type', $request->filter);
+            if ($request->filter === 'reunited') {
+                // Show only reunited pets
+                $query->where('is_resolved', true);
+            } else {
+                // Show only active pets of specific type (lost/found)
+                $query->where('is_resolved', false)
+                      ->where('type', $request->filter);
+            }
+        } else {
+            // Default: show only active (not resolved) pets
+            $query->where('is_resolved', false);
         }
 
         // Apply sorting
         if ($request->has('sort') && $request->sort === 'oldest') {
             $query->orderBy('created_at', 'asc');
         } else {
-            $query->orderBy('created_at', 'desc');
+            $query->orderBy('is_featured', 'desc')
+                  ->orderBy('created_at', 'desc');
         }
 
         $lostFoundItems = $query->paginate(12);
@@ -91,6 +101,7 @@ class LostFoundController extends Controller
         ]);
         
         $data['user_id'] = Auth::id();
+        $data['status'] = 'pending'; // Requires admin approval
 
         // Handle image upload
         if ($request->hasFile('image')) {
@@ -104,12 +115,12 @@ class LostFoundController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Your ' . $request->type . ' pet listing has been submitted successfully!'
+                'message' => 'Your ' . $request->type . ' pet listing has been submitted and is pending admin approval.'
             ]);
         }
 
         return redirect()->route('pet.lostfound')
-            ->with('success', 'Your ' . $request->type . ' pet listing has been submitted successfully!');
+            ->with('success', 'Your ' . $request->type . ' pet listing has been submitted and is pending admin approval.');
     }
 
     public function show(LostFound $lostFound)
@@ -241,5 +252,12 @@ class LostFoundController extends Controller
             ->paginate(10);
 
         return view('user.lost-found.my-listings', compact('myListings'));
+    }
+
+    public function claim(LostFound $lostFound)
+    {
+        $claims = $lostFound->claims()->with('user')->get();
+        
+        return view('user.lost-found.claim', compact('lostFound', 'claims'));
     }
 }

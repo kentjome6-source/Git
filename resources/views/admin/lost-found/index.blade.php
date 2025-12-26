@@ -1,732 +1,766 @@
 @extends('layouts.admin')
 
-@section('title', 'Lost & Found Records')
+@section('title', 'Lost & Found Management')
 
-@section('styles')
+@section('content')
+<div class="lost-found-admin-page">
+    <div class="container-fluid px-4 py-5">
+        <!-- Page Header -->
+        <div class="page-header mb-4">
+            <div class="header-content">
+                <div>
+                    <span class="label">Pet Recovery System</span>
+                    <h1 class="page-title">Lost & Found Management</h1>
+                    <p class="page-subtitle">Review and manage lost and found pet listings</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid mb-4">
+            <div class="stat-card">
+                <div class="stat-icon pending">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ $pendingCount }}</div>
+                    <div class="stat-label">Pending Review</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon active">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ $activeCount }}</div>
+                    <div class="stat-label">Active Listings</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon resolved">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ $resolvedCount }}</div>
+                    <div class="stat-label">Resolved Cases</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon claims">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ $claimsCount }}</div>
+                    <div class="stat-label">Pending Claims</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container mb-4">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="pending">
+                    Pending Review ({{ $pendingCount }})
+                </button>
+                <button class="tab-btn" data-tab="approved">
+                    Approved Listings ({{ $activeCount }})
+                </button>
+                <button class="tab-btn" data-tab="resolved">
+                    Resolved Cases ({{ $resolvedCount }})
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="tab-content active" id="pending-tab">
+            @if($pendingListings->count() > 0)
+                <div class="listings-grid">
+                    @foreach($pendingListings as $listing)
+                        <div class="listing-card">
+                            <div class="listing-image">
+                                @if($listing->image_path)
+                                    <img src="{{ asset('storage/' . $listing->image_path) }}" alt="{{ $listing->pet_name }}">
+                                @else
+                                    <div class="no-image">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                        </svg>
+                                    </div>
+                                @endif
+                                <div class="type-badge type-{{ $listing->type }}">{{ $listing->type }}</div>
+                            </div>
+                            
+                            <div class="listing-content">
+                                <h3 class="listing-title">{{ $listing->pet_name }}</h3>
+                                
+                                <div class="listing-meta">
+                                    <span class="meta-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                        </svg>
+                                        {{ ucfirst($listing->pet_type) }}
+                                    </span>
+                                    <span class="meta-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        </svg>
+                                        {{ $listing->location }}
+                                    </span>
+                                    <span class="meta-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        </svg>
+                                        {{ $listing->date_lost_found->format('M d, Y') }}
+                                    </span>
+                                </div>
+                                
+                                <p class="listing-description">{{ Str::limit($listing->description, 80) }}</p>
+                                
+                                <div class="listing-submitter">
+                                    <strong>Submitted by:</strong> {{ $listing->user->name }}<br>
+                                    <strong>Date:</strong> {{ $listing->created_at->diffForHumans() }}
+                                </div>
+                                
+                                <div class="listing-actions">
+                                    <button class="btn-view" onclick="viewListing({{ $listing->id }})">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        View Details
+                                    </button>
+                                    <button class="btn-approve" onclick="approveListing({{ $listing->id }})">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                        Approve
+                                    </button>
+                                    <button class="btn-reject" onclick="rejectListing({{ $listing->id }})">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                        Reject
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="pagination-wrapper mt-4">
+                    {{ $pendingListings->links() }}
+                </div>
+            @else
+                <div class="empty-state">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <h3>No Pending Reviews</h3>
+                    <p>All listings have been reviewed</p>
+                </div>
+            @endif
+        </div>
+
+        <div class="tab-content" id="approved-tab">
+            @if($approvedListings->count() > 0)
+                <div class="listings-grid">
+                    @foreach($approvedListings as $listing)
+                        <div class="listing-card">
+                            <div class="listing-image">
+                                @if($listing->image_path)
+                                    <img src="{{ asset('storage/' . $listing->image_path) }}" alt="{{ $listing->pet_name }}">
+                                @else
+                                    <div class="no-image">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                        </svg>
+                                    </div>
+                                @endif
+                                <div class="type-badge type-{{ $listing->type }}">{{ $listing->type }}</div>
+                                @if($listing->is_featured)
+                                    <div class="featured-badge">Featured</div>
+                                @endif
+                            </div>
+                            
+                            <div class="listing-content">
+                                <h3 class="listing-title">{{ $listing->pet_name }}</h3>
+                                
+                                <div class="listing-meta">
+                                    <span class="meta-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                        </svg>
+                                        {{ ucfirst($listing->pet_type) }}
+                                    </span>
+                                    <span class="meta-item">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        </svg>
+                                        {{ $listing->location }}
+                                    </span>
+                                </div>
+                                
+                                <p class="listing-description">{{ Str::limit($listing->description, 80) }}</p>
+                                
+                                <div class="listing-actions">
+                                    <button class="btn-view" onclick="viewListing({{ $listing->id }})">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        </svg>
+                                        View
+                                    </button>
+                                    @if($listing->type == 'found' && $listing->claims_count > 0)
+                                        <button class="btn-claims" onclick="viewClaims({{ $listing->id }})">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                                <circle cx="9" cy="7" r="4"></circle>
+                                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                            </svg>
+                                            Claims ({{ $listing->claims_count }})
+                                        </button>
+                                    @endif
+                                    <button class="btn-feature" onclick="toggleFeature({{ $listing->id }}, {{ $listing->is_featured ? 'true' : 'false' }})">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                        </svg>
+                                        {{ $listing->is_featured ? 'Unfeature' : 'Feature' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="pagination-wrapper mt-4">
+                    {{ $approvedListings->links() }}
+                </div>
+            @else
+                <div class="empty-state">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                    <h3>No Active Listings</h3>
+                    <p>No approved listings available</p>
+                </div>
+            @endif
+        </div>
+
+        <div class="tab-content" id="resolved-tab">
+            @if($resolvedListings->count() > 0)
+                <div class="listings-grid">
+                    @foreach($resolvedListings as $listing)
+                        <div class="listing-card resolved">
+                            <div class="listing-image">
+                                @if($listing->image_path)
+                                    <img src="{{ asset('storage/' . $listing->image_path) }}" alt="{{ $listing->pet_name }}">
+                                @else
+                                    <div class="no-image">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                        </svg>
+                                    </div>
+                                @endif
+                                <div class="resolved-badge">Resolved</div>
+                            </div>
+                            
+                            <div class="listing-content">
+                                <h3 class="listing-title">{{ $listing->pet_name }}</h3>
+                                
+                                <div class="listing-meta">
+                                    <span class="meta-item">{{ ucfirst($listing->pet_type) }}</span>
+                                    <span class="meta-item">{{ $listing->location }}</span>
+                                </div>
+                                
+                                <p class="listing-description">{{ Str::limit($listing->description, 80) }}</p>
+                                
+                                <div class="listing-actions">
+                                    <button class="btn-view" onclick="viewListing({{ $listing->id }})">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        </svg>
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="pagination-wrapper mt-4">
+                    {{ $resolvedListings->links() }}
+                </div>
+            @else
+                <div class="empty-state">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <h3>No Resolved Cases</h3>
+                    <p>No cases have been resolved yet</p>
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+
 <style>
     :root {
-        --primary: #0f172a;
-        --primary-light: #1e293b;
-        --accent: #3b82f6;
-        --accent-light: #60a5fa;
+        --primary: #2563eb;
         --success: #10b981;
-        --danger: #ef4444;
         --warning: #f59e0b;
-        --text-primary: #0f172a;
-        --text-secondary: #64748b;
-        --text-muted: #94a3b8;
-        --bg-primary: #ffffff;
-        --bg-secondary: #f8fafc;
-        --border-color: #e2e8f0;
-        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-        --radius: 12px;
-        --radius-lg: 16px;
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --danger: #ef4444;
+        --gray: #64748b;
+        --gray-light: #f1f5f9;
     }
 
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        background-color: var(--bg-secondary);
-        color: var(--text-primary);
-        line-height: 1.6;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+    .lost-found-admin-page {
+        background: var(--gray-light);
+        min-height: 100vh;
     }
 
-    .container-fluid {
-        padding: 2rem 1.5rem;
-    }
-
-    /* Page Header */
-    .page-header {
-        background: var(--bg-primary);
-        border-radius: var(--radius-lg);
-        padding: 2rem;
-        margin-bottom: 2rem;
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow);
-        animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    .page-header .label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--primary);
+        margin-bottom: 8px;
+        font-weight: 600;
     }
 
     .page-title {
-        font-size: 1.75rem;
+        font-size: 2rem;
         font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 0.5rem;
-        letter-spacing: -0.025em;
+        color: #0f172a;
+        margin-bottom: 6px;
     }
 
     .page-subtitle {
+        color: var(--gray);
         font-size: 1rem;
-        color: var(--text-secondary);
-        margin: 0;
     }
 
-    /* Alert */
-    .alert {
-        padding: 1rem 1.25rem;
-        border-radius: var(--radius);
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-weight: 500;
-        animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .alert-success {
-        background: rgba(16, 185, 129, 0.1);
-        color: #065f46;
-        border: 1px solid rgba(16, 185, 129, 0.2);
-    }
-
-    /* Stats Grid */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        gap: 20px;
     }
 
     .stat-card {
-        background: var(--bg-primary);
-        border-radius: var(--radius-lg);
-        padding: 1.75rem;
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow);
-        transition: var(--transition);
-        animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .stat-card:nth-child(1) { animation-delay: 0.1s; }
-    .stat-card:nth-child(2) { animation-delay: 0.2s; }
-
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: var(--card-accent);
-        opacity: 0;
-        transition: opacity 0.3s ease;
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: transform 0.2s;
     }
 
     .stat-card:hover {
         transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     }
 
-    .stat-card:hover::before {
-        opacity: 1;
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .stat-card.lost {
-        --card-accent: var(--danger);
-    }
-
-    .stat-card.found {
-        --card-accent: var(--success);
-    }
+    .stat-icon.pending { background: #fef3c7; color: #f59e0b; }
+    .stat-icon.active { background: #dbeafe; color: #2563eb; }
+    .stat-icon.resolved { background: #d1fae5; color: #10b981; }
+    .stat-icon.claims { background: #f3e8ff; color: #8b5cf6; }
 
     .stat-number {
-        font-size: 2.5rem;
+        font-size: 1.875rem;
         font-weight: 700;
-        color: var(--card-accent);
-        margin-bottom: 0.5rem;
-        line-height: 1;
+        color: #0f172a;
     }
 
     .stat-label {
-        font-size: 0.8125rem;
+        font-size: 0.875rem;
+        color: var(--gray);
+    }
+
+    .tabs-container {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 8px;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 8px;
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
         font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        color: var(--gray);
+        cursor: pointer;
+        transition: all 0.2s;
     }
 
-    /* Section Header */
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards;
-    }
-
-    .section-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        letter-spacing: -0.025em;
-    }
-
-    .section-title i {
-        color: var(--accent);
-        font-size: 1.125rem;
-    }
-
-    .section-count {
+    .tab-btn.active {
         background: var(--primary);
         color: white;
-        padding: 0.375rem 0.875rem;
-        border-radius: 50px;
-        font-size: 0.8125rem;
-        font-weight: 600;
     }
 
-    /* Listings Grid */
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
     .listings-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        gap: 24px;
     }
 
     .listing-card {
-        background: var(--bg-primary);
-        border-radius: var(--radius-lg);
+        background: white;
+        border-radius: 12px;
         overflow: hidden;
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow);
-        transition: var(--transition);
-        animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s;
     }
 
-    .listing-card:nth-child(1) { animation-delay: 0.4s; }
-    .listing-card:nth-child(2) { animation-delay: 0.45s; }
-    .listing-card:nth-child(3) { animation-delay: 0.5s; }
-    .listing-card:nth-child(4) { animation-delay: 0.55s; }
-    .listing-card:nth-child(5) { animation-delay: 0.6s; }
-    .listing-card:nth-child(6) { animation-delay: 0.65s; }
-
     .listing-card:hover {
-        transform: translateY(-6px);
-        box-shadow: var(--shadow-lg);
-        border-color: var(--accent);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    }
+
+    .listing-card.resolved {
+        opacity: 0.7;
     }
 
     .listing-image {
+        position: relative;
         height: 220px;
         overflow: hidden;
-        position: relative;
-        background: var(--bg-secondary);
+        background: #f8fafc;
     }
 
     .listing-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.5s ease;
     }
 
-    .listing-card:hover .listing-image img {
-        transform: scale(1.05);
-    }
-
-    .listing-image .no-image {
+    .no-image {
+        width: 100%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 100%;
-        color: var(--text-muted);
-        font-size: 3rem;
+        color: #cbd5e1;
     }
 
     .type-badge {
         position: absolute;
-        top: 1rem;
-        right: 1rem;
-        padding: 0.5rem 1rem;
-        border-radius: 50px;
+        top: 12px;
+        right: 12px;
+        padding: 6px 12px;
+        border-radius: 6px;
         font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        backdrop-filter: blur(10px);
-        box-shadow: var(--shadow-md);
     }
 
-    .type-badge.lost {
-        background: rgba(239, 68, 68, 0.95);
+    .type-badge.type-lost {
+        background: #ef4444;
         color: white;
     }
 
-    .type-badge.found {
-        background: rgba(16, 185, 129, 0.95);
+    .type-badge.type-found {
+        background: #10b981;
+        color: white;
+    }
+
+    .featured-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #8b5cf6;
+        color: white;
+    }
+
+    .resolved-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #64748b;
         color: white;
     }
 
     .listing-content {
-        padding: 1.5rem;
+        padding: 20px;
     }
 
     .listing-title {
         font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 0.75rem;
-        letter-spacing: -0.025em;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 12px;
     }
 
     .listing-meta {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
+        gap: 12px;
+        margin-bottom: 12px;
     }
 
     .meta-item {
         display: flex;
         align-items: center;
-        gap: 0.375rem;
-        font-size: 0.8125rem;
-        color: var(--text-secondary);
-    }
-
-    .meta-item i {
-        color: var(--accent);
-        font-size: 0.75rem;
+        gap: 4px;
+        font-size: 0.875rem;
+        color: var(--gray);
     }
 
     .listing-description {
-        color: var(--text-secondary);
-        font-size: 0.9375rem;
-        line-height: 1.6;
-        margin-bottom: 1.25rem;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        color: var(--gray);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 16px;
     }
 
-    .listing-footer {
+    .listing-submitter {
+        font-size: 0.85rem;
+        color: var(--gray);
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+        margin-bottom: 16px;
+    }
+
+    .listing-actions {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 1rem;
-        border-top: 1px solid var(--border-color);
+        gap: 8px;
+        flex-wrap: wrap;
     }
 
-    .listing-date {
-        font-size: 0.8125rem;
-        color: var(--text-muted);
-    }
-
-    .btn {
-        display: inline-flex;
+    .listing-actions button {
+        flex: 1;
+        min-width: fit-content;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
-        padding: 0.625rem 1.25rem;
-        font-size: 0.875rem;
-        font-weight: 600;
-        border-radius: var(--radius);
-        text-decoration: none;
-        transition: var(--transition);
-        border: none;
-        cursor: pointer;
+        gap: 6px;
+        transition: all 0.2s;
     }
 
-    .btn-primary {
-        background: var(--primary);
+    .btn-view {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .btn-view:hover {
+        background: #e2e8f0;
+    }
+
+    .btn-approve {
+        background: #10b981;
         color: white;
     }
 
-    .btn-primary:hover {
-        background: var(--accent);
-        transform: translateX(2px);
+    .btn-approve:hover {
+        background: #059669;
     }
 
-    .btn i {
-        font-size: 0.75rem;
+    .btn-reject {
+        background: #ef4444;
+        color: white;
     }
 
-    /* Mobile Table */
-    .mobile-table {
-        display: none;
+    .btn-reject:hover {
+        background: #dc2626;
     }
 
-    .mobile-card {
-        background: var(--bg-primary);
-        border-radius: var(--radius);
-        border: 1px solid var(--border-color);
-        margin-bottom: 1rem;
-        overflow: hidden;
-        box-shadow: var(--shadow);
-        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    .btn-feature {
+        background: #8b5cf6;
+        color: white;
     }
 
-    .mobile-card:nth-child(1) { animation-delay: 0.1s; }
-    .mobile-card:nth-child(2) { animation-delay: 0.15s; }
-    .mobile-card:nth-child(3) { animation-delay: 0.2s; }
-    .mobile-card:nth-child(4) { animation-delay: 0.25s; }
-    .mobile-card:nth-child(5) { animation-delay: 0.3s; }
-
-    .mobile-item {
-        padding: 1rem;
-        border-bottom: 1px solid var(--border-color);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .btn-feature:hover {
+        background: #7c3aed;
     }
 
-    .mobile-item:last-of-type {
-        border-bottom: none;
+    .btn-claims {
+        background: #8b5cf6;
+        color: white;
     }
 
-    .mobile-label {
-        font-weight: 600;
-        font-size: 0.8125rem;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+    .btn-claims:hover {
+        background: #7c3aed;
     }
 
-    .mobile-value {
-        text-align: right;
-        font-size: 0.9375rem;
-        color: var(--text-primary);
-        font-weight: 500;
-    }
-
-    .mobile-badge {
-        display: inline-block;
-        padding: 0.375rem 0.75rem;
-        border-radius: 50px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    .mobile-badge.lost {
-        background: rgba(239, 68, 68, 0.1);
-        color: var(--danger);
-    }
-
-    .mobile-badge.found {
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--success);
-    }
-
-    .mobile-badge.resolved {
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--success);
-    }
-
-    .mobile-badge.unresolved {
-        background: rgba(239, 68, 68, 0.1);
-        color: var(--danger);
-    }
-
-    .mobile-actions {
-        padding: 1rem;
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    .mobile-actions .btn {
-        flex: 1;
-    }
-
-    /* Empty State */
     .empty-state {
         text-align: center;
-        padding: 4rem 2rem;
-        background: var(--bg-primary);
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow);
-        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        padding: 80px 20px;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
     }
 
-    .empty-state i {
-        font-size: 4rem;
-        color: var(--text-muted);
-        margin-bottom: 1.5rem;
-        opacity: 0.5;
+    .empty-state svg {
+        color: #cbd5e1;
+        margin-bottom: 16px;
     }
 
     .empty-state h3 {
         font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 0.75rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 8px;
     }
 
     .empty-state p {
-        font-size: 1rem;
-        color: var(--text-secondary);
-        margin: 0;
-    }
-
-    /* Animations */
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Responsive */
-    @media (max-width: 1024px) {
-        .container-fluid {
-            padding: 1.5rem 1.25rem;
-        }
-
-        .listings-grid {
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        }
+        color: var(--gray);
     }
 
     @media (max-width: 768px) {
-        .container-fluid {
-            padding: 1.25rem 1rem;
-        }
-
-        .page-header {
-            padding: 1.5rem;
-        }
-
         .page-title {
             font-size: 1.5rem;
-        }
-
-        .page-subtitle {
-            font-size: 0.9375rem;
-        }
-
-        .stats-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .stat-card {
-            padding: 1.5rem 1.25rem;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-        }
-
-        .section-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.75rem;
-        }
-
-        /* Hide desktop grid on mobile */
-        .listings-grid {
-            display: none;
-        }
-
-        /* Show mobile table */
-        .mobile-table {
-            display: block;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .container-fluid {
-            padding: 1rem 0.875rem;
-        }
-
-        .page-header {
-            padding: 1.25rem;
-        }
-
-        .page-title {
-            font-size: 1.375rem;
         }
 
         .stats-grid {
             grid-template-columns: 1fr;
         }
 
-        .section-title {
-            font-size: 1.125rem;
+        .tabs {
+            flex-direction: column;
         }
 
-        .mobile-item {
-            padding: 0.875rem;
-        }
-
-        .empty-state {
-            padding: 3rem 1.5rem;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-        }
-
-        .empty-state h3 {
-            font-size: 1.25rem;
-        }
-    }
-
-    /* Desktop - ensure grid shows */
-    @media (min-width: 769px) {
-        .mobile-table {
-            display: none !important;
-        }
         .listings-grid {
-            display: grid !important;
+            grid-template-columns: 1fr;
         }
-    }
 
-    /* Smooth Scrolling */
-    html {
-        scroll-behavior: smooth;
+        .listing-actions {
+            flex-direction: column;
+        }
+
+        .listing-actions button {
+            width: 100%;
+        }
     }
 </style>
-@endsection
 
-@section('content')
-<div class="container-fluid">
-    <div class="page-header">
-        <h1 class="page-title">Lost & Found Records</h1>
-        <p class="page-subtitle">View lost and found pet listings</p>
-    </div>
+<script>
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            this.classList.add('active');
+            document.getElementById(this.dataset.tab + '-tab').classList.add('active');
+        });
+    });
 
-    @if(session('success'))
-        <div class="alert alert-success">
-            <i class="fas fa-check-circle"></i>
-            <span>{{ session('success') }}</span>
-        </div>
-    @endif
+    function viewListing(id) {
+        window.location.href = `/admin/lost-found/${id}`;
+    }
 
-    <div class="stats-grid">
-        <div class="stat-card lost">
-            <div class="stat-number">{{ $lostFoundItems->where('type', 'lost')->count() }}</div>
-            <div class="stat-label">Lost Pets</div>
-        </div>
-        <div class="stat-card found">
-            <div class="stat-number">{{ $lostFoundItems->where('type', 'found')->count() }}</div>
-            <div class="stat-label">Found Pets</div>
-        </div>
-    </div>
+    function approveListing(id) {
+        if (confirm('Approve this listing?')) {
+            fetch(`/admin/lost-found/${id}/approve`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
+        }
+    }
 
-    <div class="section-header">
-        <h2 class="section-title">
-            <i class="fas fa-paw"></i>
-            All Listings
-        </h2>
-        <span class="section-count">{{ $lostFoundItems->count() }}</span>
-    </div>
+    function rejectListing(id) {
+        const reason = prompt('Enter rejection reason:');
+        if (reason) {
+            fetch(`/admin/lost-found/${id}/reject`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
+        }
+    }
 
-    @if($lostFoundItems->count() > 0)
-        <!-- Desktop Card Grid -->
-        <div class="listings-grid">
-            @foreach($lostFoundItems as $listing)
-                <div class="listing-card">
-                    <div class="listing-image">
-                        @if($listing->image_path)
-                            <img src="{{ asset('storage/' . $listing->image_path) }}" alt="{{ $listing->pet_name }}">
-                        @else
-                            <div class="no-image">
-                                <i class="fas fa-paw"></i>
-                            </div>
-                        @endif
-                        <div class="type-badge {{ $listing->type }}">{{ $listing->type }}</div>
-                    </div>
-                    <div class="listing-content">
-                        <h3 class="listing-title">{{ $listing->pet_name }}</h3>
-                        <div class="listing-meta">
-                            <div class="meta-item">
-                                <i class="fas fa-paw"></i>
-                                <span>{{ ucfirst($listing->pet_type) }}@if($listing->breed) - {{ $listing->breed }}@endif</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>{{ $listing->location }}</span>
-                            </div>
-                        </div>
-                        <p class="listing-description">{{ Str::limit($listing->description, 100) }}</p>
-                        <div class="listing-footer">
-                            <div class="listing-date">
-                                {{ $listing->created_at->diffForHumans() }}
-                            </div>
-                            <a href="{{ route('admin.lost-found.show', $listing) }}" class="btn btn-primary">
-                                <i class="fas fa-eye"></i>
-                                <span>View</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
+    function toggleFeature(id, currentlyFeatured) {
+        fetch(`/admin/lost-found/${id}/toggle-feature`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
 
-        <!-- Mobile Table -->
-        <div class="mobile-table">
-            @foreach($lostFoundItems as $listing)
-                <div class="mobile-card">
-                    <div class="mobile-item">
-                        <span class="mobile-label">Pet</span>
-                        <span class="mobile-value">{{ $listing->pet_name }}</span>
-                    </div>
-                    <div class="mobile-item">
-                        <span class="mobile-label">Type</span>
-                        <span class="mobile-value">
-                            <span class="mobile-badge {{ $listing->type }}">{{ $listing->type }}</span>
-                        </span>
-                    </div>
-                    <div class="mobile-item">
-                        <span class="mobile-label">Location</span>
-                        <span class="mobile-value">{{ $listing->location }}</span>
-                    </div>
-                    <div class="mobile-item">
-                        <span class="mobile-label">Status</span>
-                        <span class="mobile-value">
-                            @if($listing->is_resolved)
-                                <span class="mobile-badge resolved">Resolved</span>
-                            @else
-                                <span class="mobile-badge unresolved">Unresolved</span>
-                            @endif
-                        </span>
-                    </div>
-                    <div class="mobile-item">
-                        <span class="mobile-label">Submitted</span>
-                        <span class="mobile-value">{{ $listing->created_at->format('M d, Y') }}</span>
-                    </div>
-                    <div class="mobile-actions">
-                        <a href="{{ route('admin.lost-found.show', $listing) }}" class="btn btn-primary">
-                            <i class="fas fa-eye"></i>
-                            <span>View</span>
-                        </a>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    @else
-        <div class="empty-state">
-            <i class="fas fa-paw"></i>
-            <h3>No listings yet</h3>
-            <p>There are no lost or found pet listings at this time.</p>
-        </div>
-    @endif
-</div>
+    function viewClaims(id) {
+        window.location.href = `/admin/lost-found/${id}/claims`;
+    }
+</script>
 @endsection

@@ -14,7 +14,7 @@
                     <p class="page-subtitle">Help reunite pets with their families</p>
                 </div>
                 <div class="header-actions">
-                    <a href="{{ route('lost-found.create') }}" class="btn-report" data-modal data-modal-title="Report Lost/Found Pet">
+                    <a href="{{ route('lost-found.create') }}" class="btn-report">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -58,9 +58,10 @@
                     <div class="filter-group">
                         <label for="filter" class="filter-label">Type</label>
                         <select id="filter" name="filter" class="filter-select">
-                            <option value="all" {{ request('filter', 'all') == 'all' ? 'selected' : '' }}>All Listings</option>
+                            <option value="all" {{ request('filter', 'all') == 'all' ? 'selected' : '' }}>All Active Pets</option>
                             <option value="lost" {{ request('filter') == 'lost' ? 'selected' : '' }}>Lost Pets</option>
                             <option value="found" {{ request('filter') == 'found' ? 'selected' : '' }}>Found Pets</option>
+                            <option value="reunited" {{ request('filter') == 'reunited' ? 'selected' : '' }}>Reunited Pets</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -101,7 +102,11 @@
                                         </svg>
                                     </div>
                                 @endif
-                                <div class="type-badge type-{{ $item->type }}">{{ $item->type }}</div>
+                                @if($item->is_resolved)
+                                    <div class="type-badge type-reunited">Reunited</div>
+                                @else
+                                    <div class="type-badge type-{{ $item->type }}">{{ $item->type }}</div>
+                                @endif
                             </div>
                             
                             <div class="listing-content">
@@ -475,8 +480,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
-        color: white;
+        background: #e2e8f0;
+        color: #94a3b8;
     }
 
     .type-badge {
@@ -499,6 +504,11 @@
 
     .type-found {
         background: rgba(16, 185, 129, 0.95);
+        color: white;
+    }
+
+    .type-reunited {
+        background: rgba(59, 130, 246, 0.95);
         color: white;
     }
 

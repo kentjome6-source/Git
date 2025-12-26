@@ -408,29 +408,41 @@
             </div>
         </div>
 
-        @if(Auth::id() === $lostFound->user_id)
         <div class="action-buttons">
-            <a href="{{ route('lost-found.edit', $lostFound) }}" class="btn btn-primary" data-modal data-modal-title="Edit Lost/Found Listing">
-                <i class="fas fa-edit"></i> Edit Listing
-            </a>
-            
-            <form action="{{ route('lost-found.resolve', $lostFound) }}" method="POST" style="display: inline;">
-                @csrf
-                @method('PATCH')
-                <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to mark this listing as resolved?')">
-                    <i class="fas fa-check-circle"></i> Mark as Resolved
-                </button>
-            </form>
-            
-            <form action="{{ route('lost-found.destroy', $lostFound) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this listing? This action cannot be undone.')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-danger">
-                    <i class="fas fa-trash"></i> Delete Listing
-                </button>
-            </form>
+            @if(Auth::id() === $lostFound->user_id)
+                <a href="{{ route('lost-found.edit', $lostFound) }}" class="btn btn-primary" data-modal data-modal-title="Edit Lost/Found Listing">
+                    <i class="fas fa-edit"></i> Edit Listing
+                </a>
+                
+                <form action="{{ route('lost-found.resolve', $lostFound) }}" method="POST" style="display: inline;">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to mark this listing as resolved?')">
+                        <i class="fas fa-check-circle"></i> Mark as Resolved
+                    </button>
+                </form>
+                
+                <form action="{{ route('lost-found.destroy', $lostFound) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this listing? This action cannot be undone.')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete Listing
+                    </button>
+                </form>
+            @else
+                @if($lostFound->type === 'found')
+                    <a href="{{ route('lost-found.claim', $lostFound) }}" class="btn btn-primary">
+                        <i class="fas fa-hand-holding-heart"></i> Claim This Pet
+                    </a>
+                @endif
+                
+                @if($lostFound->type === 'lost')
+                    <a href="{{ route('messages.index', ['user' => $lostFound->user_id]) }}" class="btn btn-primary">
+                        <i class="fas fa-envelope"></i> Contact Owner
+                    </a>
+                @endif
+            @endif
         </div>
-        @endif
     </div>
 </div>
 

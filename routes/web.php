@@ -1,25 +1,26 @@
 <?php
 
-use App\Http\Controllers\Admin\AdoptionController;
-use App\Http\Controllers\Admin\LostFoundController as AdminLostFoundController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PetController;
+use App\Http\Controllers\VetController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ViewMapController;
 use App\Http\Controllers\Admin\MapController;
-use App\Http\Controllers\Admin\PetController as AdminPetController;
-use App\Http\Controllers\Admin\PetUserController;
+use App\Http\Controllers\LostFoundController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\AdoptionController as UserAdoptionController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Auth\LogoutController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\PetController;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\VetController;
-use App\Http\Controllers\ViewMapController;
-use App\Http\Controllers\LostFoundController;
 use App\Http\Controllers\ChatMessageController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\PetUserController;
+use App\Http\Controllers\Admin\AdoptionController;
+use App\Http\Controllers\LostFoundClaimController;
+use App\Http\Controllers\Admin\PetController as AdminPetController;
+use App\Http\Controllers\AdoptionController as UserAdoptionController;
+use App\Http\Controllers\Admin\LostFoundController as AdminLostFoundController;
 
 // Public Routes
 Route::get('/', function () {
@@ -67,6 +68,12 @@ Route::prefix('vet')->name('vet.')->middleware(['can:isVet', 'vet.verified'])->g
     Route::post('/adoption-requests/{adoptionRequest}/orientation', [VetController::class, 'conductOrientation'])->name('adoptions.orientation.conduct');
     Route::post('/adoption-requests/{adoptionRequest}/complete-orientation', [VetController::class, 'completeOrientation'])->name('adoptions.complete-orientation');
     Route::post('/adoption-agreements/{agreement}/final-clearance', [VetController::class, 'provideFinalClearance'])->name('adoptions.final-clearance');
+
+    // Lost & Found Verification Routes
+    Route::get('/lost-found/verifications', [\App\Http\Controllers\Vet\LostFoundVerificationController::class, 'index'])->name('lost-found.verifications');
+    Route::get('/lost-found/verifications/{claim}', [\App\Http\Controllers\Vet\LostFoundVerificationController::class, 'show'])->name('lost-found.verifications.show');
+    Route::post('/lost-found/verifications/{claim}/verify', [\App\Http\Controllers\Vet\LostFoundVerificationController::class, 'verify'])->name('lost-found.verifications.verify');
+    Route::post('/lost-found/verifications/{claim}/complete', [\App\Http\Controllers\Vet\LostFoundVerificationController::class, 'completeClaim'])->name('lost-found.verifications.complete');
 
 });
 
@@ -141,15 +148,20 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     ]);
     
     // Admin Lost & Found Records
-    Route::resource('admin/lost-found', AdminLostFoundController::class)->names([
-        'index' => 'admin.lost-found.index',
-        'create' => 'admin.lost-found.create',
-        'store' => 'admin.lost-found.store',
-        'show' => 'admin.lost-found.show',
-        'edit' => 'admin.lost-found.edit',
-        'update' => 'admin.lost-found.update',
-        'destroy' => 'admin.lost-found.destroy',
-    ]);
+    Route::prefix('admin/lost-found')->name('admin.lost-found.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\LostFoundController::class, 'index'])->name('index');
+        Route::get('/{lostFound}', [\App\Http\Controllers\Admin\LostFoundController::class, 'show'])->name('show');
+        Route::post('/{lostFound}/approve', [\App\Http\Controllers\Admin\LostFoundController::class, 'approve'])->name('approve');
+        Route::post('/{lostFound}/reject', [\App\Http\Controllers\Admin\LostFoundController::class, 'reject'])->name('reject');
+        Route::post('/{lostFound}/toggle-feature', [\App\Http\Controllers\Admin\LostFoundController::class, 'toggleFeature'])->name('toggle-feature');
+        Route::get('/{lostFound}/claims', [\App\Http\Controllers\Admin\LostFoundController::class, 'viewClaims'])->name('view-claims');
+        
+        // Claims management
+        Route::get('/claims/list', [\App\Http\Controllers\Admin\LostFoundController::class, 'claims'])->name('claims');
+        Route::get('/claims/{claim}', [\App\Http\Controllers\Admin\LostFoundController::class, 'showClaim'])->name('claims.show');
+        Route::post('/claims/{claim}/approve', [\App\Http\Controllers\Admin\LostFoundController::class, 'approveClaim'])->name('claims.approve');
+        Route::post('/claims/{claim}/reject', [\App\Http\Controllers\Admin\LostFoundController::class, 'rejectClaim'])->name('claims.reject');
+    });
     
     // Admin Map Management
     Route::resource('admin/map', MapController::class)->names([
@@ -244,6 +256,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('pet/lostfound', [LostFoundController::class, 'index'])->name('pet.lostfound');
     Route::resource('lost-found', LostFoundController::class);
     Route::patch('lost-found/{lostFound}/resolve', [LostFoundController::class, 'markResolved'])->name('lost-found.resolve');
+    Route::get('lost-found/{lostFound}/map', [LostFoundController::class, 'map'])->name('lost-found.map');
+    Route::get('my-lost-found', [LostFoundController::class, 'myListings'])->name('lost-found.my-listings');
+    
+    // Lost & Found Claims Routes
+    Route::get('lost-found/{lostFound}/claim', [LostFoundClaimController::class, 'create'])->name('lost-found.claim');
+    Route::post('lost-found/{lostFound}/claim', [LostFoundClaimController::class, 'store'])->name('lost-found.claim.store');
+    Route::get('my-claims', [LostFoundClaimController::class, 'myClaims'])->name('lost-found.my-claims');
+    Route::get('claims/{claim}', [LostFoundClaimController::class, 'showClaim'])->name('lost-found.claim.show');
     
     // Social Media Routes
     Route::get('social-media', [PostController::class, 'index'])->name('social-media.index');
