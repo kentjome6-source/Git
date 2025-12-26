@@ -23,6 +23,10 @@ return new class extends Migration
             $table->string('email')->nullable();
             // Ensure `operating_hours` column is properly configured for JSON data
             $table->json('operating_hours')->nullable();
+            
+            // Add animal types as JSON array
+            $table->json('animal_types')->nullable()->comment('Array of animal types this shop caters to');
+            
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
             $table->boolean('is_active')->default(true);

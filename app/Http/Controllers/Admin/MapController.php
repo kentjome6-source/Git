@@ -8,6 +8,12 @@ use App\Models\Vetshop;
 
 class MapController extends Controller
 {
+    // Define common animal types
+    private $animalTypes = [
+        'dog', 'cat', 'bird', 'fish', 'rabbit', 
+        'hamster', 'guinea_pig', 'reptile', 'small_pet', 'exotic'
+    ];
+
     public function index(Request $request)
     {
         $query = Vetshop::query();
@@ -31,6 +37,11 @@ class MapController extends Controller
             $query->where('type', $request->type);
         }
         
+        // Animal type filter
+        if ($request->filled('animal_type')) {
+            $query->whereJsonContains('animal_types', $request->animal_type);
+        }
+        
         // Status filter
         if ($request->filled('status')) {
             $query->where('is_active', $request->status === 'active');
@@ -39,12 +50,15 @@ class MapController extends Controller
         $shelters = $query->orderBy('created_at', 'desc')
                           ->paginate(15);
         
-        return view('admin.map.index', compact('shelters'));
+        $animalTypes = $this->animalTypes;
+        
+        return view('admin.map.index', compact('shelters', 'animalTypes'));
     }
 
     public function create()
     {
-        return view('admin.map.create');
+        $animalTypes = $this->animalTypes;
+        return view('admin.map.create', compact('animalTypes'));
     }
 
     public function store(Request $request)
@@ -56,6 +70,11 @@ class MapController extends Controller
             'email' => 'nullable|email|max:255',
             'operating_hours' => 'nullable|array',
             'operating_hours.*' => 'nullable|string|max:100',
+            
+            // Animal types validation
+            'animal_types' => 'nullable|array',
+            'animal_types.*' => 'in:' . implode(',', $this->animalTypes),
+            
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:100',
             'province' => 'required|string|max:100',
@@ -69,44 +88,19 @@ class MapController extends Controller
         $validated['is_active'] = true;
         $validated['type'] = 'veterinarian';
 
-        // Ensure operating hours are properly formatted and in the correct order
+        // Process animal types (remove empty values)
+        if (isset($validated['animal_types']) && is_array($validated['animal_types'])) {
+            $validated['animal_types'] = array_filter($validated['animal_types']);
+            if (empty($validated['animal_types'])) {
+                $validated['animal_types'] = null;
+            }
+        } else {
+            $validated['animal_types'] = null;
+        }
+
+        // Ensure operating hours are properly formatted
         if (isset($validated['operating_hours']) && is_array($validated['operating_hours'])) {
-            // Filter out any empty values
-            $validated['operating_hours'] = array_filter($validated['operating_hours']);
-            
-            // Ensure operating hours contain only time data, not address data
-            foreach ($validated['operating_hours'] as $day => $hours) {
-                // If the hours look like address data (contains common address words), skip it
-                if (is_string($hours) && 
-                    (stripos($hours, 'purok') !== false || 
-                     stripos($hours, 'poblacion') !== false || 
-                     stripos($hours, 'san francisco') !== false || 
-                     stripos($hours, 'agusan') !== false || 
-                     stripos($hours, 'caraga') !== false || 
-                     preg_match('/\d{4}/', $hours))) {
-                    // This looks like address data, not time data - remove it
-                    unset($validated['operating_hours'][$day]);
-                }
-            }
-            
-            // Reorder the operating hours to match the standard sequence
-            $orderedHours = [];
-            $hourOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-            
-            foreach ($hourOrder as $day) {
-                if (isset($validated['operating_hours'][$day])) {
-                    $orderedHours[$day] = $validated['operating_hours'][$day];
-                }
-            }
-            
-            // Add any additional days that might not be in the standard order
-            foreach ($validated['operating_hours'] as $day => $hours) {
-                if (!isset($orderedHours[$day])) {
-                    $orderedHours[$day] = $hours;
-                }
-            }
-            
-            $validated['operating_hours'] = $orderedHours;
+            $validated['operating_hours'] = $this->processOperatingHours($validated['operating_hours']);
         }
 
         $shelter = Vetshop::create($validated);
@@ -132,7 +126,8 @@ class MapController extends Controller
             abort(404, 'Shelter not found.');
         }
         
-        return view('admin.map.edit', compact('map'));
+        $animalTypes = $this->animalTypes;
+        return view('admin.map.edit', compact('map', 'animalTypes'));
     }
 
     public function update(Request $request, Vetshop $map)
@@ -149,6 +144,11 @@ class MapController extends Controller
             'email' => 'nullable|email|max:255',
             'operating_hours' => 'nullable|array',
             'operating_hours.*' => 'nullable|string|max:100',
+            
+            // Animal types validation
+            'animal_types' => 'nullable|array',
+            'animal_types.*' => 'in:' . implode(',', $this->animalTypes),
+            
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:100',
             'province' => 'required|string|max:100',
@@ -160,44 +160,19 @@ class MapController extends Controller
         $validated['city'] = 'San Francisco';
         $validated['province'] = 'Agusan Del Sur';
 
-        // Ensure operating hours are properly formatted and in the correct order
+        // Process animal types
+        if (isset($validated['animal_types']) && is_array($validated['animal_types'])) {
+            $validated['animal_types'] = array_filter($validated['animal_types']);
+            if (empty($validated['animal_types'])) {
+                $validated['animal_types'] = null;
+            }
+        } else {
+            $validated['animal_types'] = null;
+        }
+
+        // Process operating hours
         if (isset($validated['operating_hours']) && is_array($validated['operating_hours'])) {
-            // Filter out any empty values
-            $validated['operating_hours'] = array_filter($validated['operating_hours']);
-            
-            // Ensure operating hours contain only time data, not address data
-            foreach ($validated['operating_hours'] as $day => $hours) {
-                // If the hours look like address data (contains common address words), skip it
-                if (is_string($hours) && 
-                    (stripos($hours, 'purok') !== false || 
-                     stripos($hours, 'poblacion') !== false || 
-                     stripos($hours, 'san francisco') !== false || 
-                     stripos($hours, 'agusan') !== false || 
-                     stripos($hours, 'caraga') !== false || 
-                     preg_match('/\d{4}/', $hours))) {
-                    // This looks like address data, not time data - remove it
-                    unset($validated['operating_hours'][$day]);
-                }
-            }
-            
-            // Reorder the operating hours to match the standard sequence
-            $orderedHours = [];
-            $hourOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-            
-            foreach ($hourOrder as $day) {
-                if (isset($validated['operating_hours'][$day])) {
-                    $orderedHours[$day] = $validated['operating_hours'][$day];
-                }
-            }
-            
-            // Add any additional days that might not be in the standard order
-            foreach ($validated['operating_hours'] as $day => $hours) {
-                if (!isset($orderedHours[$day])) {
-                    $orderedHours[$day] = $hours;
-                }
-            }
-            
-            $validated['operating_hours'] = $orderedHours;
+            $validated['operating_hours'] = $this->processOperatingHours($validated['operating_hours']);
         }
 
         $map->update($validated);
@@ -217,5 +192,69 @@ class MapController extends Controller
         
         return redirect()->route('admin.map.index')
                         ->with('success', 'Location deleted successfully!');
+    }
+
+    /**
+     * Process and clean operating hours data
+     */
+    private function processOperatingHours($operatingHours)
+    {
+        if (empty($operatingHours) || !is_array($operatingHours)) {
+            return null;
+        }
+        
+        // Filter out any empty values
+        $operatingHours = array_filter($operatingHours);
+        
+        // Filter out address data
+        foreach ($operatingHours as $day => $hours) {
+            if (is_string($hours) && 
+                $this->isAddressData($hours)) {
+                unset($operatingHours[$day]);
+            }
+        }
+        
+        // Reorder the operating hours to match the standard sequence
+        $orderedHours = [];
+        $hourOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        
+        foreach ($hourOrder as $day) {
+            if (isset($operatingHours[$day])) {
+                $orderedHours[$day] = $operatingHours[$day];
+            }
+        }
+        
+        // Add any additional days that might not be in the standard order
+        foreach ($operatingHours as $day => $hours) {
+            if (!isset($orderedHours[$day])) {
+                $orderedHours[$day] = $hours;
+            }
+        }
+        
+        return empty($orderedHours) ? null : $orderedHours;
+    }
+
+    /**
+     * Check if string looks like address data
+     */
+    private function isAddressData($string)
+    {
+        $addressKeywords = [
+            'purok', 'poblacion', 'san francisco', 'agusan', 'caraga',
+            'street', 'st.', 'avenue', 'ave.', 'road', 'rd.', 'brgy', 'barangay'
+        ];
+        
+        foreach ($addressKeywords as $keyword) {
+            if (stripos($string, $keyword) !== false) {
+                return true;
+            }
+        }
+        
+        // Check for ZIP code pattern
+        if (preg_match('/\d{4}/', $string)) {
+            return true;
+        }
+        
+        return false;
     }
 }

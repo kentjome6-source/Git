@@ -92,10 +92,19 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
         'show' => 'admin.users.show',
         'edit' => 'admin.users.edit',
         'update' => 'admin.users.update',
+        'destroy' => 'admin.users.destroy', // Add this
     ]);
     
-    Route::post('admin/users/{user}/verify-vet', [UserController::class, 'verifyVet'])->name('admin.users.verify-vet');
-    Route::post('admin/users/{user}/reject-vet', [UserController::class, 'rejectVet'])->name('admin.users.reject-vet');
+    Route::prefix('admin/users')->name('admin.users.')->group(function () {
+        Route::post('/create-vet', [UserController::class, 'storeVet'])->name('store-vet');
+        Route::post('/{user}/verify-vet', [UserController::class, 'verifyVet'])->name('verify-vet'); // Use POST
+        Route::post('/{user}/reject-vet', [UserController::class, 'rejectVet'])->name('reject-vet'); // Use POST
+        Route::post('/{user}/assign-to-shop', [UserController::class, 'assignToShop'])->name('assign-to-shop'); // Use POST
+        Route::post('/{user}/remove-from-shop', [UserController::class, 'removeFromShop'])->name('remove-from-shop'); // Use POST
+    });
+    
+    // Route::post('admin/users/{user}/verify-vet', [UserController::class, 'verifyVet'])->name('admin.users.verify-vet');
+    // Route::post('admin/users/{user}/reject-vet', [UserController::class, 'rejectVet'])->name('admin.users.reject-vet');
     
     // Admin Adoption Management
     Route::resource('admin/adoptions', AdoptionController::class)->names([

@@ -15,6 +15,7 @@ class User extends Authenticatable
      * The attributes that are mass assignable.
      */
     protected $fillable = [
+        'vet_shop_id',
         'name',
         'email',
         'password',
@@ -62,6 +63,10 @@ class User extends Authenticatable
     public function adoptions()
     {
         return $this->hasMany(Adoption::class);
+    }
+    
+    public function vetShop(){
+        return $this->belongsTo(Vetshop::class, 'vet_shop_id');
     }
 
     /**

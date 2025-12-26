@@ -54,6 +54,47 @@
     
     .action-buttons { display: flex; gap: 10px; margin-top: 20px; }
     
+    /* Animal Types Checkboxes */
+    .animal-types-container {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .animal-checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .animal-checkbox-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        background: white;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+    
+    .animal-checkbox-item:hover {
+        border-color: #667eea;
+        background: #f8fafc;
+    }
+    
+    .animal-checkbox-item input[type="checkbox"] {
+        margin-right: 10px;
+    }
+    
+    .animal-checkbox-item label {
+        cursor: pointer;
+        font-weight: 500;
+        flex: 1;
+    }
+    
     /* Responsive styles for mobile */
     @media (max-width: 768px) {
         .admin-header {
@@ -87,6 +128,11 @@
         .action-buttons a, .action-buttons button {
             width: 100%;
             text-align: center;
+        }
+        
+        .animal-checkbox-grid {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px;
         }
     }
     
@@ -173,6 +219,10 @@
         .form-label {
             font-size: 0.9rem;
         }
+        
+        .animal-checkbox-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 </style>
 @endsection
@@ -205,49 +255,96 @@
                         <textarea name="description" id="description" class="form-control" rows="3"></textarea>
                     </div>
                     
+                    <!-- Animal Types Section -->
                     <div class="form-group">
-                        <label for="phone" class="form-label">Phone</label>
-                        <input type="text" name="phone" id="phone" class="form-control">
+                        <label class="form-label">Animal Types Catered</label>
+                        <small class="form-text d-block mb-2">Select all animal types that this shelter caters to</small>
+                        
+                        <div class="animal-types-container">
+                            <div class="animal-checkbox-grid">
+                                @php
+                                    // Define animal types - should match the ones in your controller
+                                    $animalTypes = [
+                                        'dog' => 'Dog',
+                                        'cat' => 'Cat',
+                                        'bird' => 'Bird',
+                                        'fish' => 'Fish',
+                                        'rabbit' => 'Rabbit',
+                                        'hamster' => 'Hamster',
+                                        'guinea_pig' => 'Guinea Pig',
+                                        'reptile' => 'Reptile',
+                                        'small_pet' => 'Small Pet',
+                                        'exotic' => 'Exotic'
+                                    ];
+                                @endphp
+                                
+                                @foreach($animalTypes as $value => $label)
+                                    <div class="animal-checkbox-item">
+                                        <input 
+                                            type="checkbox" 
+                                            id="animal_type_{{ $value }}" 
+                                            name="animal_types[]" 
+                                            value="{{ $value }}"
+                                        >
+                                        <label for="animal_type_{{ $value }}">
+                                            {{ $label }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input type="text" name="phone" id="phone" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" name="email" id="email" class="form-control">
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" name="email" id="email" class="form-control">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="operating_hours" class="form-label">Operating Hours</label>
+                        <label class="form-label">Operating Hours</label>
+                        <small class="form-text d-block mb-2">Set operating hours for each day</small>
+                        
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="operating_hours[monday]" class="form-label">Monday</label>
-                                    <input type="text" name="operating_hours[monday]" id="operating_hours[monday]" class="form-control" placeholder="e.g., 8 AM - 5 PM" value="8 AM - 5 PM">
+                                    <label for="operating_hours_monday" class="form-label">Monday</label>
+                                    <input type="text" name="operating_hours[monday]" id="operating_hours_monday" class="form-control" placeholder="e.g., 8 AM - 5 PM" value="8 AM - 5 PM">
                                 </div>
                                 <div class="form-group">
-                                    <label for="operating_hours[tuesday]" class="form-label">Tuesday</label>
-                                    <input type="text" name="operating_hours[tuesday]" id="operating_hours[tuesday]" class="form-control" placeholder="e.g., 8 AM - 5 PM" value="8 AM - 5 PM">
+                                    <label for="operating_hours_tuesday" class="form-label">Tuesday</label>
+                                    <input type="text" name="operating_hours[tuesday]" id="operating_hours_tuesday" class="form-control" placeholder="e.g., 8 AM - 5 PM" value="8 AM - 5 PM">
                                 </div>
                                 <div class="form-group">
-                                    <label for="operating_hours[wednesday]" class="form-label">Wednesday</label>
-                                    <input type="text" name="operating_hours[wednesday]" id="operating_hours[wednesday]" class="form-control" placeholder="e.g., 8 AM - 5 PM" value="8 AM - 5 PM">
+                                    <label for="operating_hours_wednesday" class="form-label">Wednesday</label>
+                                    <input type="text" name="operating_hours[wednesday]" id="operating_hours_wednesday" class="form-control" placeholder="e.g., 8 AM - 5 PM" value="8 AM - 5 PM">
                                 </div>
                                 <div class="form-group">
-                                    <label for="operating_hours[thursday]" class="form-label">Thursday</label>
-                                    <input type="text" name="operating_hours[thursday]" id="operating_hours[thursday]" class="form-control" placeholder="e.g., 8 AM - 5 PM" value="8 AM - 5 PM">
+                                    <label for="operating_hours_thursday" class="form-label">Thursday</label>
+                                    <input type="text" name="operating_hours[thursday]" id="operating_hours_thursday" class="form-control" placeholder="e.g., 8 AM - 5 PM" value="8 AM - 5 PM">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="operating_hours[friday]" class="form-label">Friday</label>
-                                    <input type="text" name="operating_hours[friday]" id="operating_hours[friday]" class="form-control" placeholder="e.g., 8 AM - 5 PM" value="8 AM - 5 PM">
+                                    <label for="operating_hours_friday" class="form-label">Friday</label>
+                                    <input type="text" name="operating_hours[friday]" id="operating_hours_friday" class="form-control" placeholder="e.g., 8 AM - 5 PM" value="8 AM - 5 PM">
                                 </div>
                                 <div class="form-group">
-                                    <label for="operating_hours[saturday]" class="form-label">Saturday</label>
-                                    <input type="text" name="operating_hours[saturday]" id="operating_hours[saturday]" class="form-control" placeholder="e.g., 8 AM - 5 PM" value="8 AM - 5 PM">
+                                    <label for="operating_hours_saturday" class="form-label">Saturday</label>
+                                    <input type="text" name="operating_hours[saturday]" id="operating_hours_saturday" class="form-control" placeholder="e.g., 8 AM - 5 PM" value="8 AM - 5 PM">
                                 </div>
                                 <div class="form-group">
-                                    <label for="operating_hours[sunday]" class="form-label">Sunday</label>
-                                    <input type="text" name="operating_hours[sunday]" id="operating_hours[sunday]" class="form-control" placeholder="e.g., 9 AM - 4 PM" value="9 AM - 4 PM">
+                                    <label for="operating_hours_sunday" class="form-label">Sunday</label>
+                                    <input type="text" name="operating_hours[sunday]" id="operating_hours_sunday" class="form-control" placeholder="e.g., 9 AM - 4 PM" value="9 AM - 4 PM">
                                 </div>
                             </div>
                         </div>
@@ -256,6 +353,7 @@
                     <div class="form-group">
                         <label for="address" class="form-label">Address *</label>
                         <input type="text" name="address" id="address" class="form-control" required>
+                        <small class="form-text">This will be auto-filled when you click on the map, but you can edit it manually</small>
                     </div>
                     
                     <div class="row">
@@ -306,6 +404,16 @@
                             <p>Address: <span id="display-address">Click on the map to select a location</span></p>
                         </div>
                         <div class="form-text">Click on the map to select the shelter location. The coordinates will be automatically filled.</div>
+                    </div>
+                    
+                    <!-- Status field (hidden by default) -->
+                    <div class="form-group">
+                        <label for="is_active" class="form-label">Status</label>
+                        <select name="is_active" id="is_active" class="form-control">
+                            <option value="1" selected>Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                        <small class="form-text">Set the shelter's active status</small>
                     </div>
                 </div>
             </div>
@@ -397,6 +505,11 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             alert('Geolocation is not supported by your browser.');
         }
+    });
+    
+    // Set a default location on load (center of San Francisco, Agusan Del Sur)
+    map.fire('click', {
+        latlng: L.latLng(8.504588, 125.975800)
     });
 });
 </script>

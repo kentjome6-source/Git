@@ -18,6 +18,7 @@ class Vetshop extends Model
         'phone',
         'email',
         'operating_hours',
+        'animal_types',
         'latitude',
         'longitude',
         'is_active'
@@ -25,6 +26,7 @@ class Vetshop extends Model
 
     protected $casts = [
         'operating_hours' => 'array',
+        'animal_types' => 'array',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'is_active' => 'boolean'
@@ -36,6 +38,11 @@ class Vetshop extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeByAnimalType($query, $animalType)
+    {
+        return $query->whereJsonContains('animal_types', $animalType);
     }
 
     /**
@@ -55,11 +62,24 @@ class Vetshop extends Model
         }
     }
 
+    public function getAnimalTypesStringAttribute()
+    {
+        if (empty($this->animal_types)) {
+            return 'Not specified';
+        }
+        
+        return implode(', ', array_map('ucfirst', $this->animal_types));
+    }
+
     /**
      * Get the grooming services for this vetshop
      */
-    public function groomingServices()
-    {
-        return $this->hasMany(GroomingService::class);
+    // public function groomingServices()
+    // {
+    //     return $this->hasMany(GroomingService::class);
+    // }
+
+    public function vets(){
+        return $this->hasMany(User::class);
     }
 }
