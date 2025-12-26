@@ -59,12 +59,12 @@
                                 <div class="text-muted small">{{ $adoption->user->email }}</div>
                             </td>
                             <td>
-                                @if($adoption->status === 'vet_review')
+                                @if($adoption->listing_status === 'vet_review')
                                     <span class="badge bg-info">Vet Review</span>
-                                @elseif($adoption->status === 'admin_review')
+                                @elseif($adoption->listing_status === 'admin_review')
                                     <span class="badge bg-warning">Pending Approval</span>
                                 @else
-                                    <span class="badge bg-secondary">{{ ucfirst($adoption->status) }}</span>
+                                    <span class="badge bg-secondary">{{ ucfirst($adoption->listing_status) }}</span>
                                 @endif
                             </td>
                             <td>
@@ -72,7 +72,7 @@
                             </td>
                             <td>
                                 <div class="btn-group">
-                                    @if($adoption->status === 'admin_review')
+                                    @if($adoption->listing_status === 'admin_review')
                                     <form action="{{ route('admin.adoptions.approve', $adoption) }}" method="POST" class="d-inline">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-success" title="Approve">
@@ -90,6 +90,9 @@
                                         <i class="fas fa-clock"></i>
                                     </button>
                                     @endif
+                                    <a href="{{ route('messages.conversation', $adoption->user) }}" class="btn btn-sm btn-primary" title="Message Owner">
+                                        <i class="fas fa-comment"></i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>

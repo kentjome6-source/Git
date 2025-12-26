@@ -93,6 +93,9 @@
                             <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#orientationModal{{ $request->id }}">
                                 <i class="fas fa-eye me-2"></i>View Full Details
                             </button>
+                            <a href="{{ route('messages.conversation', $request->adopter) }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-comment me-2"></i>Message Adopter
+                            </a>
                             <form action="{{ route('vet.adoptions.complete-orientation', $request) }}" method="POST" class="d-inline">
                                 @csrf
                                 <button type="submit" class="btn btn-success btn-sm">
@@ -175,6 +178,9 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <a href="{{ route('messages.conversation', $request->adopter) }}" class="btn btn-primary">
+                                    <i class="fas fa-comment me-2"></i>Message Adopter
+                                </a>
                                 <form action="{{ route('vet.adoptions.complete-orientation', $request) }}" method="POST" class="d-inline">
                                     @csrf
                                     <button type="submit" class="btn btn-success">

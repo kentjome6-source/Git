@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Messenger')
+@section('title', 'Admin Messages')
 
 @section('content')
 <div class="container-fluid px-0">
@@ -202,7 +202,7 @@
                     <input type="hidden" id="receiver-id">
                     <div class="input-group">
                         <input type="text" id="message-input" class="form-control" placeholder="Type a message..." required>
-                        <button class="btn text-white" type="submit" style="background-color: #5b4b9b;">
+                        <button class="btn text-white" type="submit" style="background-color: #27ae60;">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
@@ -223,8 +223,8 @@
 }
 
 #messagesTab .nav-link.active {
-    color: #5b4b9b;
-    border-bottom: 2px solid #5b4b9b;
+    color: #27ae60;
+    border-bottom: 2px solid #27ae60;
     background: transparent;
 }
 
@@ -238,7 +238,7 @@
 }
 
 .sent-message {
-    background-color: #5b4b9b;
+    background-color: #27ae60;
     color: white;
     border-radius: 18px 18px 4px 18px;
 }
@@ -320,7 +320,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializePusher() {
-    // Replace with your Pusher credentials
     pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
         cluster: '{{ env("PUSHER_APP_CLUSTER") }}',
         encrypted: true,
@@ -332,7 +331,6 @@ function initializePusher() {
         }
     });
     
-    // Subscribe to private channel
     channel = pusher.subscribe('private-messages.{{ Auth::id() }}');
     
     channel.bind('pusher:subscription_succeeded', function() {
@@ -342,14 +340,12 @@ function initializePusher() {
     channel.bind('message-sent', function(data) {
         console.log('Message sent event:', data);
         if (currentChatUserId && currentChatUserId == data.message.sender_id) {
-            // Check if message already exists to avoid duplicates
             const existingMessage = document.querySelector(`[data-message-id="${data.message.id}"]`);
             if (!existingMessage) {
                 appendMessage(data.message, false);
                 lastMessageId = Math.max(lastMessageId, data.message.id);
             }
         } else if (data.message.sender_id != {{ Auth::id() }}) {
-            // Update unread count for this contact
             updateUnreadCount(data.message.sender_id, true);
         }
     });
@@ -357,13 +353,9 @@ function initializePusher() {
     channel.bind('message-request-sent', function(data) {
         console.log('Message request sent event:', data);
         if (data.message_request.recipient_id == {{ Auth::id() }}) {
-            // Show notification for new message request
             showNotification('New message request from ' + data.message.sender.name);
-            
-            // Update requests badge
             updateRequestsBadge(true);
             
-            // If we're on the requests tab, refresh it
             if (document.querySelector('#requests-tab').classList.contains('active')) {
                 loadRequests();
             }
@@ -376,32 +368,25 @@ function initializePusher() {
         const request = data.message_request;
         
         if (request.status === 'accepted') {
-            // If we're chatting with this user
             const otherUserId = request.sender_id == {{ Auth::id() }} ? request.recipient_id : request.sender_id;
             if (currentChatUserId && currentChatUserId == otherUserId) {
-                // Enable messaging
                 const messageInput = document.getElementById('message-input');
                 if (messageInput) {
                     messageInput.disabled = false;
                     messageInput.placeholder = "Type a message...";
                 }
                 
-                // Show acceptance message
                 showInChatNotification('Conversation accepted! You can now message freely.');
             }
         }
         
-        // Update requests badge
         updateRequestsBadge(false);
         
-        // Refresh requests list if on that tab
         if (document.querySelector('#requests-tab').classList.contains('active')) {
             loadRequests();
         }
         
-        // If this user is now in our contacts, refresh contacts
         if (request.status === 'accepted') {
-            // Refresh contacts list via AJAX instead of reloading
             setTimeout(() => {
                 if (document.querySelector('#chats-tab').classList.contains('active')) {
                     refreshContactsList();
@@ -418,7 +403,6 @@ function updateRequestsBadge(increment) {
         if (increment) {
             count++;
         } else {
-            // Fetch updated count from server
             fetch('/messages/requests/count')
                 .then(response => response.json())
                 .then(data => {
@@ -426,7 +410,6 @@ function updateRequestsBadge(increment) {
                     updateBadgeDisplay(badge, count);
                 })
                 .catch(() => {
-                    // Decrement by 1 as fallback
                     count = Math.max(0, count - 1);
                     updateBadgeDisplay(badge, count);
                 });
@@ -458,7 +441,6 @@ function updateBadgeDisplay(badge, count) {
 function loadConversation(userId, userName) {
     currentChatUserId = userId;
     
-    // Clear any existing polling interval
     if (pollingInterval) {
         clearInterval(pollingInterval);
     }
@@ -474,16 +456,13 @@ function loadConversation(userId, userName) {
     chatHeader.classList.remove('d-none');
     messageInputContainer.classList.remove('d-none');
     
-    // Update user info in header
     document.getElementById('chat-user-info').innerHTML = `
         <h5 class="mb-0">${userName}</h5>
         <small class="text-muted">Active now</small>
     `;
     
-    // Set receiver ID
     document.getElementById('receiver-id').value = userId;
     
-    // Load messages via AJAX
     fetch(`/messages/conversation/${userId}/load`, {
         method: 'GET',
         headers: {
@@ -511,15 +490,12 @@ function loadConversation(userId, userName) {
                 });
             }
             
-            // Mark messages as read
             markMessagesAsRead(userId);
             
-            // Scroll to bottom
             setTimeout(() => {
                 container.scrollTop = container.scrollHeight;
             }, 100);
             
-            // Start polling for new messages (fallback if WebSocket fails)
             startPolling(userId);
         } else {
             alert(data.message || 'Failed to load conversation');
@@ -529,7 +505,6 @@ function loadConversation(userId, userName) {
         console.error('Error:', error);
     });
     
-    // On mobile, hide sidebar and show chat
     if (window.innerWidth < 768) {
         document.querySelector('#chat-sidebar').style.display = 'none';
         document.querySelector('#chat-main').classList.add('active');
@@ -548,7 +523,6 @@ function appendMessage(message, isInitialLoad) {
     bubble.className = `d-inline-block p-3 message-bubble ${isSender ? 'sent-message' : 'received-message'}`;
     bubble.style.maxWidth = '70%';
     
-    // Format timestamp
     const timestamp = new Date(message.created_at).toLocaleTimeString([], { 
         hour: '2-digit', 
         minute: '2-digit' 
@@ -578,7 +552,6 @@ function sendMessage() {
         return;
     }
     
-    // Disable input while sending
     messageInput.disabled = true;
     
     fetch('/messages/send', {
@@ -599,14 +572,12 @@ function sendMessage() {
             messageInput.disabled = false;
             messageInput.focus();
             
-            // Add message to UI immediately (optimistic update)
             const existingMessage = document.querySelector(`[data-message-id="${data.message.id}"]`);
             if (!existingMessage) {
                 appendMessage(data.message, false);
                 lastMessageId = Math.max(lastMessageId, data.message.id);
             }
             
-            // If this is the first message (request), show appropriate message
             if (data.message_type === 'request') {
                 if (data.request_status === 'pending') {
                     const container = document.getElementById('conversation-messages');
@@ -639,10 +610,7 @@ function acceptRequest(requestId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Show success message
             showNotification('Message request accepted!');
-            
-            // Refresh contacts and requests without reloading page
             refreshContactsList();
             refreshRequestsList();
         } else {
@@ -677,15 +645,11 @@ function declineRequest(requestId) {
 }
 
 function viewRequest(userId, userName) {
-    // Load conversation to view the request message
     loadConversation(userId, userName);
-    
-    // Switch to chats tab
     document.querySelector('#chats-tab').click();
 }
 
 function startPolling(userId) {
-    // Poll for new messages every 3 seconds
     pollingInterval = setInterval(() => {
         if (currentChatUserId !== userId) {
             clearInterval(pollingInterval);
@@ -708,7 +672,6 @@ function startPolling(userId) {
                         appendMessage(message, false);
                         lastMessageId = Math.max(lastMessageId, message.id);
                         
-                        // Mark as read if not from current user
                         if (message.sender_id !== {{ Auth::id() }}) {
                             markMessagesAsRead(userId);
                         }
@@ -723,15 +686,12 @@ function startPolling(userId) {
 }
 
 function refreshContactsList() {
-    // This would ideally fetch the contacts list via AJAX
-    // For now, we'll just reload the page as a simple solution
     setTimeout(() => {
         location.reload();
     }, 500);
 }
 
 function refreshRequestsList() {
-    // Reload requests section
     setTimeout(() => {
         location.reload();
     }, 500);
@@ -747,7 +707,6 @@ function markMessagesAsRead(userId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Update unread count badge for this contact
             updateUnreadCount(userId, false);
         }
     });
@@ -773,34 +732,11 @@ function updateUnreadCount(userId, increment) {
 }
 
 function closeChat() {
-    // On mobile, show sidebar again
     document.querySelector('#chat-sidebar').style.display = 'block';
     document.querySelector('#chat-main').classList.remove('active');
 }
 
 function showNotification(message) {
-    // Create a toast notification
-    const toast = document.createElement('div');
-    toast.className = 'position-fixed top-0 end-0 p-3';
-    toast.style.zIndex = '9999';
-    toast.innerHTML = `
-        <div class="toast show" role="alert">
-            <div class="toast-header bg-success text-white">
-                <strong class="me-auto">Success</strong>
-                <button type="button" class="btn-close btn-close-white" onclick="this.closest('.position-fixed').remove()"></button>
-            </div>
-            <div class="toast-body">${message}</div>
-        </div>
-    `;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
-}
-
-function showNotification(message) {
-    // Create a simple notification
     const notification = document.createElement('div');
     notification.className = 'alert alert-info alert-dismissible fade show position-fixed';
     notification.style.top = '20px';
@@ -813,7 +749,6 @@ function showNotification(message) {
     
     document.body.appendChild(notification);
     
-    // Auto remove after 5 seconds
     setTimeout(() => {
         notification.remove();
     }, 5000);

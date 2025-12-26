@@ -18,10 +18,16 @@
             </div>
         </div>
 
-        @if($adoptions->count() > 0)
+        <!-- My Listings Section -->
+        <div class="section-header mb-3">
+            <h3 class="section-title">My Pet Listings</h3>
+            <p class="section-subtitle text-muted">Pets you've listed for adoption</p>
+        </div>
+
+        @if($myListings->count() > 0)
         <!-- History Grid -->
-        <div class="row g-4">
-            @foreach($adoptions as $adoption)
+        <div class="row g-4 mb-5">
+            @foreach($myListings as $adoption)
             <div class="col-lg-4 col-md-6">
                 <div class="history-card">
                     <!-- Pet Image -->
@@ -32,12 +38,16 @@
                             <img src="{{ asset('images/pawpatrol.jpg') }}" alt="{{ $adoption->pet_name }}">
                         @endif
                         <div class="history-status">
-                            @if($adoption->status === 'completed')
-                                <span class="badge bg-success">Completed</span>
-                            @elseif($adoption->status === 'published')
-                                <span class="badge bg-primary">Active</span>
+                            @if($adoption->listing_status === 'published')
+                                <span class="badge bg-success">Published</span>
+                            @elseif($adoption->listing_status === 'vet_review')
+                                <span class="badge bg-warning">Vet Review</span>
+                            @elseif($adoption->listing_status === 'admin_review')
+                                <span class="badge bg-info">Admin Review</span>
+                            @elseif($adoption->is_adopted)
+                                <span class="badge bg-dark">Adopted</span>
                             @else
-                                <span class="badge bg-secondary">{{ ucfirst($adoption->status) }}</span>
+                                <span class="badge bg-secondary">{{ ucfirst(str_replace('_', ' ', $adoption->listing_status)) }}</span>
                             @endif
                         </div>
                     </div>
@@ -63,6 +73,39 @@
                             </span>
                         </div>
 
+                        <!-- Adoption Progress -->
+                        @php
+                            $activeRequest = $adoption->adoptionRequests->where('status', '!=', 'rejected')->first();
+                        @endphp
+                        
+                        @if($activeRequest)
+                        <div class="adoption-progress mb-3">
+                            <div class="progress-label">Adoption Progress:</div>
+                            <div class="progress-status">
+                                @if($activeRequest->status === 'pending')
+                                    <i class="fas fa-hourglass-half text-warning"></i> Pending Screening
+                                @elseif($activeRequest->status === 'screened')
+                                    <i class="fas fa-user-check text-info"></i> Screened - Orientation Pending
+                                @elseif($activeRequest->status === 'oriented')
+                                    <i class="fas fa-graduation-cap text-primary"></i> Oriented - Awaiting Your Review
+                                @elseif($activeRequest->status === 'owner_review')
+                                    <i class="fas fa-eye text-warning"></i> Awaiting Your Approval
+                                @elseif($activeRequest->status === 'owner_approved')
+                                    <i class="fas fa-check-circle text-info"></i> Approved - Final Admin Review
+                                @elseif($activeRequest->status === 'approved')
+                                    <i class="fas fa-check-double text-success"></i> Approved - Ready for Transfer
+                                @endif
+                            </div>
+                            @if($activeRequest->adopter)
+                            <div class="adopter-info mt-2">
+                                <small class="text-muted">
+                                    Applicant: <strong>{{ $activeRequest->adopter->name }}</strong>
+                                </small>
+                            </div>
+                            @endif
+                        </div>
+                        @endif
+
                         @if($adoption->description)
                         <p class="history-description">
                             {{ Str::limit($adoption->description, 80) }}
@@ -72,7 +115,7 @@
                         <!-- Actions -->
                         <div class="history-actions mt-3">
                             <a href="{{ route('adoptions.show', $adoption) }}" class="btn btn-outline-primary btn-sm w-100">
-                                <i class="fas fa-eye me-2"></i>View Details
+                                <i class="fas fa-eye me-2"></i>View Details & Progress
                             </a>
                         </div>
                     </div>
@@ -82,13 +125,99 @@
         </div>
 
         <!-- Pagination -->
-        @if($adoptions->hasPages())
-        <div class="pagination-wrapper mt-5">
-            {{ $adoptions->links() }}
+        @if($myListings->hasPages())
+        <div class="pagination-wrapper mb-5">
+            {{ $myListings->links() }}
         </div>
         @endif
 
         @else
+        <!-- Empty State for Listings -->
+        <div class="empty-state-small mb-5">
+            <div class="empty-state-icon-small">
+                <i class="fas fa-list"></i>
+            </div>
+            <h5 class="empty-state-title-small">No Listings Yet</h5>
+            <p class="empty-state-text-small">
+                You haven't listed any pets for adoption yet.
+            </p>
+        </div>
+        @endif
+
+        <!-- Adopted Pets Section -->
+        <div class="section-header mb-3 mt-5">
+            <h3 class="section-title">Pets I've Adopted</h3>
+            <p class="section-subtitle text-muted">Pets you've successfully adopted</p>
+        </div>
+
+        @if($adoptedPets->count() > 0)
+        <div class="row g-4">
+            @foreach($adoptedPets as $history)
+            <div class="col-lg-4 col-md-6">
+                <div class="history-card">
+                    <!-- Pet Image -->
+                    <div class="history-image">
+                        @if($history->adoption->image_path)
+                            <img src="{{ asset('storage/' . $history->adoption->image_path) }}" alt="{{ $history->adoption->pet_name }}">
+                        @else
+                            <img src="{{ asset('images/pawpatrol.jpg') }}" alt="{{ $history->adoption->pet_name }}">
+                        @endif
+                        <div class="history-status">
+                            <span class="badge bg-success">Adopted</span>
+                        </div>
+                    </div>
+
+                    <!-- Pet Info -->
+                    <div class="history-content">
+                        <h5 class="history-pet-name">{{ $history->adoption->pet_name }}</h5>
+                        
+                        <div class="history-meta mb-3">
+                            @if($history->adoption->breed)
+                            <span class="meta-item">
+                                <i class="fas fa-tag"></i>
+                                {{ $history->adoption->breed }}
+                            </span>
+                            @endif
+                            <span class="meta-item">
+                                <i class="fas fa-calendar-check"></i>
+                                {{ $history->created_at->format('M d, Y') }}
+                            </span>
+                        </div>
+
+                        <div class="owner-info mb-3">
+                            <small class="text-muted">
+                                Previous Owner: <strong>{{ $history->uploader->name ?? 'N/A' }}</strong>
+                            </small>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="history-actions mt-3">
+                            <a href="{{ route('adoptions.show', $history->adoption) }}" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="fas fa-eye me-2"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @else
+        <!-- Empty State for Adopted -->
+        <div class="empty-state-small">
+            <div class="empty-state-icon-small">
+                <i class="fas fa-heart"></i>
+            </div>
+            <h5 class="empty-state-title-small">No Adopted Pets</h5>
+            <p class="empty-state-text-small">
+                You haven't adopted any pets yet.
+            </p>
+            <a href="{{ route('adoptions.index') }}" class="btn btn-primary btn-sm mt-2">
+                <i class="fas fa-search me-2"></i>Browse Available Pets
+            </a>
+        </div>
+        @endif
+
+        @if($myListings->count() === 0 && $adoptedPets->count() === 0)
         <!-- Empty State -->
         <div class="empty-state">
             <div class="empty-state-icon">
@@ -111,6 +240,8 @@
 :root {
     --primary: #2563eb;
     --success: #10b981;
+    --info: #0ea5e9;
+    --warning: #f59e0b;
     --dark: #1e293b;
     --gray-50: #f8fafc;
     --gray-100: #f1f5f9;
@@ -138,6 +269,23 @@
 
 .page-subtitle {
     color: var(--gray-600);
+}
+
+.section-header {
+    border-bottom: 2px solid var(--gray-200);
+    padding-bottom: 0.75rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin: 0;
+}
+
+.section-subtitle {
+    font-size: 0.875rem;
+    margin: 0;
 }
 
 .history-card {
@@ -232,6 +380,31 @@
     color: var(--primary);
 }
 
+.adoption-progress {
+    background: var(--gray-50);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border-left: 3px solid var(--primary);
+}
+
+.progress-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    margin-bottom: 0.375rem;
+}
+
+.progress-status {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.adopter-info, .owner-info {
+    font-size: 0.875rem;
+}
+
 .history-description {
     font-size: 0.9375rem;
     color: var(--gray-600);
@@ -277,6 +450,41 @@
     margin: 0 auto;
 }
 
+.empty-state-small {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow);
+}
+
+.empty-state-icon-small {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-100);
+    border-radius: 50%;
+}
+
+.empty-state-icon-small i {
+    font-size: 1.75rem;
+    color: var(--gray-600);
+}
+
+.empty-state-title-small {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.empty-state-text-small {
+    color: var(--gray-600);
+    font-size: 0.9375rem;
+}
+
 .pagination-wrapper {
     display: flex;
     justify-content: center;
@@ -313,6 +521,10 @@
 @media (max-width: 768px) {
     .page-title {
         font-size: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
     }
 }
 </style>

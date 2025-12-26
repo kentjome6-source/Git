@@ -28,10 +28,10 @@
                     @endif
                     
                     <div class="pet-status-overlay">
-                        @if($adoption->status === 'published')
+                        @if($adoption->listing_status === 'published')
                             <span class="badge bg-success">Available for Adoption</span>
                         @else
-                            <span class="badge bg-secondary">{{ ucfirst($adoption->status) }}</span>
+                            <span class="badge bg-secondary">{{ ucfirst(str_replace('_', ' ', $adoption->listing_status)) }}</span>
                         @endif
                     </div>
                 </div>
@@ -108,7 +108,7 @@
                     </div>
                     @endif
 
-                    @if($adoption->user_id != auth()->id() && $adoption->status === 'published')
+                    @if($adoption->user_id != auth()->id() && $adoption->listing_status === 'published')
                         @if(!$adoption->adoptionRequests()->where('adopter_id', auth()->id())->exists())
                             <!-- Application Form -->
                             <div class="application-form-section">
@@ -171,14 +171,6 @@
                                                     <option value="">Select...</option>
                                                     <option value="own">Own</option>
                                                     <option value="rent">Rent</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-12" id="landlordField" style="display:none;">
-                                                <label class="form-label">Landlord Approval <span class="required">*</span></label>
-                                                <select class="form-select" name="landlord_approval" id="landlordApproval">
-                                                    <option value="">Select...</option>
-                                                    <option value="1">Yes, I have approval</option>
-                                                    <option value="0">No</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -253,28 +245,177 @@
                             </div>
                         @endif
                     @else
-                        <!-- Owner View or Not Available -->
-                        <div class="alert-card alert-warning">
-                            <div class="alert-icon">
-                                <i class="fas fa-exclamation-triangle"></i>
+                        @if($adoption->user_id == auth()->id())
+                            <!-- Owner View - Show Adoption Progress -->
+                            <div class="owner-dashboard-section">
+                                <div class="section-header mb-4">
+                                    <h4 class="section-title">Your Pet Listing</h4>
+                                    <p class="text-muted mb-0">Manage your pet's adoption process</p>
+                                </div>
+
+                                <!-- Listing Status -->
+                                <div class="status-card mb-4">
+                                    <h6 class="status-label">Listing Status</h6>
+                                    <div class="status-value">
+                                        @if($adoption->listing_status === 'vet_review')
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-stethoscope me-1"></i>Awaiting Vet Certification
+                                            </span>
+                                        @elseif($adoption->listing_status === 'admin_review')
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-user-shield me-1"></i>Awaiting Admin Approval
+                                            </span>
+                                        @elseif($adoption->listing_status === 'published')
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>Published & Available
+                                            </span>
+                                        @elseif($adoption->is_adopted)
+                                            <span class="badge bg-dark">
+                                                <i class="fas fa-heart me-1"></i>Adopted
+                                            </span>
+                                        @else
+                                            <span class="badge bg-secondary">
+                                                {{ ucfirst(str_replace('_', ' ', $adoption->listing_status)) }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Adoption Requests -->
+                                @php
+                                    $activeRequests = $adoption->adoptionRequests()
+                                        ->with('adopter')
+                                        ->whereIn('status', ['pending', 'screened', 'oriented', 'owner_review', 'owner_approved', 'approved'])
+                                        ->latest()
+                                        ->get();
+                                @endphp
+
+                                @if($activeRequests->count() > 0)
+                                    <div class="requests-section">
+                                        <h5 class="section-title mb-3">
+                                            <i class="fas fa-clipboard-list me-2"></i>Adoption Applications
+                                        </h5>
+
+                                        @foreach($activeRequests as $request)
+                                            <div class="request-card mb-3">
+                                                <div class="request-header">
+                                                    <div class="applicant-info">
+                                                        <div class="applicant-avatar">
+                                                            <i class="fas fa-user"></i>
+                                                        </div>
+                                                        <div>
+                                                            <h6 class="applicant-name mb-1">{{ $request->adopter->name }}</h6>
+                                                            <p class="applicant-email mb-0">{{ $request->adopter->email }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="request-status-badge">
+                                                        @if($request->status === 'pending')
+                                                            <span class="badge bg-warning">Pending Screening</span>
+                                                        @elseif($request->status === 'screened')
+                                                            <span class="badge bg-info">Screened</span>
+                                                        @elseif($request->status === 'oriented')
+                                                            <span class="badge bg-primary">Orientation Complete</span>
+                                                        @elseif($request->status === 'owner_review')
+                                                            <span class="badge bg-warning">Awaiting Your Review</span>
+                                                        @elseif($request->status === 'owner_approved')
+                                                            <span class="badge bg-success">You Approved</span>
+                                                        @elseif($request->status === 'approved')
+                                                            <span class="badge bg-success">Approved - Ready</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+
+                                                <div class="request-progress mt-3">
+                                                    <div class="progress-steps">
+                                                        <div class="progress-step {{ in_array($request->status, ['pending', 'screened', 'oriented', 'owner_review', 'owner_approved', 'approved']) ? 'completed' : '' }}">
+                                                            <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                                                            <div class="step-label">Applied</div>
+                                                        </div>
+                                                        <div class="progress-line {{ in_array($request->status, ['screened', 'oriented', 'owner_review', 'owner_approved', 'approved']) ? 'completed' : '' }}"></div>
+                                                        <div class="progress-step {{ in_array($request->status, ['screened', 'oriented', 'owner_review', 'owner_approved', 'approved']) ? 'completed' : '' }}">
+                                                            <div class="step-icon"><i class="fas fa-user-check"></i></div>
+                                                            <div class="step-label">Screened</div>
+                                                        </div>
+                                                        <div class="progress-line {{ in_array($request->status, ['oriented', 'owner_review', 'owner_approved', 'approved']) ? 'completed' : '' }}"></div>
+                                                        <div class="progress-step {{ in_array($request->status, ['oriented', 'owner_review', 'owner_approved', 'approved']) ? 'completed' : '' }}">
+                                                            <div class="step-icon"><i class="fas fa-graduation-cap"></i></div>
+                                                            <div class="step-label">Oriented</div>
+                                                        </div>
+                                                        <div class="progress-line {{ in_array($request->status, ['owner_approved', 'approved']) ? 'completed' : '' }}"></div>
+                                                        <div class="progress-step {{ in_array($request->status, ['owner_approved', 'approved']) ? 'completed' : '' }}">
+                                                            <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                                                            <div class="step-label">Owner Approved</div>
+                                                        </div>
+                                                        <div class="progress-line {{ $request->status === 'approved' ? 'completed' : '' }}"></div>
+                                                        <div class="progress-step {{ $request->status === 'approved' ? 'completed' : '' }}">
+                                                            <div class="step-icon"><i class="fas fa-heart"></i></div>
+                                                            <div class="step-label">Final Approval</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                @if($request->status === 'owner_review')
+                                                    <div class="request-actions mt-3">
+                                                        <button onclick="approveOwner({{ $request->id }})" class="btn btn-success">
+                                                            <i class="fas fa-check me-2"></i>Approve Applicant
+                                                        </button>
+                                                        <button onclick="rejectOwner({{ $request->id }})" class="btn btn-outline-danger">
+                                                            <i class="fas fa-times me-2"></i>Reject
+                                                        </button>
+                                                        <a href="{{ route('messages.index', ['user' => $request->adopter_id]) }}" class="btn btn-outline-primary">
+                                                            <i class="fas fa-envelope me-2"></i>Message
+                                                        </a>
+                                                    </div>
+                                                @else
+                                                    <div class="request-actions mt-3">
+                                                        <a href="{{ route('messages.index', ['user' => $request->adopter_id]) }}" class="btn btn-outline-primary btn-sm">
+                                                            <i class="fas fa-envelope me-2"></i>Message Applicant
+                                                        </a>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="alert-card alert-info">
+                                        <div class="alert-icon">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="alert-title">No Applications Yet</h5>
+                                            <p class="mb-0">No one has applied to adopt {{ $adoption->pet_name }} yet. Applications will appear here when users submit them.</p>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!-- Edit/Delete Actions -->
+                                @if($adoption->listing_status !== 'published' && !$adoption->is_adopted)
+                                    <div class="owner-actions mt-4">
+                                        <a href="{{ route('adoptions.edit', $adoption) }}" class="btn btn-primary">
+                                            <i class="fas fa-edit me-2"></i>Edit Listing
+                                        </a>
+                                        <form action="{{ route('adoptions.destroy', $adoption) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this listing?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger">
+                                                <i class="fas fa-trash me-2"></i>Delete Listing
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
                             </div>
-                            <div>
-                                <h5 class="alert-title">
-                                    @if($adoption->user_id == auth()->id())
-                                        Your Pet Listing
-                                    @else
-                                        Not Available
-                                    @endif
-                                </h5>
-                                <p class="mb-0">
-                                    @if($adoption->user_id == auth()->id())
-                                        This is your pet listing. You can edit or remove it from your dashboard.
-                                    @else
-                                        This pet is currently not available for adoption.
-                                    @endif
-                                </p>
+                        @else
+                            <!-- Not Available -->
+                            <div class="alert-card alert-warning">
+                                <div class="alert-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <h5 class="alert-title">Not Available</h5>
+                                    <p class="mb-0">This pet is currently not available for adoption.</p>
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -559,6 +700,164 @@
     margin-bottom: 0.5rem;
 }
 
+/* Owner Dashboard Styles */
+.owner-dashboard-section {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.status-card {
+    background: var(--gray-50);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    border-left: 4px solid var(--primary);
+}
+
+.status-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.status-value {
+    font-size: 1rem;
+}
+
+.requests-section {
+    margin-top: 2rem;
+}
+
+.request-card {
+    background: var(--gray-50);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    border: 1px solid var(--gray-200);
+    transition: all 0.3s;
+}
+
+.request-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+}
+
+.request-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.applicant-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.applicant-avatar {
+    width: 50px;
+    height: 50px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.applicant-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.applicant-email {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+.request-status-badge .badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.request-progress {
+    margin-top: 1.5rem;
+}
+
+.progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.step-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--gray-200);
+    color: var(--gray-600);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.progress-step.completed .step-icon {
+    background: var(--primary);
+    color: white;
+}
+
+.step-label {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    text-align: center;
+    max-width: 80px;
+}
+
+.progress-step.completed .step-label {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.progress-line {
+    flex: 1;
+    height: 2px;
+    background: var(--gray-200);
+    margin: 0 0.5rem;
+    position: relative;
+    top: -20px;
+}
+
+.progress-line.completed {
+    background: var(--primary);
+}
+
+.request-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.owner-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
 /* Animations */
 @keyframes fadeIn {
     from { opacity: 0; }
@@ -603,6 +902,39 @@
     .form-actions .btn {
         width: 100%;
     }
+    
+    .progress-steps {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .progress-line {
+        display: none;
+    }
+    
+    .progress-step {
+        flex-direction: row;
+        width: 100%;
+    }
+    
+    .step-label {
+        text-align: left;
+        max-width: none;
+    }
+    
+    .request-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .request-actions {
+        width: 100%;
+    }
+    
+    .request-actions .btn {
+        flex: 1;
+    }
 }
 </style>
 
@@ -625,5 +957,90 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function approveOwner(requestId) {
+    Swal.fire({
+        title: 'Approve Application?',
+        text: 'Are you sure you want to approve this adoption application?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, Approve',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/adoption-requests/${requestId}/owner-approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Approved!',
+                        text: data.message,
+                        icon: 'success'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('Error', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                Swal.fire('Error', 'An error occurred while processing your request.', 'error');
+            });
+        }
+    });
+}
+
+function rejectOwner(requestId) {
+    Swal.fire({
+        title: 'Reject Application?',
+        text: 'Are you sure you want to reject this adoption application?',
+        icon: 'warning',
+        input: 'textarea',
+        inputPlaceholder: 'Reason for rejection (optional)',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, Reject',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/adoption-requests/${requestId}/owner-reject`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    rejection_reason: result.value || 'No reason provided'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Rejected',
+                        text: data.message,
+                        icon: 'success'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('Error', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                Swal.fire('Error', 'An error occurred while processing your request.', 'error');
+            });
+        }
+    });
+}
 </script>
 @endsection

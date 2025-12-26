@@ -40,7 +40,13 @@ class AdoptionRequest extends Model
         'vet_orientation_completed',
         'vet_orientation_date',
         'vet_orientation_by',
-        'vet_orientation_notes'
+        'vet_orientation_notes',
+        'owner_approved',
+        'owner_approval_date',
+        'admin_final_approved',
+        'admin_final_approval_date',
+        'admin_final_approved_by',
+        'admin_approval_notes'
     ];
     
     protected $casts = [
@@ -52,7 +58,11 @@ class AdoptionRequest extends Model
         'admin_screened' => 'boolean',
         'admin_screening_date' => 'datetime',
         'vet_orientation_completed' => 'boolean',
-        'vet_orientation_date' => 'datetime'
+        'vet_orientation_date' => 'datetime',
+        'owner_approved' => 'boolean',
+        'owner_approval_date' => 'datetime',
+        'admin_final_approved' => 'boolean',
+        'admin_final_approval_date' => 'datetime'
     ];
     
     // Relationship: an adoption request belongs to an adoption listing
@@ -89,6 +99,18 @@ class AdoptionRequest extends Model
     public function vetOrientator()
     {
         return $this->belongsTo(User::class, 'vet_orientation_by');
+    }
+    
+    // Alias for vetOrientator
+    public function vetOrientation()
+    {
+        return $this->belongsTo(User::class, 'vet_orientation_by');
+    }
+    
+    // Alias for adminScreener
+    public function adminScreening()
+    {
+        return $this->belongsTo(User::class, 'admin_screened_by');
     }
     
     // Check if adoption request is pending

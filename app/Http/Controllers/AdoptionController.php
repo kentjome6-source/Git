@@ -92,9 +92,19 @@ class AdoptionController extends Controller
      */
     public function show(Adoption $adoption)
     {
-        $adoption->load(['user', 'pet', 'adoptionRequests.adopter']);
+        // Allow pet owners to view their own adoptions and adopters to view adoptions they applied for
+        $userId = Auth::id();
+        $isOwner = $adoption->user_id == $userId;
+        $isAdopter = $adoption->adoptionRequests()->where('adopter_id', $userId)->exists();
+        $isAdmin = Auth::user() && Auth::user()->role === 'admin';
         
-        return view('user.adoptions.show', compact('adoption'));
+        if (!$isOwner && !$isAdopter && !$isAdmin) {
+            abort(403, 'This action is unauthorized.');
+        }
+        
+        $adoption->load(['user', 'pet', 'adoptionRequests.adopter', 'adoptionRequests.vetOrientation', 'adoptionRequests.adminScreening', 'adoptionRequests.agreement']);
+        
+        return view('user.adoptions.show', compact('adoption', 'isOwner', 'isAdopter', 'isAdmin'));
     }
 
     /**
@@ -136,7 +146,6 @@ class AdoptionController extends Controller
             'housing_type' => 'required|in:house,apartment,condo,other',
             'has_yard' => 'required|boolean',
             'own_or_rent' => 'required|in:own,rent',
-            'landlord_approval' => 'required_if:own_or_rent,rent|boolean',
             'current_pets' => 'nullable|string|max:1000',
             'veterinarian_info' => 'nullable|string|max:500',
             'experience_with_pets' => 'nullable|string|max:1000',
@@ -183,8 +192,10 @@ class AdoptionController extends Controller
             return redirect()->back()->with('error', 'The adoption application is incomplete.');
         }
 
-        // Update adoption request to approved status
-        $adoptionRequest->status = 'approved';
+        // Update adoption request to owner_approved status (awaiting admin final approval)
+        $adoptionRequest->status = 'owner_approved';
+        $adoptionRequest->owner_approved = true;
+        $adoptionRequest->owner_approval_date = now();
         $adoptionRequest->responded_at = now();
         $adoptionRequest->save();
         
@@ -198,7 +209,7 @@ class AdoptionController extends Controller
         $agreement->adoption_fee = 0; // Can be set by owner
         $agreement->save();
 
-        return redirect()->route('adoptions.show', $adoption)->with('success', 'Adoption request approved! Please proceed to sign the adoption agreement.');
+        return redirect()->route('adoptions.show', $adoption)->with('success', 'Adoption request approved! Awaiting admin final approval and agreement processing.');
     }
     
     /**
@@ -394,25 +405,19 @@ class AdoptionController extends Controller
      */
     public function history()
     {
-        // Get adoption history where the user is either the uploader or adopter
-        $adoptedPetsAsUploader = AdoptionHistory::with(['adoption', 'adopter'])
-            ->where('uploader_id', Auth::id())
+        // Get all adoptions owned by the user (pets they listed)
+        $myListings = Adoption::with(['adoptionRequests.adopter'])
+            ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
-            ->get();
-            
-        $adoptedPetsAsAdopter = AdoptionHistory::with(['adoption', 'uploader'])
+            ->paginate(12);
+        
+        // Get adoption history where the user adopted a pet
+        $adoptedPets = AdoptionHistory::with(['adoption', 'uploader'])
             ->where('adopter_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
-            
-        // Get adoption listings that the user has uploaded but not yet adopted
-        $uploadedPets = Adoption::with(['adoptionRequests'])
-            ->where('user_id', Auth::id())
-            ->whereDoesntHave('adoptionHistory')
-            ->orderBy('created_at', 'desc')
-            ->get();
         
-        return view('user.adoptions.history', compact('adoptedPetsAsUploader', 'adoptedPetsAsAdopter', 'uploadedPets'));
+        return view('user.adoptions.history', compact('myListings', 'adoptedPets'));
     }
 
     /**
@@ -599,5 +604,61 @@ class AdoptionController extends Controller
             ->get();
         
         return view('user.adoptions.followups', compact('adoptionHistories'));
+    }
+    
+    /**
+     * Owner approves adoption request.
+     */
+    public function ownerApprove(AdoptionRequest $adoptionRequest)
+    {
+        // Check if the current user is the pet owner
+        if ($adoptionRequest->adoption->user_id != Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to approve this request.'
+            ], 403);
+        }
+        
+        // Check if request is in owner_review status
+        if ($adoptionRequest->status !== 'owner_review') {
+            return response()->json([
+                'success' => false,
+                'message' => 'This request is not ready for owner approval.'
+            ], 400);
+        }
+        
+        // Update status to owner_approved
+        $adoptionRequest->status = 'owner_approved';
+        $adoptionRequest->owner_approval_date = now();
+        $adoptionRequest->save();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'You have approved this adoption application. It will now proceed to final admin approval.'
+        ]);
+    }
+    
+    /**
+     * Owner rejects adoption request.
+     */
+    public function ownerReject(Request $request, AdoptionRequest $adoptionRequest)
+    {
+        // Check if the current user is the pet owner
+        if ($adoptionRequest->adoption->user_id != Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to reject this request.'
+            ], 403);
+        }
+        
+        // Update status to rejected
+        $adoptionRequest->status = 'rejected';
+        $adoptionRequest->rejection_reason = $request->input('rejection_reason', 'Rejected by pet owner');
+        $adoptionRequest->save();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'You have rejected this adoption application.'
+        ]);
     }
 }

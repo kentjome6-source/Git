@@ -94,6 +94,9 @@
                                         </button>
                                     </form>
                                     @endif
+                                    <a href="{{ route('messages.conversation', $request->adopter) }}" class="btn btn-sm btn-primary" title="Message Adopter">
+                                        <i class="fas fa-comment"></i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -160,6 +163,9 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <a href="{{ route('messages.conversation', $request->adopter) }}" class="btn btn-primary">
+                                            <i class="fas fa-comment me-2"></i>Message Adopter
+                                        </a>
                                         @if($request->status === 'pending')
                                         <form action="{{ route('admin.adoption-requests.approve', $request) }}" method="POST" class="d-inline">
                                             @csrf

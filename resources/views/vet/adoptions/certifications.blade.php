@@ -68,17 +68,53 @@
                                 @endif
 
                                 <div class="cert-actions mt-3">
-                                    <form action="{{ route('vet.adoptions.certify', $adoption) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-success btn-sm">
-                                            <i class="fas fa-certificate me-2"></i>Certify
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#certifyModal{{ $adoption->id }}">
+                                        <i class="fas fa-certificate me-2"></i>Certify
+                                    </button>
                                     <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal{{ $adoption->id }}">
                                         <i class="fas fa-eye me-2"></i>Details
                                     </button>
+                                    <a href="{{ route('messages.conversation', $adoption->user) }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-comment me-2"></i>Message
+                                    </a>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certify Modal -->
+                <div class="modal fade" id="certifyModal{{ $adoption->id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Certify {{ $adoption->pet_name }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form action="{{ route('vet.adoptions.certify', $adoption) }}" method="POST">
+                                @csrf
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="vet_health_notes{{ $adoption->id }}" class="form-label fw-semibold">Health Notes <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="vet_health_notes{{ $adoption->id }}" name="vet_health_notes" rows="4" required placeholder="Enter your health assessment and notes..."></textarea>
+                                        <small class="text-muted">Provide detailed health assessment and any recommendations</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="is_fit_for_adoption{{ $adoption->id }}" class="form-label fw-semibold">Adoption Fitness <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="is_fit_for_adoption{{ $adoption->id }}" name="is_fit_for_adoption" required>
+                                            <option value="">Select status...</option>
+                                            <option value="1">Fit for Adoption</option>
+                                            <option value="0">Not Fit for Adoption</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-certificate me-2"></i>Submit Certification
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -145,12 +181,12 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <form action="{{ route('vet.adoptions.certify', $adoption) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-certificate me-2"></i>Certify Pet
-                                    </button>
-                                </form>
+                                <a href="{{ route('messages.conversation', $adoption->user) }}" class="btn btn-primary">
+                                    <i class="fas fa-comment me-2"></i>Message Owner
+                                </a>
+                                <button type="button" class="btn btn-success" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#certifyModal{{ $adoption->id }}">
+                                    <i class="fas fa-certificate me-2"></i>Certify Pet
+                                </button>
                             </div>
                         </div>
                     </div>

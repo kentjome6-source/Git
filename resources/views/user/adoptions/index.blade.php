@@ -111,10 +111,10 @@
                                  alt="{{ $adoption->pet_name }}">
                         @endif
                         <div class="pet-status-badge">
-                            @if($adoption->status === 'published')
+                            @if($adoption->listing_status === 'published')
                                 <span class="badge bg-success">Available</span>
                             @else
-                                <span class="badge bg-secondary">{{ ucfirst($adoption->status) }}</span>
+                                <span class="badge bg-secondary">{{ ucfirst(str_replace('_', ' ', $adoption->listing_status)) }}</span>
                             @endif
                         </div>
                     </div>

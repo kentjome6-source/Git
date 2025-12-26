@@ -204,6 +204,19 @@ class AdoptionController extends Controller
     }
     
     /**
+     * Show adoption requests awaiting final admin approval
+     */
+    public function pendingFinalApproval()
+    {
+        $adoptionRequests = \App\Models\AdoptionRequest::where('status', 'owner_approved')
+            ->with(['adoption.user', 'adopter'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+        
+        return view('admin.adoption-requests.final-approvals', compact('adoptionRequests'));
+    }
+    
+    /**
      * Screen an adopter
      */
     public function screenAdopter(Request $request, \App\Models\AdoptionRequest $adoptionRequest)
@@ -304,5 +317,67 @@ class AdoptionController extends Controller
         $agreement->save();
         
         return redirect()->back()->with('success', 'Adoption certificate issued successfully! Certificate Number: ' . $certificateNumber);
+    }
+    
+    /**
+     * Approve an adoption request
+     */
+    public function approveRequest(Request $request, \App\Models\AdoptionRequest $adoptionRequest)
+    {
+        if ($adoptionRequest->status !== 'owner_approved') {
+            return response()->json([
+                'success' => false,
+                'message' => 'This application is not ready for final approval.'
+            ], 400);
+        }
+        
+        $validated = $request->validate([
+            'admin_approval_notes' => 'nullable|string|max:2000'
+        ]);
+        
+        $adoptionRequest->admin_final_approved = true;
+        $adoptionRequest->admin_final_approval_date = now();
+        $adoptionRequest->admin_final_approved_by = auth()->id();
+        $adoptionRequest->admin_approval_notes = $validated['admin_approval_notes'] ?? null;
+        $adoptionRequest->status = 'approved';
+        $adoptionRequest->save();
+        
+        // Create adoption agreement if it doesn't exist
+        if (!$adoptionRequest->agreement) {
+            $agreement = new \App\Models\AdoptionAgreement();
+            $agreement->adoption_request_id = $adoptionRequest->id;
+            $agreement->adoption_id = $adoptionRequest->adoption_id;
+            $agreement->owner_id = $adoptionRequest->adoption->user_id;
+            $agreement->adopter_id = $adoptionRequest->adopter_id;
+            $agreement->terms_and_conditions = $this->getDefaultTermsAndConditions();
+            $agreement->adoption_fee = 0;
+            $agreement->save();
+        }
+        
+        // Update pet status
+        $adoptionRequest->adoption->update([
+            'status' => 'adopted',
+            'adopted_by' => $adoptionRequest->adopter_id
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Adoption request approved successfully! Adoption agreement created.'
+        ]);
+    }
+    
+    /**
+     * Get default terms and conditions for adoption agreement
+     */
+    private function getDefaultTermsAndConditions()
+    {
+        return "ADOPTION AGREEMENT TERMS AND CONDITIONS\n\n" .
+               "1. The adopter agrees to provide proper care, food, shelter, and medical attention to the pet.\n" .
+               "2. The adopter agrees to keep the pet's vaccinations current.\n" .
+               "3. The adopter will not abuse, neglect, or abandon the pet.\n" .
+               "4. The adopter agrees to comply with all local animal control laws and regulations.\n" .
+               "5. The adopter agrees to allow follow-up visits to ensure the pet's welfare.\n" .
+               "6. If the adopter can no longer care for the pet, they agree to return the pet to the shelter.\n" .
+               "7. The adopter understands this is a lifelong commitment to care for the pet.";
     }
 }

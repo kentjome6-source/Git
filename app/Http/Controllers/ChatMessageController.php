@@ -26,10 +26,12 @@ class ChatMessageController extends Controller
         // Get accepted contacts (existing conversations)
         $contacts = $this->getAcceptedContacts($currentUser);
         
-        // Get pending message requests
+        // Get pending message requests with first message preview
         $pendingRequests = MessageRequest::where('recipient_id', $currentUser->id)
             ->where('status', 'pending')
-            ->with('sender')
+            ->with(['sender', 'messages' => function($query) {
+                $query->orderBy('created_at', 'asc')->limit(1);
+            }])
             ->get();
         
         // Get message requests sent by current user
@@ -41,9 +43,11 @@ class ChatMessageController extends Controller
         // Initialize selectedUser as null (for the combined view)
         $selectedUser = null;
         
-        // Use veterinarian-specific view if user is a vet
+        // Use role-specific views
         if ($currentUser->role === 'vet') {
             return view('vet.messages.index', compact('contacts', 'pendingRequests', 'sentRequests', 'selectedUser'));
+        } elseif ($currentUser->role === 'admin') {
+            return view('admin.messages.index', compact('contacts', 'pendingRequests', 'sentRequests', 'selectedUser'));
         }
         
         return view('messages.index', compact('contacts', 'pendingRequests', 'sentRequests', 'selectedUser'));
@@ -56,7 +60,7 @@ class ChatMessageController extends Controller
     {
         $currentUser = Auth::user();
         
-        // Check if conversation is accepted
+        // Check if conversation exists
         $messageRequest = MessageRequest::where(function($query) use ($currentUser, $user) {
             $query->where('sender_id', $currentUser->id)
                   ->where('recipient_id', $user->id);
@@ -65,11 +69,22 @@ class ChatMessageController extends Controller
                   ->where('recipient_id', $currentUser->id);
         })->first();
         
-        // If no message request exists or it's not accepted
-        if (!$messageRequest || $messageRequest->status !== 'accepted') {
+        // If no message request exists, cannot load conversation
+        if (!$messageRequest) {
             return response()->json([
                 'success' => false,
-                'message' => 'You need to accept the message request first.'
+                'message' => 'No conversation exists with this user.'
+            ], 403);
+        }
+        
+        // Allow viewing if:
+        // 1. Message request is accepted
+        // 2. Current user is the sender (they can see their sent messages)
+        // 3. Message request status is pending (both sender and recipient can view)
+        if ($messageRequest->status === 'declined') {
+            return response()->json([
+                'success' => false,
+                'message' => 'This message request has been declined.'
             ], 403);
         }
         
@@ -103,7 +118,7 @@ class ChatMessageController extends Controller
     {
         $currentUser = Auth::user();
         
-        // Check if conversation is accepted
+        // Check if conversation exists
         $messageRequest = MessageRequest::where(function($query) use ($currentUser, $user) {
             $query->where('sender_id', $currentUser->id)
                   ->where('recipient_id', $user->id);
@@ -112,9 +127,27 @@ class ChatMessageController extends Controller
                   ->where('recipient_id', $currentUser->id);
         })->first();
         
-        // If no message request exists or it's not accepted
-        if (!$messageRequest || $messageRequest->status !== 'accepted') {
-            return redirect()->route('messages.index')->with('error', 'You need to accept the message request first.');
+        // If no message request exists, create a new one and redirect to messages index
+        if (!$messageRequest) {
+            // Create new message request
+            $messageRequest = MessageRequest::create([
+                'sender_id' => $currentUser->id,
+                'recipient_id' => $user->id,
+                'status' => 'pending',
+                'accepted_at' => null
+            ]);
+            
+            // Redirect to messages index where they can send the first message
+            return redirect()->route('messages.index')
+                ->with('info', 'Start a conversation with ' . $user->name);
+        }
+        
+        // Allow viewing if:
+        // 1. Message request is accepted
+        // 2. Current user is the sender (they can see their sent messages)
+        // 3. Message request status is pending (both sender and recipient can view)
+        if ($messageRequest->status === 'declined') {
+            return redirect()->route('messages.index')->with('error', 'This message request has been declined.');
         }
         
         // Get messages
@@ -171,9 +204,11 @@ class ChatMessageController extends Controller
             $messageRequest = MessageRequest::create([
                 'sender_id' => $currentUser->id,
                 'recipient_id' => $recipientId,
-                'status' => 'pending'
+                'status' => 'pending',
+                'accepted_at' => null
             ]);
             
+            // First message is always a request message type
             $messageType = 'request';
         } else {
             // Check if current user can message (must be accepted or sender of pending request)
@@ -227,9 +262,11 @@ class ChatMessageController extends Controller
     /**
      * Accept a message request
      */
-    public function acceptRequest(Request $request, MessageRequest $messageRequest)
+    public function acceptRequest(Request $request, $requestId)
     {
         $currentUser = Auth::user();
+        
+        $messageRequest = MessageRequest::findOrFail($requestId);
         
         // Ensure the current user is the recipient
         if ($messageRequest->recipient_id !== $currentUser->id) {
@@ -270,9 +307,11 @@ class ChatMessageController extends Controller
     /**
      * Decline a message request
      */
-    public function declineRequest(Request $request, MessageRequest $messageRequest)
+    public function declineRequest(Request $request, $requestId)
     {
         $currentUser = Auth::user();
+        
+        $messageRequest = MessageRequest::findOrFail($requestId);
         
         // Ensure the current user is the recipient
         if ($messageRequest->recipient_id !== $currentUser->id) {
@@ -406,7 +445,7 @@ class ChatMessageController extends Controller
         $currentUser = Auth::user();
         $lastMessageId = $request->query('last_message_id', 0);
         
-        // Check if there's an accepted conversation
+        // Check if there's a conversation
         $messageRequest = MessageRequest::where(function($query) use ($currentUser, $user) {
             $query->where('sender_id', $currentUser->id)
                   ->where('recipient_id', $user->id);
@@ -415,7 +454,8 @@ class ChatMessageController extends Controller
                   ->where('recipient_id', $currentUser->id);
         })->first();
         
-        if (!$messageRequest || $messageRequest->status !== 'accepted') {
+        if (!$messageRequest || 
+            ($messageRequest->status !== 'accepted' && $messageRequest->sender_id !== $currentUser->id)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid contact.'

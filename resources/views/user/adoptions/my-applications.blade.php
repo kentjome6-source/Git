@@ -158,13 +158,18 @@
                                 </div>
 
                                 <!-- Action Buttons -->
-                                @if($application->status === 'approved')
                                 <div class="application-actions mt-3">
-                                    <button class="btn btn-success btn-sm w-100">
+                                    @if($application->status === 'admin_screening' || $application->status === 'vet_orientation' || $application->status === 'owner_review')
+                                    <a href="{{ route('messages.index') }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-comment me-2"></i>Message About Application
+                                    </a>
+                                    @endif
+                                    @if($application->status === 'approved')
+                                    <button class="btn btn-success btn-sm">
                                         <i class="fas fa-calendar-check me-2"></i>Schedule Finalization
                                     </button>
+                                    @endif
                                 </div>
-                                @endif
                             </div>
                         </div>
                     </div>

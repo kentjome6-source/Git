@@ -1,288 +1,3 @@
-@extends('layouts.app')
-
-@section('title', 'Messenger')
-
-@section('content')
-<div class="container-fluid px-0">
-    <div class="row g-0" style="height: calc(100vh - 100px);">
-        <!-- Sidebar - Contacts & Requests -->
-        <div class="col-lg-4 col-md-5 col-12 border-end">
-            <div class="d-flex flex-column h-100">
-                
-                <!-- Search -->
-                <div class="p-3 border-bottom">
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-0">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input type="text" class="form-control border-0 bg-light" id="search-contacts" placeholder="Search messages...">
-                    </div>
-                </div>
-                
-                <!-- Tabs -->
-                <ul class="nav nav-tabs border-bottom px-3" id="messagesTab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="chats-tab" data-bs-toggle="tab" data-bs-target="#chats" type="button" role="tab">
-                            <i class="fas fa-comment-dots me-1"></i> Chats
-                            @if($contacts->count() > 0)
-                                <span class="badge bg-primary rounded-pill ms-1">{{ $contacts->count() }}</span>
-                            @endif
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="requests-tab" data-bs-toggle="tab" data-bs-target="#requests" type="button" role="tab">
-                            <i class="fas fa-user-clock me-1"></i> Requests
-                            @if($pendingRequests->count() > 0)
-                                <span class="badge bg-danger rounded-pill ms-1">{{ $pendingRequests->count() }}</span>
-                            @endif
-                        </button>
-                    </li>
-                </ul>
-                
-                <!-- Tab Content -->
-                <div class="tab-content flex-grow-1 overflow-auto">
-                    <!-- Chats Tab -->
-                    <div class="tab-pane fade show active h-100" id="chats" role="tabpanel">
-                        <div class="list-group list-group-flush" id="contact-list">
-                            @if($contacts->isEmpty())
-                                <div class="text-center p-5 text-muted">
-                                    <i class="fas fa-user-friends fa-2x mb-3"></i>
-                                    <p class="mb-0">No conversations yet</p>
-                                </div>
-                            @else
-                                @foreach($contacts as $user)
-                                    <a href="javascript:void(0);" 
-                                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center contact-item"
-                                       onclick="loadConversation({{ $user->id }}, '{{ $user->name }}')">
-                                        <div class="d-flex align-items-center">
-                                            @if($user->profile_picture_path)
-                                                <img src="{{ $user->profile_picture_url }}" 
-                                                     alt="{{ $user->name }}" 
-                                                     class="rounded-circle me-3"
-                                                     style="width: 50px; height: 50px; object-fit: cover;">
-                                            @else
-                                                <div class="avatar rounded-circle d-flex align-items-center justify-content-center me-3"
-                                                     style="width: 50px; height: 50px; background-color: #e9ecef; color: #495057; font-weight: 600; font-size: 1.1rem;">
-                                                    {{ substr($user->name, 0, 1) }}
-                                                </div>
-                                            @endif
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <div class="fw-bold text-truncate" style="max-width: 150px;">{{ $user->name }}</div>
-                                                    <small class="text-muted">{{ $user->last_message_time ?? '' }}</small>
-                                                </div>
-                                                <div class="small text-muted text-truncate" style="max-width: 180px;">
-                                                    {{ $user->last_message ?? 'No messages yet' }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @if($user->unread_count > 0)
-                                            <span class="badge bg-danger rounded-pill">{{ $user->unread_count }}</span>
-                                        @endif
-                                    </a>
-                                @endforeach
-                            @endif
-                        </div>
-                    </div>
-                    
-                    <!-- Requests Tab -->
-                    <div class="tab-pane fade h-100" id="requests" role="tabpanel">
-                        <div class="list-group list-group-flush">
-                            <!-- Pending Requests -->
-                            @if($pendingRequests->isEmpty() && $sentRequests->isEmpty())
-                                <div class="text-center p-5 text-muted">
-                                    <i class="fas fa-user-clock fa-2x mb-3"></i>
-                                    <p class="mb-0">No message requests</p>
-                                </div>
-                            @else
-                                @if($pendingRequests->count() > 0)
-                                    <div class="px-3 py-2 small fw-bold text-muted">REQUESTS</div>
-                                    @foreach($pendingRequests as $request)
-                                        <div class="list-group-item">
-                                            <div class="d-flex align-items-start">
-                                                @if($request->sender->profile_picture_path)
-                                                    <img src="{{ $request->sender->profile_picture_url }}" 
-                                                         alt="{{ $request->sender->name }}" 
-                                                         class="rounded-circle me-3"
-                                                         style="width: 45px; height: 45px; object-fit: cover;">
-                                                @else
-                                                    <div class="avatar rounded-circle d-flex align-items-center justify-content-center me-3"
-                                                         style="width: 45px; height: 45px; background-color: #e9ecef; color: #495057; font-weight: 600;">
-                                                        {{ substr($request->sender->name, 0, 1) }}
-                                                    </div>
-                                                @endif
-                                                <div class="flex-grow-1">
-                                                    <div class="fw-bold">{{ $request->sender->name }}</div>
-                                                    @if($request->messages && $request->messages->count() > 0)
-                                                        <div class="bg-light p-2 rounded my-2" style="max-width: 250px;">
-                                                            <small class="text-dark">{{ $request->messages->first()->message }}</small>
-                                                        </div>
-                                                    @else
-                                                        <small class="text-muted">Wants to message you</small>
-                                                    @endif
-                                                    <div class="btn-group btn-group-sm mt-2">
-                                                        <button class="btn btn-success" onclick="acceptRequest({{ $request->id }})">
-                                                            <i class="fas fa-check me-1"></i> Accept
-                                                        </button>
-                                                        <button class="btn btn-danger" onclick="declineRequest({{ $request->id }})">
-                                                            <i class="fas fa-times me-1"></i> Decline
-                                                        </button>
-                                                        <button class="btn btn-outline-secondary" onclick="viewRequest({{ $request->sender->id }}, '{{ $request->sender->name }}')">
-                                                            <i class="fas fa-eye me-1"></i> View
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @endif
-                                
-                                @if($sentRequests->count() > 0)
-                                    <div class="px-3 py-2 small fw-bold text-muted">SENT REQUESTS</div>
-                                    @foreach($sentRequests as $request)
-                                        <div class="list-group-item">
-                                            <div class="d-flex align-items-center">
-                                                @if($request->recipient->profile_picture_path)
-                                                    <img src="{{ $request->recipient->profile_picture_url }}" 
-                                                         alt="{{ $request->recipient->name }}" 
-                                                         class="rounded-circle me-3"
-                                                         style="width: 45px; height: 45px; object-fit: cover;">
-                                                @else
-                                                    <div class="avatar rounded-circle d-flex align-items-center justify-content-center me-3"
-                                                         style="width: 45px; height: 45px; background-color: #e9ecef; color: #495057; font-weight: 600;">
-                                                        {{ substr($request->recipient->name, 0, 1) }}
-                                                    </div>
-                                                @endif
-                                                <div class="flex-grow-1">
-                                                    <div class="fw-bold">{{ $request->recipient->name }}</div>
-                                                    <small class="text-muted text-warning">Waiting for acceptance</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @endif
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Main Chat Area -->
-        <div class="col-lg-8 col-md-7 col-12 d-flex flex-column">
-            <!-- Chat Header (initially hidden) -->
-            <div class="border-bottom p-3 d-none" id="chat-header">
-                <div class="d-flex align-items-center">
-                    <button class="btn btn-sm btn-outline-secondary me-2 d-md-none" onclick="closeChat()">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <div id="chat-user-info"></div>
-                </div>
-            </div>
-            
-            <!-- Messages Container -->
-            <div class="flex-grow-1 overflow-auto p-3" id="message-container" style="background-color: #f8f9fa;">
-                <!-- Initial state -->
-                <div class="h-100 d-flex align-items-center justify-content-center" id="initial-state">
-                    <div class="text-center text-muted">
-                        <i class="fas fa-comments fa-3x mb-3"></i>
-                        <h4>Your Messages</h4>
-                        <p class="mb-0">Select a conversation to start messaging</p>
-                    </div>
-                </div>
-                
-                <!-- Messages will be loaded here -->
-                <div id="conversation-messages" class="d-none"></div>
-            </div>
-            
-            <!-- Message Input (initially hidden) -->
-            <div class="border-top p-3 bg-white d-none" id="message-input-container">
-                <form id="message-form">
-                    @csrf
-                    <input type="hidden" id="receiver-id">
-                    <div class="input-group">
-                        <input type="text" id="message-input" class="form-control" placeholder="Type a message..." required>
-                        <button class="btn text-white" type="submit" style="background-color: #5b4b9b;">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- WebSocket Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pusher/8.4.0/pusher.min.js"></script>
-
-<style>
-#messagesTab .nav-link {
-    border: none;
-    color: #6c757d;
-    font-weight: 500;
-}
-
-#messagesTab .nav-link.active {
-    color: #5b4b9b;
-    border-bottom: 2px solid #5b4b9b;
-    background: transparent;
-}
-
-.contact-item:hover {
-    background-color: #f8f9fa;
-}
-
-.message-bubble {
-    max-width: 70%;
-    word-wrap: break-word;
-}
-
-.sent-message {
-    background-color: #5b4b9b;
-    color: white;
-    border-radius: 18px 18px 4px 18px;
-}
-
-.received-message {
-    background-color: white;
-    border-radius: 18px 18px 18px 4px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-#message-container::-webkit-scrollbar {
-    width: 6px;
-}
-
-#message-container::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-#message-container::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
-}
-
-@media (max-width: 768px) {
-    #chat-sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1050;
-        background: white;
-    }
-    
-    #chat-main {
-        display: none;
-    }
-    
-    #chat-main.active {
-        display: flex;
-    }
-}
-</style>
-
 <script>
 let currentChatUserId = null;
 let pusher = null;
@@ -377,6 +92,7 @@ function initializePusher() {
         
         if (request.status === 'accepted') {
             // If we're chatting with this user
+            
             const otherUserId = request.sender_id == {{ Auth::id() }} ? request.recipient_id : request.sender_id;
             if (currentChatUserId && currentChatUserId == otherUserId) {
                 // Enable messaging
@@ -463,22 +179,24 @@ function loadConversation(userId, userName) {
         clearInterval(pollingInterval);
     }
     
-    // Hide initial state and show chat UI
-    const initialState = document.getElementById('initial-state');
-    const conversationMessages = document.getElementById('conversation-messages');
+    // Show chat header and update user info
     const chatHeader = document.getElementById('chat-header');
-    const messageInputContainer = document.getElementById('message-input-container');
-    
-    initialState.classList.add('d-none');
-    conversationMessages.classList.remove('d-none');
     chatHeader.classList.remove('d-none');
-    messageInputContainer.classList.remove('d-none');
     
     // Update user info in header
     document.getElementById('chat-user-info').innerHTML = `
         <h5 class="mb-0">${userName}</h5>
         <small class="text-muted">Active now</small>
     `;
+    
+    // Hide initial state
+    document.getElementById('initial-state').style.display = 'none';
+    
+    // Show conversation area
+    document.getElementById('conversation-messages').style.display = 'block';
+    
+    // Show message input
+    document.getElementById('message-input-container').classList.remove('d-none');
     
     // Set receiver ID
     document.getElementById('receiver-id').value = userId;
@@ -827,4 +545,3 @@ function viewRequest(userId, userName) {
     loadConversation(userId, userName);
 }
 </script>
-@endsection

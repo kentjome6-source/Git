@@ -120,6 +120,9 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     Route::post('admin/adoptions/{adoption}/reject-listing', [AdoptionController::class, 'rejectListing'])->name('admin.adoptions.reject');
     Route::get('admin/adoption-requests/pending-screening', [AdoptionController::class, 'pendingScreenings'])->name('admin.adoption-requests.screening');
     Route::post('admin/adoption-requests/{adoptionRequest}/screen', [AdoptionController::class, 'screenAdopter'])->name('admin.adoption-requests.screen');
+    Route::get('admin/adoption-requests/pending-final-approval', [AdoptionController::class, 'pendingFinalApproval'])->name('admin.adoption-requests.final-approval');
+    Route::post('admin/adoption-requests/{adoptionRequest}/approve', [AdoptionController::class, 'approveRequest'])->name('admin.adoption-requests.approve');
+    Route::post('admin/adoption-requests/{adoptionRequest}/reject', [AdoptionController::class, 'rejectRequest'])->name('admin.adoption-requests.reject');
     Route::post('admin/adoption-requests/{adoptionRequest}/schedule-interview', [AdoptionController::class, 'scheduleInterview'])->name('admin.adoption-requests.schedule-interview');
     Route::post('admin/adoption-interviews/{interview}/conduct', [AdoptionController::class, 'conductInterview'])->name('admin.adoption-interviews.conduct');
     Route::post('admin/adoption-agreements/{agreement}/issue-certificate', [AdoptionController::class, 'issueCertificate'])->name('admin.adoption-agreements.issue-certificate');
@@ -159,6 +162,13 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     
     // Admin Pet User Management
     Route::resource('admin/pet-users', PetUserController::class);
+    
+    // Admin Messages Routes
+    Route::get('admin/messages', [ChatMessageController::class, 'index'])->name('admin.messages.index');
+    Route::get('admin/messages/conversation/{user}/load', [ChatMessageController::class, 'loadConversation'])->name('admin.messages.load-conversation');
+    Route::post('admin/messages/send', [ChatMessageController::class, 'sendMessage'])->name('admin.messages.send');
+    Route::post('admin/messages/accept', [ChatMessageController::class, 'acceptRequest'])->name('admin.messages.accept');
+    Route::post('admin/messages/mark-read', [ChatMessageController::class, 'markAsRead'])->name('admin.messages.mark-read');
 });
 
 // Authenticated User Routes
@@ -211,6 +221,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/adoptions/{adoption}/reject', [UserAdoptionController::class, 'rejectAdoption'])->name('adoptions.reject');
     Route::post('/adoptions/{adoption}/complete', [UserAdoptionController::class, 'completeAdoption'])->name('adoptions.complete');
     Route::delete('/adoptions/{adoption}', [UserAdoptionController::class, 'destroy'])->name('adoptions.destroy');
+    
+    // Adoption Request Owner Actions
+    Route::post('/adoption-requests/{adoptionRequest}/owner-approve', [UserAdoptionController::class, 'ownerApprove'])->name('adoption-requests.owner-approve');
+    Route::post('/adoption-requests/{adoptionRequest}/owner-reject', [UserAdoptionController::class, 'ownerReject'])->name('adoption-requests.owner-reject');
     
     // Adoption Application Routes
     Route::get('/adoption-requests/{request}/application', [UserAdoptionController::class, 'viewApplication'])->name('adoptions.application.view');

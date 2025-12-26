@@ -430,6 +430,20 @@
                             <span class="menu-text">Adopter Screening</span>
                         </a>
                     </div>
+                    <div class="menu-item">
+                        <a href="{{ route('admin.adoption-requests.final-approval') }}" class="menu-link {{ request()->routeIs('admin.adoption-requests.final-approval') ? 'active' : '' }}">
+                            <i class="fas fa-certificate menu-icon" aria-hidden="true"></i>
+                            <span class="menu-text">Final Approvals</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Messages -->
+                    <div class="menu-item mt-3">
+                        <a href="{{ route('admin.messages.index') }}" class="menu-link {{ request()->routeIs('admin.messages.*') ? 'active' : '' }}">
+                            <i class="fas fa-comments menu-icon" aria-hidden="true"></i>
+                            <span class="menu-text">Messages</span>
+                        </a>
+                    </div>
                 </div>
             </div>
 
