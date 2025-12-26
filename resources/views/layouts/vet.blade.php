@@ -330,6 +330,25 @@
                         <span id="unread-message-count" class="badge bg-danger ms-2" style="display: none;">0</span>
                     </a>
                 </div>
+                
+                <!-- Adoption Workflow Section -->
+                <div class="menu-item mt-4">
+                    <div class="px-3 mb-2">
+                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Adoption Management</small>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <a href="{{ route('vet.adoptions.pending') }}" class="menu-link {{ request()->routeIs('vet.adoptions.pending') ? 'active' : '' }}">
+                        <i class="fas fa-clipboard-check menu-icon"></i>
+                        <span class="menu-text">Pet Certifications</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="{{ route('vet.adoptions.orientations') }}" class="menu-link {{ request()->routeIs('vet.adoptions.orientations') ? 'active' : '' }}">
+                        <i class="fas fa-chalkboard-teacher menu-icon"></i>
+                        <span class="menu-text">Adopter Orientations</span>
+                    </a>
+                </div>
             </div>
         </div>
 

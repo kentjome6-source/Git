@@ -25,6 +25,17 @@
                         </div>
                     @endif
 
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Adoption Listing Process</h6>
+                        <p class="mb-2">Your pet listing will go through the following approval process:</p>
+                        <ol class="mb-0 ps-3">
+                            <li><strong>Veterinarian Review:</strong> A vet will certify your pet's health status</li>
+                            <li><strong>Admin Approval:</strong> LGU admin will review and approve your listing</li>
+                            <li><strong>Published:</strong> Your pet will be visible to potential adopters</li>
+                        </ol>
+                        <small class="text-muted mt-2 d-block">This process ensures all pets are healthy and ready for adoption.</small>
+                    </div>
+
                     <form action="{{ route('adoptions.store') }}" method="POST" enctype="multipart/form-data" aria-labelledby="form-heading">
                         @csrf
                         

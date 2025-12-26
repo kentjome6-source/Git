@@ -57,7 +57,15 @@ Route::prefix('vet')->name('vet.')->middleware(['can:isVet', 'vet.verified'])->g
     // Vet Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');    
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Vet Adoption Routes
+    Route::get('/adoptions/pending-certifications', [VetController::class, 'pendingCertifications'])->name('adoptions.pending');
+    Route::post('/adoptions/{adoption}/certify', [VetController::class, 'certifyPet'])->name('adoptions.certify');
+    Route::post('/adoptions/{adoption}/reject-listing', [VetController::class, 'rejectPetListing'])->name('adoptions.reject');
+    Route::get('/adoptions/orientations', [VetController::class, 'pendingOrientations'])->name('adoptions.orientations');
+    Route::post('/adoption-requests/{adoptionRequest}/orientation', [VetController::class, 'conductOrientation'])->name('adoptions.orientation.conduct');
+    Route::post('/adoption-agreements/{agreement}/final-clearance', [VetController::class, 'provideFinalClearance'])->name('adoptions.final-clearance');
 
 });
 
@@ -106,7 +114,17 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     // Route::post('admin/users/{user}/verify-vet', [UserController::class, 'verifyVet'])->name('admin.users.verify-vet');
     // Route::post('admin/users/{user}/reject-vet', [UserController::class, 'rejectVet'])->name('admin.users.reject-vet');
     
-    // Admin Adoption Management
+    // Admin Adoption Workflow Routes - MUST BE BEFORE RESOURCE ROUTES
+    Route::get('admin/adoptions/pending-approvals', [AdoptionController::class, 'pendingApprovals'])->name('admin.adoptions.pending');
+    Route::post('admin/adoptions/{adoption}/approve-listing', [AdoptionController::class, 'approveListing'])->name('admin.adoptions.approve');
+    Route::post('admin/adoptions/{adoption}/reject-listing', [AdoptionController::class, 'rejectListing'])->name('admin.adoptions.reject');
+    Route::get('admin/adoption-requests/pending-screening', [AdoptionController::class, 'pendingScreenings'])->name('admin.adoption-requests.screening');
+    Route::post('admin/adoption-requests/{adoptionRequest}/screen', [AdoptionController::class, 'screenAdopter'])->name('admin.adoption-requests.screen');
+    Route::post('admin/adoption-requests/{adoptionRequest}/schedule-interview', [AdoptionController::class, 'scheduleInterview'])->name('admin.adoption-requests.schedule-interview');
+    Route::post('admin/adoption-interviews/{interview}/conduct', [AdoptionController::class, 'conductInterview'])->name('admin.adoption-interviews.conduct');
+    Route::post('admin/adoption-agreements/{agreement}/issue-certificate', [AdoptionController::class, 'issueCertificate'])->name('admin.adoption-agreements.issue-certificate');
+    
+    // Admin Adoption Management - Resource routes AFTER specific routes
     Route::resource('admin/adoptions', AdoptionController::class)->names([
         'index' => 'admin.adoptions.index',
         'create' => 'admin.adoptions.create',

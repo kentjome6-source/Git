@@ -250,7 +250,49 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <span class="badge bg-info">{{ $adoption->status }}</span>
+                                                        @php
+                                                            $statusClass = 'secondary';
+                                                            $statusIcon = 'fas fa-circle';
+                                                            
+                                                            switch($adoption->listing_status) {
+                                                                case 'vet_review':
+                                                                    $statusClass = 'warning';
+                                                                    $statusIcon = 'fas fa-clock';
+                                                                    break;
+                                                                case 'vet_rejected':
+                                                                    $statusClass = 'danger';
+                                                                    $statusIcon = 'fas fa-times-circle';
+                                                                    break;
+                                                                case 'admin_review':
+                                                                    $statusClass = 'info';
+                                                                    $statusIcon = 'fas fa-hourglass-half';
+                                                                    break;
+                                                                case 'admin_rejected':
+                                                                    $statusClass = 'danger';
+                                                                    $statusIcon = 'fas fa-times-circle';
+                                                                    break;
+                                                                case 'published':
+                                                                    $statusClass = 'success';
+                                                                    $statusIcon = 'fas fa-check-circle';
+                                                                    break;
+                                                                case 'adopted':
+                                                                    $statusClass = 'primary';
+                                                                    $statusIcon = 'fas fa-heart';
+                                                                    break;
+                                                            }
+                                                        @endphp
+                                                        <span class="badge bg-{{ $statusClass }}">
+                                                            <i class="{{ $statusIcon }} me-1"></i>{{ $adoption->status }}
+                                                        </span>
+                                                        @if($adoption->listing_status == 'vet_review')
+                                                            <br><small class="text-muted">Pending vet certification</small>
+                                                        @elseif($adoption->listing_status == 'admin_review')
+                                                            <br><small class="text-muted">Pending admin approval</small>
+                                                        @elseif($adoption->listing_status == 'vet_rejected')
+                                                            <br><small class="text-danger">Rejected by vet</small>
+                                                        @elseif($adoption->listing_status == 'admin_rejected')
+                                                            <br><small class="text-danger">Rejected by admin</small>
+                                                        @endif
                                                     </td>
                                                     <td>
                                                         {{ $adoption->adoptionRequests->count() }} request(s)

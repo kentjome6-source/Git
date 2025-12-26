@@ -31,7 +31,16 @@ class AdoptionRequest extends Model
         'hours_alone',
         'agree_to_home_visit',
         'additional_info',
-        'rejection_reason'
+        'rejection_reason',
+        'admin_screened',
+        'admin_screening_date',
+        'admin_screened_by',
+        'admin_screening_notes',
+        'admin_screening_rejection',
+        'vet_orientation_completed',
+        'vet_orientation_date',
+        'vet_orientation_by',
+        'vet_orientation_notes'
     ];
     
     protected $casts = [
@@ -39,7 +48,11 @@ class AdoptionRequest extends Model
         'responded_at' => 'datetime',
         'has_yard' => 'boolean',
         'landlord_approval' => 'boolean',
-        'agree_to_home_visit' => 'boolean'
+        'agree_to_home_visit' => 'boolean',
+        'admin_screened' => 'boolean',
+        'admin_screening_date' => 'datetime',
+        'vet_orientation_completed' => 'boolean',
+        'vet_orientation_date' => 'datetime'
     ];
     
     // Relationship: an adoption request belongs to an adoption listing
@@ -58,6 +71,24 @@ class AdoptionRequest extends Model
     public function agreement()
     {
         return $this->hasOne(AdoptionAgreement::class);
+    }
+    
+    // Relationship: adoption request has many interviews
+    public function interviews()
+    {
+        return $this->hasMany(AdoptionInterview::class);
+    }
+    
+    // Relationship: admin who screened
+    public function adminScreener()
+    {
+        return $this->belongsTo(User::class, 'admin_screened_by');
+    }
+    
+    // Relationship: vet who conducted orientation
+    public function vetOrientator()
+    {
+        return $this->belongsTo(User::class, 'vet_orientation_by');
     }
     
     // Check if adoption request is pending
@@ -86,5 +117,23 @@ class AdoptionRequest extends Model
                !empty($this->phone) &&
                !empty($this->address) &&
                !empty($this->reason_for_adoption);
+    }
+    
+    // Check if needs admin screening
+    public function needsAdminScreening()
+    {
+        return $this->status === 'pending';
+    }
+    
+    // Check if needs vet orientation
+    public function needsVetOrientation()
+    {
+        return $this->status === 'vet_orientation';
+    }
+    
+    // Check if awaiting owner review
+    public function awaitingOwnerReview()
+    {
+        return $this->status === 'owner_review';
     }
 }

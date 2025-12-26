@@ -21,6 +21,7 @@ class AdoptionController extends Controller
     public function index()
     {
         $adoptionPets = Adoption::with(['user'])
+                              ->where('listing_status', 'published')
                               ->where('is_adopted', false)
                               ->whereDoesntHave('adoptionRequests', function($query) {
                                   $query->where('status', 'approved');
@@ -61,7 +62,7 @@ class AdoptionController extends Controller
 
         $adoption = new Adoption();
         $adoption->user_id = Auth::id();
-        $adoption->uploader_type = 'user'; // Pet parent is uploading
+        $adoption->uploader_type = 'user';
         $adoption->pet_name = $request->pet_name;
         $adoption->breed = $request->breed;
         $adoption->age = $request->age;
@@ -69,6 +70,7 @@ class AdoptionController extends Controller
         $adoption->description = $request->description;
         $adoption->image_path = $imagePath;
         $adoption->is_adopted = false;
+        $adoption->listing_status = 'vet_review'; // Start with vet review
         $adoption->save();
 
 
@@ -82,7 +84,7 @@ class AdoptionController extends Controller
             ]);
         }
 
-        return redirect()->route('adoptions.index')->with('success', 'Pet listed for adoption successfully!');
+        return redirect()->route('adoptions.index')->with('success', 'Pet listed for adoption! Your listing will be reviewed by a veterinarian first.');
     }
 
     /**
@@ -166,12 +168,14 @@ class AdoptionController extends Controller
             return redirect()->back()->with('error', 'You are not authorized to approve this adoption request.');
         }
         
-        // Get the pending adoption request
-        $adoptionRequest = $adoption->pendingRequest();
+        // Get the adoption request awaiting owner review
+        $adoptionRequest = $adoption->adoptionRequests()
+            ->where('status', 'owner_review')
+            ->first();
         
-        // Check if there's a pending adoption request
+        // Check if there's an adoption request awaiting review
         if (!$adoptionRequest) {
-            return redirect()->back()->with('error', 'There is no pending adoption request for this pet.');
+            return redirect()->back()->with('error', 'There is no adoption request awaiting your review.');
         }
         
         // Validate application completeness
@@ -253,8 +257,19 @@ class AdoptionController extends Controller
             return redirect()->back()->with('error', 'The adoption fee must be paid before completion.');
         }
         
+        // Check if admin certificate is issued
+        if (!$agreement->admin_certificate_issued) {
+            return redirect()->back()->with('error', 'Admin must issue the adoption certificate before completion.');
+        }
+        
+        // Check if vet final clearance is provided
+        if (!$agreement->vet_final_clearance) {
+            return redirect()->back()->with('error', 'Veterinarian must provide final medical clearance before completion.');
+        }
+        
         // Complete the adoption
         $adoption->is_adopted = true;
+        $adoption->listing_status = 'adopted';
         $adoption->save();
         
         // Create adoption history record

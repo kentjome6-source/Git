@@ -406,9 +406,28 @@
                         </a>
                     </div>
                     <div class="menu-item">
-                        <a href="{{ route('admin.adoptions.index') }}" class="menu-link {{ request()->routeIs('admin.adoptions.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.adoptions.index') }}" class="menu-link {{ request()->routeIs('admin.adoptions.index') || request()->routeIs('admin.adoptions.show') ? 'active' : '' }}">
                             <i class="fas fa-history menu-icon" aria-hidden="true"></i>
                             <span class="menu-text">Adoption History</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Adoption Workflow Section -->
+                    <div class="menu-item mt-3">
+                        <div class="px-3 mb-2">
+                            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Adoption Workflow</small>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <a href="{{ route('admin.adoptions.pending') }}" class="menu-link {{ request()->routeIs('admin.adoptions.pending') ? 'active' : '' }}">
+                            <i class="fas fa-clipboard-check menu-icon" aria-hidden="true"></i>
+                            <span class="menu-text">Listing Approvals</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a href="{{ route('admin.adoption-requests.screening') }}" class="menu-link {{ request()->routeIs('admin.adoption-requests.screening') ? 'active' : '' }}">
+                            <i class="fas fa-user-check menu-icon" aria-hidden="true"></i>
+                            <span class="menu-text">Adopter Screening</span>
                         </a>
                     </div>
                 </div>

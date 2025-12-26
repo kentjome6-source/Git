@@ -20,7 +20,15 @@ class AdoptionAgreement extends Model
         'adopter_signature',
         'special_conditions',
         'adoption_fee',
-        'payment_completed'
+        'payment_completed',
+        'admin_certificate_issued',
+        'admin_certificate_number',
+        'admin_certificate_issued_at',
+        'admin_issued_by',
+        'vet_final_clearance',
+        'vet_final_clearance_date',
+        'vet_final_clearance_notes',
+        'vet_final_clearance_by'
     ];
     
     protected $casts = [
@@ -29,7 +37,11 @@ class AdoptionAgreement extends Model
         'payment_completed' => 'boolean',
         'owner_signed_at' => 'datetime',
         'adopter_signed_at' => 'datetime',
-        'adoption_fee' => 'decimal:2'
+        'adoption_fee' => 'decimal:2',
+        'admin_certificate_issued' => 'boolean',
+        'admin_certificate_issued_at' => 'datetime',
+        'vet_final_clearance' => 'boolean',
+        'vet_final_clearance_date' => 'datetime'
     ];
     
     public function adoptionRequest()
@@ -52,6 +64,16 @@ class AdoptionAgreement extends Model
         return $this->belongsTo(User::class, 'adopter_id');
     }
     
+    public function adminIssuer()
+    {
+        return $this->belongsTo(User::class, 'admin_issued_by');
+    }
+    
+    public function vetClearanceProvider()
+    {
+        return $this->belongsTo(User::class, 'vet_final_clearance_by');
+    }
+    
     public function isFullySigned()
     {
         return $this->owner_signed && $this->adopter_signed;
@@ -59,6 +81,19 @@ class AdoptionAgreement extends Model
     
     public function isReadyForCompletion()
     {
-        return $this->isFullySigned() && $this->payment_completed;
+        return $this->isFullySigned() && 
+               $this->payment_completed && 
+               $this->admin_certificate_issued && 
+               $this->vet_final_clearance;
+    }
+    
+    public function needsAdminCertificate()
+    {
+        return $this->isFullySigned() && !$this->admin_certificate_issued;
+    }
+    
+    public function needsVetClearance()
+    {
+        return $this->admin_certificate_issued && !$this->vet_final_clearance;
     }
 }
