@@ -167,10 +167,6 @@
                 </div>
             @else
                 <div class="empty-state">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
                     <h3>No Pending Reviews</h3>
                     <p>All listings have been reviewed</p>
                 </div>
@@ -252,9 +248,6 @@
                 </div>
             @else
                 <div class="empty-state">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <circle cx="12" cy="12" r="10"></circle>
-                    </svg>
                     <h3>No Active Listings</h3>
                     <p>No approved listings available</p>
                 </div>
@@ -306,9 +299,6 @@
                 </div>
             @else
                 <div class="empty-state">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
                     <h3>No Resolved Cases</h3>
                     <p>No cases have been resolved yet</p>
                 </div>

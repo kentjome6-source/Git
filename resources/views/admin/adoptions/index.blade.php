@@ -36,14 +36,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($adoptions as $adoption)
+                                        @forelse($adoptions as $adoptionRequest)
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    @if($adoption->image_path)
-                                                    <img src="{{ asset('storage/' . $adoption->image_path) }}" 
+                                                    @if($adoptionRequest->adoption && $adoptionRequest->adoption->image_path)
+                                                    <img src="{{ asset('storage/' . $adoptionRequest->adoption->image_path) }}" 
                                                          class="me-2 rounded" 
-                                                         alt="Photo of {{ $adoption->pet_name }}" 
+                                                         alt="Photo of {{ $adoptionRequest->adoption->pet_name }}" 
                                                          width="40" height="40"
                                                          style="object-fit: cover;" loading="lazy">
                                                     @else
@@ -53,52 +53,46 @@
                                                     </div>
                                                     @endif
                                                     <div>
-                                                        <div class="fw-bold">{{ $adoption->pet_name }}</div>
-                                                        @if($adoption->breed)
-                                                        <small class="text-muted">{{ $adoption->breed }}</small>
+                                                        <div class="fw-bold">{{ $adoptionRequest->adoption->pet_name ?? 'N/A' }}</div>
+                                                        @if($adoptionRequest->adoption && $adoptionRequest->adoption->breed)
+                                                        <small class="text-muted">{{ $adoptionRequest->adoption->breed }}</small>
                                                         @endif
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
-                                                @if($adoption->user)
-                                                <div class="fw-bold">{{ $adoption->user->name }}</div>
-                                                <small class="text-muted">{{ $adoption->user->email }}</small>
+                                                @if($adoptionRequest->adoption && $adoptionRequest->adoption->user)
+                                                <div class="fw-bold">{{ $adoptionRequest->adoption->user->name }}</div>
+                                                <small class="text-muted">{{ $adoptionRequest->adoption->user->email }}</small>
                                                 @else
                                                 <span class="text-muted">N/A</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                @if($adoption->is_adopted && $adoption->adoptionHistory && $adoption->adoptionHistory->adopter)
-                                                <div class="fw-bold">{{ $adoption->adoptionHistory->adopter->name }}</div>
-                                                <small class="text-muted">{{ $adoption->adoptionHistory->adopter->email }}</small>
-                                                @elseif($adoption->is_adopted)
+                                                @if($adoptionRequest->adopter)
+                                                <div class="fw-bold">{{ $adoptionRequest->adopter->name }}</div>
+                                                <small class="text-muted">{{ $adoptionRequest->adopter->email }}</small>
+                                                @else
                                                 <span class="text-muted">Unknown User</span>
-                                                @else
-                                                <span class="text-muted">Not Adopted</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                @if($adoption->is_adopted)
                                                 <span class="badge bg-success" role="status" aria-label="Adopted">Adopted</span>
-                                                @else
-                                                <span class="badge bg-warning" role="status" aria-label="Available">Available</span>
-                                                @endif
                                             </td>
                                             <td>
-                                                <time datetime="{{ $adoption->created_at->toIso8601String() }}">
-                                                    {{ $adoption->created_at->format('M d, Y') }}
+                                                <time datetime="{{ $adoptionRequest->created_at->toIso8601String() }}">
+                                                    {{ $adoptionRequest->created_at->format('M d, Y') }}
                                                 </time>
                                                 <br>
-                                                <small class="text-muted">{{ $adoption->created_at->format('h:i A') }}</small>
+                                                <small class="text-muted">{{ $adoptionRequest->created_at->format('h:i A') }}</small>
                                             </td>
                                             <td>
-                                                @if($adoption->is_adopted && $adoption->updated_at)
-                                                <time datetime="{{ $adoption->updated_at->toIso8601String() }}">
-                                                    {{ $adoption->updated_at->format('M d, Y') }}
+                                                @if($adoptionRequest->agreement)
+                                                <time datetime="{{ $adoptionRequest->agreement->updated_at->toIso8601String() }}">
+                                                    {{ $adoptionRequest->agreement->updated_at->format('M d, Y') }}
                                                 </time>
                                                 <br>
-                                                <small class="text-muted">{{ $adoption->updated_at->format('h:i A') }}</small>
+                                                <small class="text-muted">{{ $adoptionRequest->agreement->updated_at->format('h:i A') }}</small>
                                                 @else
                                                 <span class="text-muted">N/A</span>
                                                 @endif
@@ -119,14 +113,14 @@
                             
                             <!-- Mobile Card View -->
                             <div class="d-md-none">
-                                @forelse($adoptions as $adoption)
+                                @forelse($adoptions as $adoptionRequest)
                                 <div class="card mb-3 border shadow-sm">
                                     <div class="card-body">
                                         <div class="d-flex align-items-center mb-3">
-                                            @if($adoption->image_path)
-                                            <img src="{{ asset('storage/' . $adoption->image_path) }}" 
+                                            @if($adoptionRequest->adoption && $adoptionRequest->adoption->image_path)
+                                            <img src="{{ asset('storage/' . $adoptionRequest->adoption->image_path) }}" 
                                                  class="me-3 rounded" 
-                                                 alt="Photo of {{ $adoption->pet_name }}" 
+                                                 alt="Photo of {{ $adoptionRequest->adoption->pet_name }}" 
                                                  width="60" height="60"
                                                  style="object-fit: cover;" loading="lazy">
                                             @else
@@ -136,9 +130,9 @@
                                             </div>
                                             @endif
                                             <div>
-                                                <h5 class="mb-1">{{ $adoption->pet_name }}</h5>
-                                                @if($adoption->breed)
-                                                <small class="text-muted">{{ $adoption->breed }}</small>
+                                                <h5 class="mb-1">{{ $adoptionRequest->adoption->pet_name ?? 'N/A' }}</h5>
+                                                @if($adoptionRequest->adoption && $adoptionRequest->adoption->breed)
+                                                <small class="text-muted">{{ $adoptionRequest->adoption->breed }}</small>
                                                 @endif
                                             </div>
                                         </div>
@@ -148,9 +142,9 @@
                                                 <div class="d-flex justify-content-between">
                                                     <span class="text-muted">Listed By:</span>
                                                     <span>
-                                                        @if($adoption->user)
-                                                        <div class="fw-bold">{{ $adoption->user->name }}</div>
-                                                        <small class="text-muted">{{ $adoption->user->email }}</small>
+                                                        @if($adoptionRequest->adoption && $adoptionRequest->adoption->user)
+                                                        <div class="fw-bold">{{ $adoptionRequest->adoption->user->name }}</div>
+                                                        <small class="text-muted">{{ $adoptionRequest->adoption->user->email }}</small>
                                                         @else
                                                         <span class="text-muted">N/A</span>
                                                         @endif
@@ -162,13 +156,11 @@
                                                 <div class="d-flex justify-content-between">
                                                     <span class="text-muted">Adopted By:</span>
                                                     <span>
-                                                        @if($adoption->is_adopted && $adoption->adoptionHistory && $adoption->adoptionHistory->adopter)
-                                                        <div class="fw-bold">{{ $adoption->adoptionHistory->adopter->name }}</div>
-                                                        <small class="text-muted">{{ $adoption->adoptionHistory->adopter->email }}</small>
-                                                        @elseif($adoption->is_adopted)
-                                                        <span class="text-muted">Unknown User</span>
+                                                        @if($adoptionRequest->adopter)
+                                                        <div class="fw-bold">{{ $adoptionRequest->adopter->name }}</div>
+                                                        <small class="text-muted">{{ $adoptionRequest->adopter->email }}</small>
                                                         @else
-                                                        <span class="text-muted">Not Adopted</span>
+                                                        <span class="text-muted">Unknown User</span>
                                                         @endif
                                                     </span>
                                                 </div>
@@ -178,11 +170,7 @@
                                                 <div class="d-flex justify-content-between">
                                                     <span class="text-muted">Status:</span>
                                                     <span>
-                                                        @if($adoption->is_adopted)
                                                         <span class="badge bg-success" role="status" aria-label="Adopted">Adopted</span>
-                                                        @else
-                                                        <span class="badge bg-warning" role="status" aria-label="Available">Available</span>
-                                                        @endif
                                                     </span>
                                                 </div>
                                             </div>
@@ -191,25 +179,25 @@
                                                 <div class="d-flex justify-content-between">
                                                     <span class="text-muted">Listed Date:</span>
                                                     <span>
-                                                        <time datetime="{{ $adoption->created_at->toIso8601String() }}">
-                                                            {{ $adoption->created_at->format('M d, Y') }}
+                                                        <time datetime="{{ $adoptionRequest->created_at->toIso8601String() }}">
+                                                            {{ $adoptionRequest->created_at->format('M d, Y') }}
                                                         </time>
                                                         <br>
-                                                        <small class="text-muted">{{ $adoption->created_at->format('h:i A') }}</small>
+                                                        <small class="text-muted">{{ $adoptionRequest->created_at->format('h:i A') }}</small>
                                                     </span>
                                                 </div>
                                             </div>
                                             
-                                            @if($adoption->is_adopted && $adoption->updated_at)
+                                            @if($adoptionRequest->agreement)
                                             <div class="col-12">
                                                 <div class="d-flex justify-content-between">
                                                     <span class="text-muted">Adoption Date:</span>
                                                     <span>
-                                                        <time datetime="{{ $adoption->updated_at->toIso8601String() }}">
-                                                            {{ $adoption->updated_at->format('M d, Y') }}
+                                                        <time datetime="{{ $adoptionRequest->agreement->updated_at->toIso8601String() }}">
+                                                            {{ $adoptionRequest->agreement->updated_at->format('M d, Y') }}
                                                         </time>
                                                         <br>
-                                                        <small class="text-muted">{{ $adoption->updated_at->format('h:i A') }}</small>
+                                                        <small class="text-muted">{{ $adoptionRequest->agreement->updated_at->format('h:i A') }}</small>
                                                     </span>
                                                 </div>
                                             </div>

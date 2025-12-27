@@ -113,6 +113,12 @@ class AdoptionRequest extends Model
         return $this->belongsTo(User::class, 'admin_screened_by');
     }
     
+    // Add ownerConsent relationship (returns self for consistency)
+    public function ownerConsent()
+    {
+        return $this->belongsTo(User::class, 'adoption_id')->whereNull('id'); // Returns null
+    }
+    
     // Check if adoption request is pending
     public function isPending()
     {

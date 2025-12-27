@@ -20,9 +20,21 @@ class AdoptionController extends Controller
      */
     public function index()
     {
-        // Get all adoption records with related data
-        $adoptions = Adoption::with(['user', 'pet', 'adoptionHistory.adopter'])
-            ->orderBy('created_at', 'desc')
+        // Get all finalized adoption records
+        $adoptions = \App\Models\AdoptionRequest::with([
+            'adoption.user', 
+            'adoption.pet', 
+            'adopter',
+            'ownerConsent',
+            'vetOrientation',
+            'adminScreening',
+            'agreement'
+        ])
+            ->where('status', 'approved')
+            ->whereHas('agreement', function($query) {
+                $query->where('status', 'approved');
+            })
+            ->orderBy('updated_at', 'desc')
             ->paginate(20);
         
         return view('admin.adoptions.index', compact('adoptions'));
@@ -375,11 +387,19 @@ class AdoptionController extends Controller
             $agreement->save();
         }
         
-        // Update pet status
-        $adoptionRequest->adoption->update([
-            'status' => 'adopted',
-            'adopted_by' => $adoptionRequest->adopter_id
-        ]);
+        // Update adoption status to adopted
+        $adoption = $adoptionRequest->adoption;
+        $adoption->is_adopted = true;
+        $adoption->listing_status = 'adopted';
+        $adoption->save();
+        
+        // Create adoption history record
+        $adoptionHistory = new \App\Models\AdoptionHistory();
+        $adoptionHistory->adoption_id = $adoption->id;
+        $adoptionHistory->uploader_id = $adoption->user_id;
+        $adoptionHistory->adopter_id = $adoptionRequest->adopter_id;
+        $adoptionHistory->adopted_at = now();
+        $adoptionHistory->save();
         
         return response()->json([
             'success' => true,
