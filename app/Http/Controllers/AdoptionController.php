@@ -16,6 +16,31 @@ use Illuminate\Support\Facades\Storage;
 class AdoptionController extends Controller
 {
     /**
+     * Display public homepage with adoptions and lost & found.
+     */
+    public function publicHome()
+    {
+        $adoptionPets = Adoption::with(['user', 'pet'])
+                              ->where('listing_status', 'published')
+                              ->where('is_adopted', false)
+                              ->whereDoesntHave('adoptionRequests', function($query) {
+                                  $query->where('status', 'approved');
+                              })
+                              ->latest()
+                              ->take(6)
+                              ->get();
+        
+        $lostFoundPets = \App\Models\LostFound::with(['user', 'images'])
+                              ->where('is_resolved', false)
+                              ->where('status', 'approved')
+                              ->latest()
+                              ->take(6)
+                              ->get();
+        
+        return view('welcome', compact('adoptionPets', 'lostFoundPets'));
+    }
+
+    /**
      * Display a listing of pets available for adoption.
      */
     public function index()

@@ -329,7 +329,7 @@
         
         .service-item {
             background: white;
-            padding: 40px 32px;
+            padding: 24px 20px;
             border-radius: 12px;
             border: 1px solid rgba(0, 0, 0, 0.06);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -523,9 +523,9 @@
         <div class="nav-container">
             <div class="logo">PawPortal</div>
             <div class="nav-links">
-                <a href="#services">Services</a>
+                {{-- <a href="#services">Services</a>
                 <a href="#about">About</a>
-                <a href="#contact">Contact</a>
+                <a href="#contact">Contact</a> --}}
                 <a href="{{ route('login') }}" class="btn-nav">Sign In</a>
             </div>
         </div>
@@ -543,7 +543,7 @@
                     Connect with trusted veterinarians, reunite lost pets with their families, and join a community of pet lovers in your area. Everything you need in one platform.
                 </p>
                 <div class="hero-actions">
-                    <a href="{{ route('register') }}" class="btn-primary">Get Started</a>
+                    {{-- <a href="{{ route('register') }}" class="btn-primary">Get Started</a> --}}
                     <a href="{{ route('login') }}" class="btn-secondary">Sign In</a>
                 </div>
             </div>
@@ -626,6 +626,102 @@
                     <p>Manage all your pet care appointments in one place with reminders and flexible rescheduling options.</p>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Pets for Adoption Section -->
+    <section class="services" style="background: white;">
+        <div class="services-container">
+            <div class="section-header">
+                <span class="label">Adoption</span>
+                <h2>Pets looking for homes</h2>
+                <p>Give a loving pet a second chance at happiness. Browse available pets ready for adoption.</p>
+            </div>
+            
+            <div class="services-grid">
+                @forelse($adoptionPets as $adoption)
+                <div class="service-item">
+                    @if($adoption->image_path)
+                        <img src="{{ asset('storage/' . $adoption->image_path) }}" 
+                             alt="{{ $adoption->pet_name }}" 
+                             style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 16px;">
+                    @else
+                        <div style="width: 100%; height: 200px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 16px;">
+                            <span style="color: #9ca3af;">No Image</span>
+                        </div>
+                    @endif
+                    <h3>{{ $adoption->pet_name ?? 'N/A' }}</h3>
+                    <p style="margin-bottom: 8px;">
+                        <strong>Breed:</strong> {{ $adoption->breed ?? 'N/A' }}<br>
+                        <strong>Age:</strong> {{ $adoption->age ?? 'N/A' }}<br>
+                        <strong>Gender:</strong> {{ ucfirst($adoption->gender ?? 'N/A') }}
+                    </p>
+                    <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 12px;">
+                        {{ Str::limit($adoption->description ?? '', 80) }}
+                    </p>
+                    <a href="{{ route('login') }}" class="btn-primary" style="display: inline-block; margin-top: 12px; padding: 12px 24px; font-size: 0.9rem;">
+                        View Details
+                    </a>
+                </div>
+                @empty
+                <div class="service-item" style="grid-column: 1 / -1; text-align: center;">
+                    <p style="color: var(--gray);">No pets available for adoption at the moment.</p>
+                </div>
+                @endforelse
+            </div>
+            
+            @if(isset($adoptionPets) && $adoptionPets->count() > 0)
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="{{ route('login') }}" class="btn-primary">View All Adoptions</a>
+            </div>
+            @endif
+        </div>
+    </section>
+
+    <!-- Lost & Found Section -->
+    <section class="services" style="background: var(--gray-light);">
+        <div class="services-container">
+            <div class="section-header">
+                <span class="label">Lost & Found</span>
+                <h2>Help reunite pets with their families</h2>
+                <p>Check recent reports of lost and found pets in your area. Every share could help bring a pet home.</p>
+            </div>
+            
+            <div class="services-grid">
+                @forelse($lostFoundPets as $lostFound)
+                <div class="service-item">
+                    @if($lostFound->images->isNotEmpty())
+                        <img src="{{ asset('storage/' . $lostFound->images->first()->image_path) }}" 
+                             alt="{{ $lostFound->pet_name }}" 
+                             style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 16px;">
+                    @endif
+                    <div style="display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 12px;
+                                {{ $lostFound->type === 'lost' ? 'background: rgba(239, 68, 68, 0.1); color: #dc2626;' : 'background: rgba(34, 197, 94, 0.1); color: #16a34a;' }}">
+                        {{ ucfirst($lostFound->type) }}
+                    </div>
+                    <h3>{{ $lostFound->pet_name }}</h3>
+                    <p style="margin-bottom: 8px;">
+                        <strong>Type:</strong> {{ ucfirst($lostFound->pet_type) }}<br>
+                        <strong>Breed:</strong> {{ $lostFound->breed ?? 'N/A' }}<br>
+                        <strong>Date:</strong> {{ $lostFound->type === 'lost' ? $lostFound->last_seen_date : $lostFound->found_date }}<br>
+                        <strong>Location:</strong> {{ Str::limit($lostFound->location, 50) }}
+                    </p>
+                    <a href="{{ route('login') }}" class="btn-secondary" style="display: inline-block; margin-top: 12px; padding: 12px 24px; font-size: 0.9rem;">
+                        View Details
+                    </a>
+                </div>
+                @empty
+                <div class="service-item" style="grid-column: 1 / -1; text-align: center;">
+                    <p style="color: var(--gray);">No lost or found pets reported recently.</p>
+                </div>
+                @endforelse
+            </div>
+            
+            @if(isset($lostFoundPets) && $lostFoundPets->count() > 0)
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="{{ route('login') }}" class="btn-primary">View All Reports</a>
+            </div>
+            @endif
         </div>
     </section>
 

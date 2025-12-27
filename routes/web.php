@@ -23,9 +23,7 @@ use App\Http\Controllers\AdoptionController as UserAdoptionController;
 use App\Http\Controllers\Admin\LostFoundController as AdminLostFoundController;
 
 // Public Routes
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [UserAdoptionController::class, 'publicHome'])->name('home');
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
