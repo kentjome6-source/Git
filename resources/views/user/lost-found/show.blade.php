@@ -409,7 +409,16 @@
         </div>
 
         <div class="action-buttons">
-            @if(Auth::id() === $lostFound->user_id)
+            @php
+                $hasConfirmedClaim = $lostFound->claims()->where('status', 'confirmed')->exists();
+            @endphp
+            
+            @if($lostFound->is_resolved || $hasConfirmedClaim)
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> This pet has been reunited with its owner.
+                </div>
+            @elseif(Auth::id() === $lostFound->user_id)
+                <!-- Owner actions - only show if not reunited -->
                 <a href="{{ route('lost-found.edit', $lostFound) }}" class="btn btn-primary" data-modal data-modal-title="Edit Lost/Found Listing">
                     <i class="fas fa-edit"></i> Edit Listing
                 </a>
@@ -430,10 +439,21 @@
                     </button>
                 </form>
             @else
+                <!-- Other users actions -->
+                @php
+                    $userHasClaimed = $lostFound->claims()->where('claimer_id', Auth::id())->where('status', 'confirmed')->exists();
+                @endphp
+                
                 @if($lostFound->type === 'found')
-                    <a href="{{ route('lost-found.claim', $lostFound) }}" class="btn btn-primary">
-                        <i class="fas fa-hand-holding-heart"></i> Claim This Pet
-                    </a>
+                    @if($userHasClaimed)
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> This pet has been claimed by you.
+                        </div>
+                    @else
+                        <a href="{{ route('lost-found.claim', $lostFound) }}" class="btn btn-primary">
+                            <i class="fas fa-hand-holding-heart"></i> Claim This Pet
+                        </a>
+                    @endif
                 @endif
                 
                 @if($lostFound->type === 'lost')
