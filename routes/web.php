@@ -195,6 +195,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Messages Routes
     Route::get('/messages', [ChatMessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/start/{user}', [ChatMessageController::class, 'startConversation'])->name('messages.start');
     Route::get('/messages/conversation/{user}', [ChatMessageController::class, 'conversation'])->name('messages.conversation');
     Route::post('/messages/send', [ChatMessageController::class, 'sendMessage'])->name('messages.send');
     Route::post('/messages/mark-as-read/{userId}', [ChatMessageController::class, 'markAsRead'])->name('messages.mark-as-read');

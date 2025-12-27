@@ -159,15 +159,15 @@
 
                                 <!-- Action Buttons -->
                                 <div class="application-actions mt-3">
-                                    @if($application->status === 'admin_screening' || $application->status === 'vet_orientation' || $application->status === 'owner_review')
-                                    <a href="{{ route('messages.index') }}" class="btn btn-primary btn-sm">
-                                        <i class="fas fa-comment me-2"></i>Message About Application
+                                    @if(in_array($application->status, ['owner_review', 'approved', 'completed']))
+                                    <a href="{{ route('messages.start', $application->adoption->user) }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-envelope me-2"></i>Message Owner
                                     </a>
                                     @endif
                                     @if($application->status === 'approved')
-                                    <button class="btn btn-success btn-sm">
-                                        <i class="fas fa-calendar-check me-2"></i>Schedule Finalization
-                                    </button>
+                                    <a href="{{ route('messages.start', $application->adoption->user) }}" class="btn btn-success btn-sm">
+                                        <i class="fas fa-handshake me-2"></i>Arrange Pickup
+                                    </a>
                                     @endif
                                 </div>
                             </div>

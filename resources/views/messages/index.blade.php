@@ -6,7 +6,7 @@
 <div class="container-fluid px-0">
     <div class="row g-0" style="height: calc(100vh - 100px);">
         <!-- Sidebar - Contacts & Requests -->
-        <div class="col-lg-4 col-md-5 col-12 border-end">
+        <div class="col-lg-4 col-md-5 col-12 border-end" id="chat-sidebar">
             <div class="d-flex flex-column h-100">
                 
                 <!-- Search -->
@@ -169,14 +169,14 @@
         </div>
         
         <!-- Main Chat Area -->
-        <div class="col-lg-8 col-md-7 col-12 d-flex flex-column">
+        <div class="col-lg-8 col-md-7 col-12 d-flex flex-column" id="chat-main">
             <!-- Chat Header (initially hidden) -->
-            <div class="border-bottom p-3 d-none" id="chat-header">
+            <div class="border-bottom p-3 d-none bg-white" id="chat-header">
                 <div class="d-flex align-items-center">
-                    <button class="btn btn-sm btn-outline-secondary me-2 d-md-none" onclick="closeChat()">
+                    <button class="btn btn-sm btn-outline-secondary me-2 d-md-none" onclick="backToContacts()">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <div id="chat-user-info"></div>
+                    <div id="chat-user-info" class="flex-grow-1"></div>
                 </div>
             </div>
             
@@ -264,21 +264,26 @@
 
 @media (max-width: 768px) {
     #chat-sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1050;
-        background: white;
+        display: block;
     }
     
     #chat-main {
-        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: 1050;
+        background: white;
+        display: none !important;
     }
     
     #chat-main.active {
-        display: flex;
+        display: flex !important;
+    }
+    
+    #chat-sidebar.hidden {
+        display: none !important;
     }
 }
 </style>
@@ -293,6 +298,21 @@ let lastMessageId = 0;
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Pusher
     initializePusher();
+    
+    // Check if we should start a conversation
+    @if(session('startConversation'))
+    const startUserId = {{ session('startConversation') }};
+    const contactElement = document.querySelector(`[data-user-id="${startUserId}"]`);
+    if (contactElement) {
+        contactElement.click();
+    } else {
+        // User might be in pending requests, check there too
+        const requestElement = document.querySelector(`[onclick*="viewRequest(${startUserId}"]`);
+        if (requestElement) {
+            requestElement.click();
+        }
+    }
+    @endif
     
     // Search functionality
     document.getElementById('search-contacts').addEventListener('input', function(e) {
@@ -531,8 +551,8 @@ function loadConversation(userId, userName) {
     
     // On mobile, hide sidebar and show chat
     if (window.innerWidth < 768) {
-        document.querySelector('#chat-sidebar').style.display = 'none';
-        document.querySelector('#chat-main').classList.add('active');
+        document.getElementById('chat-sidebar').classList.add('hidden');
+        document.getElementById('chat-main').classList.add('active');
     }
 }
 
@@ -774,8 +794,33 @@ function updateUnreadCount(userId, increment) {
 
 function closeChat() {
     // On mobile, show sidebar again
-    document.querySelector('#chat-sidebar').style.display = 'block';
-    document.querySelector('#chat-main').classList.remove('active');
+    document.getElementById('chat-sidebar').classList.remove('hidden');
+    document.getElementById('chat-main').classList.remove('active');
+    
+    // Clear current chat
+    currentChatUserId = null;
+    document.getElementById('initial-state').classList.remove('d-none');
+    document.getElementById('conversation-messages').classList.add('d-none');
+    document.getElementById('chat-header').classList.add('d-none');
+    document.getElementById('message-input-container').classList.add('d-none');
+}
+
+function backToContacts() {
+    // On mobile, hide chat and show sidebar
+    const chatSidebar = document.getElementById('chat-sidebar');
+    const chatMain = document.getElementById('chat-main');
+    
+    chatSidebar.classList.remove('hidden');
+    chatMain.classList.remove('active');
+    
+    // Clear current conversation so "Your Messages" shows when reopening
+    currentChatUserId = null;
+    
+    // Stop polling
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+    }
 }
 
 function showNotification(message) {

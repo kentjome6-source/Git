@@ -489,6 +489,48 @@ class ChatMessageController extends Controller
     }
     
     /**
+     * Start a conversation with a user
+     */
+    public function startConversation(User $user)
+    {
+        $currentUser = Auth::user();
+        
+        // Don't allow messaging oneself
+        if ($currentUser->id == $user->id) {
+            return redirect()->route('messages.index')
+                ->with('error', 'You cannot message yourself.');
+        }
+        
+        // Check if there's an existing message request
+        $messageRequest = MessageRequest::where(function($query) use ($currentUser, $user) {
+            $query->where('sender_id', $currentUser->id)
+                  ->where('recipient_id', $user->id);
+        })->orWhere(function($query) use ($currentUser, $user) {
+            $query->where('sender_id', $user->id)
+                  ->where('recipient_id', $currentUser->id);
+        })->first();
+        
+        // If no existing request, create one but don't send any message yet
+        if (!$messageRequest) {
+            $messageRequest = MessageRequest::create([
+                'sender_id' => $currentUser->id,
+                'recipient_id' => $user->id,
+                'status' => 'pending',
+                'accepted_at' => null
+            ]);
+        }
+        
+        // Redirect to messages page with the user selected
+        if ($currentUser->role === 'vet') {
+            return redirect()->route('messages.index')->with('startConversation', $user->id);
+        } elseif ($currentUser->role === 'admin') {
+            return redirect()->route('messages.index')->with('startConversation', $user->id);
+        }
+        
+        return redirect()->route('messages.index')->with('startConversation', $user->id);
+    }
+    
+    /**
      * Add unread counts to users collection
      */
     private function addUnreadCounts($users, $currentUserId)

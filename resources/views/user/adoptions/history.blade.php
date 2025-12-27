@@ -101,6 +101,9 @@
                                 <small class="text-muted">
                                     Applicant: <strong>{{ $activeRequest->adopter->name }}</strong>
                                 </small>
+                                <a href="{{ route('messages.start', $activeRequest->adopter) }}" class="btn btn-sm btn-outline-primary ms-2">
+                                    <i class="fas fa-comment"></i> Message
+                                </a>
                             </div>
                             @endif
                         </div>
@@ -188,6 +191,11 @@
                             <small class="text-muted">
                                 Previous Owner: <strong>{{ $history->uploader->name ?? 'N/A' }}</strong>
                             </small>
+                            @if($history->uploader)
+                            <a href="{{ route('messages.start', $history->uploader) }}" class="btn btn-sm btn-outline-primary ms-2">
+                                <i class="fas fa-comment"></i> Message
+                            </a>
+                            @endif
                         </div>
 
                         <!-- Actions -->

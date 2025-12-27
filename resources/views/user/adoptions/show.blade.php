@@ -362,13 +362,13 @@
                                                         <button onclick="rejectOwner({{ $request->id }})" class="btn btn-outline-danger">
                                                             <i class="fas fa-times me-2"></i>Reject
                                                         </button>
-                                                        <a href="{{ route('messages.index', ['user' => $request->adopter_id]) }}" class="btn btn-outline-primary">
+                                                        <a href="{{ route('messages.start', $request->adopter) }}" class="btn btn-outline-primary">
                                                             <i class="fas fa-envelope me-2"></i>Message
                                                         </a>
                                                     </div>
                                                 @else
                                                     <div class="request-actions mt-3">
-                                                        <a href="{{ route('messages.index', ['user' => $request->adopter_id]) }}" class="btn btn-outline-primary btn-sm">
+                                                        <a href="{{ route('messages.start', $request->adopter) }}" class="btn btn-outline-primary btn-sm">
                                                             <i class="fas fa-envelope me-2"></i>Message Applicant
                                                         </a>
                                                     </div>
