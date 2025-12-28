@@ -228,24 +228,24 @@
                                                 </button>
                                             </form>
                                             
-                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal{{ $appointment->id }}">
+                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModalMobile{{ $appointment->id }}">
                                                 <i class="fas fa-times me-1"></i>Reject
                                             </button>
                                             
-                                            <!-- Rejection Modal -->
-                                            <div class="modal fade" id="rejectModal{{ $appointment->id }}" tabindex="-1" aria-labelledby="rejectModalLabel{{ $appointment->id }}" aria-hidden="true">
+                                            <!-- Rejection Modal for Mobile -->
+                                            <div class="modal fade" id="rejectModalMobile{{ $appointment->id }}" tabindex="-1" aria-labelledby="rejectModalMobileLabel{{ $appointment->id }}" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <form action="{{ route('vet.appointments.reject', $appointment) }}" method="POST">
                                                             @csrf
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title" id="rejectModalLabel{{ $appointment->id }}">Reject Appointment</h5>
+                                                                <h5 class="modal-title" id="rejectModalMobileLabel{{ $appointment->id }}">Reject Appointment</h5>
                                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
                                                             <div class="modal-body">
                                                                 <div class="mb-3">
-                                                                    <label for="rejection_reason{{ $appointment->id }}" class="form-label">Reason for Rejection</label>
-                                                                    <textarea class="form-control" id="rejection_reason{{ $appointment->id }}" name="rejection_reason" rows="4" required></textarea>
+                                                                    <label for="rejection_reason_mobile{{ $appointment->id }}" class="form-label">Reason for Rejection</label>
+                                                                    <textarea class="form-control" id="rejection_reason_mobile{{ $appointment->id }}" name="rejection_reason" rows="4" required></textarea>
                                                                     <div class="form-text">Please provide a reason for rejecting this appointment (maximum 500 characters).</div>
                                                                 </div>
                                                             </div>
@@ -290,10 +290,6 @@
 .badge-info { background-color: #17a2b8; }
 .badge-secondary { background-color: #6c757d; }
 
-.table-responsive {
-    max-height: 70vh;
-}
-
 /* Vet green theme for table header */
 .table-success {
     --bs-table-bg: #27ae60;
@@ -311,12 +307,21 @@
     margin-bottom: 2px;
 }
 
-/* Mobile swipeable view styles */
-.mobile-swipeable-view {
-    display: none;
-    padding: 15px;
+/* Desktop view - default display */
+.desktop-table {
+    display: block;
 }
 
+.mobile-swipeable-view {
+    display: none;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile swipeable view styles */
 .swipeable-appointment-card {
     border: 1px solid #dee2e6;
     border-radius: 8px;
@@ -330,9 +335,11 @@
     border-bottom: 1px solid #eee;
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
 }
 
-.swipeable-item:last-child {
+.swipeable-item:last-of-type {
     border-bottom: none;
 }
 
@@ -340,95 +347,132 @@
     font-weight: 600;
     color: #495057;
     min-width: 100px;
+    flex-shrink: 0;
 }
 
 .swipeable-item .value {
     text-align: right;
     flex: 1;
+    word-break: break-word;
 }
 
 .swipeable-actions {
     padding: 15px;
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
+    border-top: 2px solid #dee2e6;
 }
 
 .swipeable-actions .btn {
-    flex: 1;
-    min-width: 100px;
+    flex: 1 1 calc(50% - 4px);
+    min-width: 120px;
+    white-space: nowrap;
 }
 
-/* Mobile responsiveness improvements */
-@media (max-width: 768px) {
-    .table-responsive {
-        display: none;
+.swipeable-actions form {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 120px;
+}
+
+.swipeable-actions form .btn {
+    width: 100%;
+}
+
+/* Tablet and below - show mobile view */
+@media (max-width: 991px) {
+    .desktop-table {
+        display: none !important;
     }
     
     .mobile-swipeable-view {
         display: block;
-    }
-    
-    .table {
-        min-width: 800px; /* Ensure table has minimum width for scrolling */
-        font-size: 0.9rem;
-    }
-    
-    .table th,
-    .table td {
-        padding: 8px 6px;
-        white-space: nowrap;
-    }
-    
-    .btn-group-vertical .btn {
-        padding: 6px 10px;
-        font-size: 0.85rem;
-        margin-bottom: 1px;
+        padding: 15px;
     }
     
     h2 {
         font-size: 1.5rem;
     }
     
+    .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+    
+    .d-flex.justify-content-between.align-items-center h2 {
+        margin-bottom: 0;
+    }
+}
+
+/* Small tablets and large phones */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    .mobile-swipeable-view {
+        padding: 10px;
+    }
+    
     .swipeable-item {
         padding: 10px 12px;
+        flex-direction: column;
+        align-items: flex-start;
     }
     
     .swipeable-item .label {
-        min-width: 90px;
-        font-size: 0.9rem;
+        min-width: auto;
+        margin-bottom: 4px;
+    }
+    
+    .swipeable-item .value {
+        text-align: left;
+        width: 100%;
     }
     
     .swipeable-actions {
         padding: 12px;
+        gap: 8px;
     }
     
     .swipeable-actions .btn {
-        padding: 6px 10px;
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+    
+    .swipeable-actions form {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+    
+    h2 {
+        font-size: 1.3rem;
+    }
+    
+    h2 i {
+        font-size: 1.1rem;
+    }
+    
+    .badge {
         font-size: 0.85rem;
-        min-width: 100px;
     }
 }
 
+/* Mobile phones */
 @media (max-width: 576px) {
-    .table {
-        min-width: 700px;
-        font-size: 0.85rem;
+    .container-fluid {
+        padding-left: 8px;
+        padding-right: 8px;
     }
     
-    .table th,
-    .table td {
-        padding: 6px 4px;
-        font-size: 0.8rem;
+    .mobile-swipeable-view {
+        padding: 8px;
     }
     
-    .btn-group-vertical .btn {
-        padding: 5px 8px;
-        font-size: 0.8rem;
-    }
-    
-    .text-truncate {
-        max-width: 150px;
+    .swipeable-appointment-card {
+        margin-bottom: 12px;
     }
     
     .swipeable-item {
@@ -436,41 +480,55 @@
     }
     
     .swipeable-item .label {
-        font-size: 0.85rem;
-        min-width: 80px;
+        font-size: 0.9rem;
+    }
+    
+    .swipeable-item .value {
+        font-size: 0.9rem;
     }
     
     .swipeable-actions {
         padding: 10px;
-        gap: 5px;
+        gap: 6px;
     }
     
     .swipeable-actions .btn {
-        padding: 5px 8px;
+        padding: 8px 12px;
+        font-size: 0.875rem;
+    }
+    
+    h2 {
+        font-size: 1.2rem;
+    }
+    
+    .badge {
         font-size: 0.8rem;
-        min-width: 80px;
+        padding: 4px 8px;
+    }
+    
+    .modal-dialog {
+        margin: 10px;
+    }
+    
+    .modal-body {
+        padding: 15px;
     }
 }
 
+/* Very small screens */
 @media (max-width: 400px) {
-    .table {
-        min-width: 600px;
-        font-size: 0.8rem;
+    .container-fluid {
+        padding-left: 5px;
+        padding-right: 5px;
     }
     
-    .table th,
-    .table td {
-        padding: 5px 3px;
-        font-size: 0.75rem;
+    .mobile-swipeable-view {
+        padding: 5px;
     }
     
-    .btn-group-vertical .btn {
-        padding: 4px 6px;
-        font-size: 0.75rem;
-    }
-    
-    .text-truncate {
-        max-width: 120px;
+    .swipeable-appointment-card {
+        margin-bottom: 10px;
+        border-radius: 6px;
     }
     
     .swipeable-item {
@@ -478,27 +536,43 @@
     }
     
     .swipeable-item .label {
-        font-size: 0.8rem;
-        min-width: 70px;
+        font-size: 0.85rem;
+    }
+    
+    .swipeable-item .value {
+        font-size: 0.85rem;
     }
     
     .swipeable-actions {
         padding: 8px;
-        gap: 4px;
+        gap: 5px;
     }
     
     .swipeable-actions .btn {
-        padding: 4px 6px;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+    
+    h2 {
+        font-size: 1.1rem;
+    }
+    
+    h2 i {
+        font-size: 1rem;
+    }
+    
+    .badge {
         font-size: 0.75rem;
-        min-width: 70px;
+        padding: 3px 6px;
     }
 }
 
-/* Desktop view */
-@media (min-width: 769px) {
+/* Large desktop - ensure table remains visible */
+@media (min-width: 992px) {
     .mobile-swipeable-view {
         display: none !important;
     }
+    
     .desktop-table {
         display: block !important;
     }
