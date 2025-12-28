@@ -73,6 +73,11 @@ Route::prefix('vet')->name('vet.')->middleware(['can:isVet', 'vet.verified'])->g
     Route::post('/lost-found/verifications/{claim}/verify', [\App\Http\Controllers\Vet\LostFoundVerificationController::class, 'verify'])->name('lost-found.verifications.verify');
     Route::post('/lost-found/verifications/{claim}/complete', [\App\Http\Controllers\Vet\LostFoundVerificationController::class, 'completeClaim'])->name('lost-found.verifications.complete');
 
+    // Vet Messages Routes
+    Route::get('/messages', [ChatMessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/conversation/{user}/load', [ChatMessageController::class, 'loadConversation'])->name('messages.load-conversation');
+    Route::post('/messages/send', [ChatMessageController::class, 'sendMessage'])->name('messages.send');
+    Route::post('/messages/mark-as-read/{userId}', [ChatMessageController::class, 'markAsRead'])->name('messages.mark-as-read');
 });
 
 // Admin Routes
