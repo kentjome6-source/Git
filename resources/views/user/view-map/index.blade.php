@@ -171,6 +171,7 @@
     #shelterMap {
         height: 100%;
         width: 100%;
+        min-height: 500px;
     }
 
     .map-controls {
@@ -1056,12 +1057,35 @@ document.addEventListener('DOMContentLoaded', function() {
         
         initFullscreenFunctionality();
         
-        // Fix map size on load
-        setTimeout(() => {
+        // Fix map size on load and when window resizes
+        function fixMapSize() {
             if (window.shelterMap && window.shelterMap.map) {
                 window.shelterMap.map.invalidateSize();
             }
-        }, 300);
+        }
+        
+        setTimeout(fixMapSize, 300);
+        setTimeout(fixMapSize, 600);
+        setTimeout(fixMapSize, 1000);
+        
+        // Fix map on window resize (important for mobile orientation changes)
+        window.addEventListener('resize', function() {
+            fixMapSize();
+        });
+        
+        // Fix map when it becomes visible (mobile scroll into view)
+        const mapObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    fixMapSize();
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        const mapContainer = document.querySelector('#shelterMap');
+        if (mapContainer) {
+            mapObserver.observe(mapContainer);
+        }
     }, 100);
 });
 
