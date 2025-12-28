@@ -275,7 +275,7 @@
         height: 100vh;
         z-index: 1050;
         background: white;
-        display: none;
+        display: none !important;
     }
     
     #chat-main.active {
@@ -283,7 +283,7 @@
     }
     
     #chat-sidebar.hidden {
-        display: none;
+        display: none !important;
     }
 }
 </style>
