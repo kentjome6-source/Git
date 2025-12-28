@@ -156,7 +156,7 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
         Route::get('/{lostFound}', [\App\Http\Controllers\Admin\LostFoundController::class, 'show'])->name('show');
         Route::post('/{lostFound}/approve', [\App\Http\Controllers\Admin\LostFoundController::class, 'approve'])->name('approve');
         Route::post('/{lostFound}/reject', [\App\Http\Controllers\Admin\LostFoundController::class, 'reject'])->name('reject');
-        Route::post('/{lostFound}/toggle-feature', [\App\Http\Controllers\Admin\LostFoundController::class, 'toggleFeature'])->name('toggle-feature');
+        Route::post('/{lostFound}/toggle-feature', [\App\Http\Controllers\Admin\LostFoundController::class, 'toggleFeatured'])->name('toggle-feature');
         Route::get('/{lostFound}/claims', [\App\Http\Controllers\Admin\LostFoundController::class, 'viewClaims'])->name('view-claims');
         
         // Claims management
