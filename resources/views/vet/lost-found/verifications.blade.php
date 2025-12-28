@@ -125,6 +125,24 @@
     .filter-tabs .btn {
         flex: 1;
     }
+    
+    .card-body .row {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .page-subtitle {
+        font-size: 0.875rem;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+    }
 }
 </style>
 @endsection

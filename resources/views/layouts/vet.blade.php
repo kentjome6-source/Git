@@ -307,10 +307,12 @@
         @media (max-width: 576px) {
             html { font-size: 14px; }
             
-            .sidebar { width: 240px; }
+            .sidebar {
+                width: 230px; /* Slightly smaller on very small screens */
+            }
             
             .main-content {
-                padding: 80px 16px 16px 16px;
+                padding: 80px 15px 15px 15px;
             }
             
             h1, .h1 { font-size: 1.75rem; }

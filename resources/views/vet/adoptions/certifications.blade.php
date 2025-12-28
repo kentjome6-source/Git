@@ -386,5 +386,44 @@
         transform: translateY(0);
     }
 }
+
+@media (max-width: 768px) {
+    .cert-image {
+        min-height: 200px;
+    }
+    
+    .cert-content {
+        padding: 1rem;
+    }
+    
+    .cert-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .cert-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .cert-image {
+        min-height: 150px;
+    }
+    
+    .cert-pet-name {
+        font-size: 1.1rem;
+    }
+    
+    .cert-meta {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
 </style>
 @endsection
