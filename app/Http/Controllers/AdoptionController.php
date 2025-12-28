@@ -30,7 +30,7 @@ class AdoptionController extends Controller
                               ->take(6)
                               ->get();
         
-        $lostFoundPets = \App\Models\LostFound::with(['user', 'images'])
+        $lostFoundPets = \App\Models\LostFound::with(['user'])
                               ->where('is_resolved', false)
                               ->where('status', 'approved')
                               ->latest()

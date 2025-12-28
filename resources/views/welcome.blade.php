@@ -690,8 +690,8 @@
             <div class="services-grid">
                 @forelse($lostFoundPets as $lostFound)
                 <div class="service-item">
-                    @if($lostFound->images->isNotEmpty())
-                        <img src="{{ asset('storage/' . $lostFound->images->first()->image_path) }}" 
+                    @if($lostFound->image_path)
+                        <img src="{{ asset('storage/' . $lostFound->image_path) }}" 
                              alt="{{ $lostFound->pet_name }}" 
                              style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 16px;">
                     @endif
