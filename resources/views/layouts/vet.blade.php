@@ -175,8 +175,6 @@
             margin-left: 260px; 
             padding: 32px; 
             transition: margin-left 0.3s ease; 
-            max-width: calc(100vw - 260px); 
-            overflow-x: hidden; 
         }
 
         /* Mobile Header */
