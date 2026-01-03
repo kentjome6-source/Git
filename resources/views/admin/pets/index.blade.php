@@ -13,6 +13,10 @@
                         <h2 class="page-title mb-1">Pet Management</h2>
                         <p class="page-subtitle text-muted mb-0">Manage and organize your pet listings</p>
                     </div>
+                    <a href="{{ route('admin.pets.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Add Pet
+                    </a>
                 </div>
             </div>
 
@@ -75,6 +79,21 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="pet-card-actions">
+                                        <a href="{{ route('admin.pets.show', $pet) }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i> View
+                                        </a>
+                                        <a href="{{ route('admin.pets.edit', $pet) }}" class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-edit me-1"></i> Edit
+                                        </a>
+                                        <form action="{{ route('admin.pets.destroy', $pet) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this pet?')">
+                                                <i class="fas fa-trash me-1"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
@@ -107,6 +126,21 @@
                                             <span class="mobile-info-label">Description</span>
                                             <span class="mobile-info-value">{{ Str::limit($pet->description, 80) }}</span>
                                         </div>
+                                    </div>
+                                    <div class="mobile-card-actions">
+                                        <a href="{{ route('admin.pets.show', $pet) }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i> View
+                                        </a>
+                                        <a href="{{ route('admin.pets.edit', $pet) }}" class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-edit me-1"></i> Edit
+                                        </a>
+                                        <form action="{{ route('admin.pets.destroy', $pet) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this pet?')">
+                                                <i class="fas fa-trash me-1"></i> Delete
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             @endforeach

@@ -55,6 +55,11 @@ return new class extends Migration
                 'vet_orientation_notes'
             ]);
             
+            // Update existing records with newer status values to compatible old values before changing enum
+            DB::statement("UPDATE adoption_requests SET status = 'pending' WHERE status IN ('admin_screening', 'vet_orientation', 'owner_review')");
+            DB::statement("UPDATE adoption_requests SET status = 'rejected' WHERE status = 'admin_rejected'");
+            DB::statement("UPDATE adoption_requests SET status = 'approved' WHERE status IN ('approved', 'rejected')");
+            
             // Revert status enum
             DB::statement("ALTER TABLE adoption_requests MODIFY COLUMN status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending'");
         });

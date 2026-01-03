@@ -117,19 +117,36 @@ class AdoptionController extends Controller
      */
     public function show(Adoption $adoption)
     {
-        // Allow pet owners to view their own adoptions and adopters to view adoptions they applied for
         $userId = Auth::id();
         $isOwner = $adoption->user_id == $userId;
         $isAdopter = $adoption->adoptionRequests()->where('adopter_id', $userId)->exists();
         $isAdmin = Auth::user() && Auth::user()->role === 'admin';
         
-        if (!$isOwner && !$isAdopter && !$isAdmin) {
-            abort(403, 'This action is unauthorized.');
+        // Allow pet owners to view their own adoptions
+        if ($isOwner) {
+            $adoption->load(['user', 'pet', 'adoptionRequests.adopter', 'adoptionRequests.vetOrientation', 'adoptionRequests.adminScreening', 'adoptionRequests.agreement']);
+            return view('user.adoptions.show', compact('adoption', 'isOwner', 'isAdopter', 'isAdmin'));
         }
         
-        $adoption->load(['user', 'pet', 'adoptionRequests.adopter', 'adoptionRequests.vetOrientation', 'adoptionRequests.adminScreening', 'adoptionRequests.agreement']);
+        // Allow admin to view any adoption
+        if ($isAdmin) {
+            $adoption->load(['user', 'pet', 'adoptionRequests.adopter', 'adoptionRequests.vetOrientation', 'adoptionRequests.adminScreening', 'adoptionRequests.agreement']);
+            return view('user.adoptions.show', compact('adoption', 'isOwner', 'isAdopter', 'isAdmin'));
+        }
         
-        return view('user.adoptions.show', compact('adoption', 'isOwner', 'isAdopter', 'isAdmin'));
+        // Allow adopters to view adoptions they applied for
+        if ($isAdopter) {
+            $adoption->load(['user', 'pet', 'adoptionRequests.adopter', 'adoptionRequests.vetOrientation', 'adoptionRequests.adminScreening', 'adoptionRequests.agreement']);
+            return view('user.adoptions.show', compact('adoption', 'isOwner', 'isAdopter', 'isAdmin'));
+        }
+        
+        // Allow any authenticated user to view published adoptions that are available
+        if ($adoption->listing_status === 'published' && !$adoption->is_adopted) {
+            $adoption->load(['user', 'pet', 'adoptionRequests.adopter', 'adoptionRequests.vetOrientation', 'adoptionRequests.adminScreening', 'adoptionRequests.agreement']);
+            return view('user.adoptions.show', compact('adoption', 'isOwner', 'isAdopter', 'isAdmin'));
+        }
+        
+        abort(403, 'This action is unauthorized.');
     }
 
     /**
