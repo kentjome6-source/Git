@@ -326,6 +326,10 @@
             grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
             gap: 24px;
         }
+
+        .lost-found-grid {
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        }
         
         .service-item {
             background: white;
@@ -542,10 +546,6 @@
                 <p class="hero-description">
                     Connect with trusted veterinarians, reunite lost pets with their families, and join a community of pet lovers in your area. Everything you need in one platform.
                 </p>
-                <div class="hero-actions">
-                    {{-- <a href="{{ route('register') }}" class="btn-primary">Get Started</a> --}}
-                    <a href="{{ route('login') }}" class="btn-secondary">Sign In</a>
-                </div>
             </div>
             
             <div class="hero-visual">
@@ -687,7 +687,7 @@
                 <p>Check recent reports of lost and found pets in your area. Every share could help bring a pet home.</p>
             </div>
             
-            <div class="services-grid">
+            <div class="services-grid lost-found-grid">
                 @forelse($lostFoundPets as $lostFound)
                 <div class="service-item">
                     @if($lostFound->image_path)

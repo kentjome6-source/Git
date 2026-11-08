@@ -6,30 +6,30 @@
 <div class="lostfound-page">
     <div class="container-fluid px-4 py-5">
         <!-- Page Header -->
-        <div class="page-header mb-5">
+        <div class="page-header mb-3">
             <div class="header-content">
                 <div class="header-text">
                     <span class="label">Community Help</span>
                     <h1 class="page-title">Lost & Found Pets</h1>
                     <p class="page-subtitle">Help reunite pets with their families</p>
                 </div>
-                <div class="header-actions">
-                    <a href="{{ route('lost-found.create') }}" class="btn-report">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Report Pet</span>
-                    </a>
-                    <a href="{{ route('view.map') }}" class="btn-map">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                            <circle cx="12" cy="10" r="3"></circle>
-                        </svg>
-                        <span>View Map</span>
-                    </a>
-                </div>
             </div>
+        </div>
+        <div class="page-toolbar mb-5">
+            <a href="{{ route('lost-found.create') }}" class="btn-report">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Report Pet</span>
+            </a>
+            <a href="{{ route('view.map') }}" class="btn-map">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span>View Map</span>
+            </a>
         </div>
 
         <!-- Success Message -->
@@ -208,10 +208,21 @@
         font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
         background: var(--gray-lighter);
         min-height: 100vh;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .lostfound-page .container-fluid {
+        width: 100%;
+        min-width: 0;
     }
 
     /* Page Header */
     .page-header {
+        padding: 30px 32px;
+        border: 1px solid #5b438e;
+        border-radius: 16px;
+        background: #6951a2;
         animation: fadeInDown 0.6s ease-out;
     }
 
@@ -228,18 +239,18 @@
 
     .header-content {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         flex-wrap: wrap;
         gap: 24px;
     }
 
     .label {
-        display: block;
+        display: inline-block;
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        color: var(--blue);
+        color: #e8defc;
         margin-bottom: 12px;
         font-weight: 600;
     }
@@ -247,14 +258,21 @@
     .page-title {
         font-size: clamp(2rem, 4vw, 2.75rem);
         font-weight: 700;
-        color: var(--slate);
+        color: #fff;
         margin-bottom: 8px;
         letter-spacing: -0.02em;
     }
 
     .page-subtitle {
         font-size: 1.05rem;
-        color: var(--gray);
+        color: rgba(255, 255, 255, 0.84);
+    }
+
+    .page-toolbar {
+        display: flex;
+        justify-content: flex-start;
+        gap: 12px;
+        flex-wrap: nowrap;
     }
 
     .header-actions {
@@ -267,7 +285,9 @@
     .btn-map {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
+        min-width: 0;
         padding: 12px 24px;
         border-radius: 8px;
         font-weight: 600;
@@ -377,7 +397,7 @@
 
     .filter-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr auto;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
         gap: 20px;
         align-items: end;
     }
@@ -392,6 +412,7 @@
 
     .filter-select {
         width: 100%;
+        min-width: 0;
         padding: 12px 16px;
         border: 2px solid #e2e8f0;
         border-radius: 8px;
@@ -430,23 +451,26 @@
     /* Listings Grid */
     .listings-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 24px;
-        max-width: 1400px;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 340px));
+        justify-content: start;
+        gap: 18px;
+        max-width: 1080px;
         margin: 0 auto 40px;
+        min-width: 0;
     }
 
     .listing-card {
+        min-width: 0;
         background: white;
-        border-radius: 16px;
+        border-radius: 12px;
         overflow: hidden;
         border: 1px solid #e2e8f0;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     }
 
     .listing-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
         border-color: var(--blue);
     }
 
@@ -454,11 +478,12 @@
         text-decoration: none;
         color: inherit;
         display: block;
+        min-width: 0;
     }
 
     .listing-image {
         position: relative;
-        height: 250px;
+        height: 200px;
         overflow: hidden;
         background: var(--gray-light);
     }
@@ -513,7 +538,7 @@
     }
 
     .listing-content {
-        padding: 24px;
+        padding: 18px;
     }
 
     .listing-title {
@@ -534,9 +559,11 @@
     .meta-item {
         display: flex;
         align-items: center;
+        min-width: 0;
         gap: 6px;
         font-size: 0.85rem;
         color: var(--gray);
+        overflow-wrap: anywhere;
     }
 
     .listing-description {
@@ -636,7 +663,8 @@
     /* Responsive */
     @media (max-width: 1024px) {
         .listings-grid {
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 340px));
+            max-width: 700px;
         }
     }
 
@@ -646,14 +674,16 @@
             align-items: flex-start;
         }
 
-        .header-actions {
-            width: 100%;
-        }
+        .page-header { padding: 24px 20px; }
 
         .btn-report,
         .btn-map {
-            flex: 1;
-            justify-content: center;
+            flex: 1 1 0;
+            gap: 6px;
+            padding: 11px 8px;
+            font-size: 0.85rem;
+            white-space: normal;
+            text-align: center;
         }
 
         .page-title {
@@ -675,6 +705,7 @@
 
         .listings-grid {
             grid-template-columns: 1fr;
+            max-width: 360px;
         }
 
         .listing-footer {
@@ -695,11 +726,11 @@
         }
 
         .listing-image {
-            height: 220px;
+            height: 190px;
         }
 
         .listing-content {
-            padding: 20px;
+            padding: 16px;
         }
 
         .listing-title {

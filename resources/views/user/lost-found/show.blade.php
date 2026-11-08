@@ -6,10 +6,15 @@
 <style>
         
         .page-header {
-            text-align: center; margin-bottom: 40px;
+            margin-bottom: 32px;
+            padding: 30px 24px;
+            border: 1px solid #5b438e;
+            border-radius: 16px;
+            background: #6951a2;
+            text-align: center;
         }
-        .page-title { font-size: 2.5rem; color: #5b4b9b; margin-bottom: 10px; }
-        .page-subtitle { font-size: 1.1rem; color: #666; }
+        .page-title { font-size: 2.5rem; color: #fff; margin-bottom: 10px; }
+        .page-subtitle { font-size: 1.1rem; color: rgba(255, 255, 255, 0.84); margin-bottom: 0; }
 
         .back-link {
             display: inline-flex; align-items: center; gap: 8px;
@@ -146,6 +151,9 @@
 
         /* Responsive styles for mobile */
         @media (max-width: 768px) {
+            .page-header { padding: 24px 18px; }
+            .page-title { font-size: 2rem; }
+
             .listing-content {
                 padding: 25px;
             }

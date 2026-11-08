@@ -222,9 +222,11 @@
                 
                 <div class="form-group">
                     <label class="form-label">Type <span class="required">*</span></label>
+                    <div class="form-help">Choose whether you are reporting a lost pet or a found pet.</div>
                     <div class="radio-group">
                         <div class="radio-item">
                             <input type="radio" name="type" value="lost" id="type_lost" 
+                                   required
                                    {{ request('type') == 'lost' || old('type') == 'lost' ? 'checked' : '' }}>
                             <label for="type_lost">
                                 <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>
@@ -233,6 +235,7 @@
                         </div>
                         <div class="radio-item">
                             <input type="radio" name="type" value="found" id="type_found"
+                                   required
                                    {{ request('type') == 'found' || old('type') == 'found' ? 'checked' : '' }}>
                             <label for="type_found">
                                 <i class="fas fa-heart" style="color: #27ae60;"></i>
@@ -240,6 +243,9 @@
                             </label>
                         </div>
                     </div>
+                    @error('type')
+                        <div class="form-help" role="alert" style="color: #b42318;">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="form-group">

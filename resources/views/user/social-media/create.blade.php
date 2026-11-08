@@ -25,9 +25,10 @@
                         @csrf
                         
                         <div class="mb-3">
-                            <label for="content" class="form-label fw-bold">Content *</label>
+                            <label for="content" class="form-label fw-bold">Content</label>
                             <textarea class="form-control rounded-3 @error('content') is-invalid @enderror" 
                                       id="content" name="content" rows="5" placeholder="Share your pet's story...">{{ old('content') }}</textarea>
+                            <div class="form-text">Write a caption, upload an image, or do both.</div>
                             @error('content')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

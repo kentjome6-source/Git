@@ -78,6 +78,9 @@ class LostFoundController extends Controller
             'contact_phone' => 'required|string|max:20',
             'contact_email' => 'nullable|email|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
+        ], [
+            'type.required' => 'Please choose whether you are reporting a lost pet or a found pet.',
+            'type.in' => 'The report type must be either lost or found.',
         ]);
 
         // Explicitly specify the fields to include instead of using $request->all()

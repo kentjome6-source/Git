@@ -25,10 +25,10 @@
 
                     <!-- Pet Information in Bond Paper Style -->
                     <div class="bond-paper-content">
-                        <!-- Animal Type -->
+                        <!-- Pet Name -->
                         <div class="mb-3">
                             <div class="row">
-                                <div class="col-4 fw-bold text-primary">Animal Type:</div>
+                                <div class="col-4 fw-bold text-primary">Pet Name:</div>
                                 <div class="col-8">{{ ucfirst($pet->name ?? 'Not specified') }}</div>
                             </div>
                         </div>

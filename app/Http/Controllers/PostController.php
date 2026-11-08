@@ -36,14 +36,16 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'content' => 'required|string',
+        $validated = $request->validate([
+            'content' => 'required_without:image|nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
+        ], [
+            'content.required_without' => 'Add some text or upload an image to create a post.',
         ]);
 
         $postData = [
             'user_id' => Auth::id(),
-            'content' => $request->content,
+            'content' => $validated['content'] ?? '',
         ];
 
         // Handle image upload

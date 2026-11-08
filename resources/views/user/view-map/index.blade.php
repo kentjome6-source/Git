@@ -26,7 +26,11 @@
 
     /* Page Header */
     .page-header {
-        padding: 40px 20px;
+        margin: 20px 20px 24px;
+        padding: 32px 24px;
+        border: 1px solid #5b438e;
+        border-radius: 16px;
+        background: #6951a2;
         text-align: center;
         animation: fadeInDown 0.6s ease-out;
     }
@@ -55,14 +59,14 @@
     .page-title {
         font-size: clamp(2rem, 4vw, 3rem);
         font-weight: 700;
-        color: var(--slate);
+        color: #fff;
         margin-bottom: 12px;
         letter-spacing: -0.02em;
     }
 
     .page-subtitle {
         font-size: 1.1rem;
-        color: var(--gray);
+        color: rgba(255, 255, 255, 0.84);
     }
 
     /* Main Layout - Map on right, shelters on left */

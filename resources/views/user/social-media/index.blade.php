@@ -6,21 +6,23 @@
 <div class="social-page">
     <div class="container-fluid px-4 py-5">
         <!-- Page Header -->
-        <div class="page-header mb-5">
+        <div class="page-header mb-3">
             <div class="header-content">
                 <div class="header-text">
                     <span class="label">Community</span>
                     <h1 class="page-title">Furparent Social Feed</h1>
                     <p class="page-subtitle">Share moments and connect with fellow pet parents</p>
                 </div>
-                <a href="{{ route('social-media.create') }}" class="btn-create-post" data-modal data-modal-title="Create New Post">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    <span>Create Post</span>
-                </a>
             </div>
+        </div>
+        <div class="page-toolbar mb-5">
+            <a href="{{ route('social-media.create') }}" class="btn-create-post">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Create Post</span>
+            </a>
         </div>
 
         <!-- Success Message -->
@@ -176,6 +178,10 @@
 
     /* Page Header */
     .page-header {
+        padding: 30px 32px;
+        border: 1px solid #5b438e;
+        border-radius: 16px;
+        background: #6951a2;
         animation: fadeInDown 0.6s ease-out;
     }
 
@@ -192,18 +198,18 @@
 
     .header-content {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         flex-wrap: wrap;
         gap: 24px;
     }
 
     .label {
-        display: block;
+        display: inline-block;
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        color: var(--blue);
+        color: #e8defc;
         margin-bottom: 12px;
         font-weight: 600;
     }
@@ -211,14 +217,19 @@
     .page-title {
         font-size: clamp(2rem, 4vw, 2.75rem);
         font-weight: 700;
-        color: var(--slate);
+        color: #fff;
         margin-bottom: 8px;
         letter-spacing: -0.02em;
     }
 
     .page-subtitle {
         font-size: 1.05rem;
-        color: var(--gray);
+        color: rgba(255, 255, 255, 0.84);
+    }
+
+    .page-toolbar {
+        display: flex;
+        justify-content: flex-end;
     }
 
     .btn-create-post {
@@ -547,10 +558,7 @@
             align-items: flex-start;
         }
 
-        .btn-create-post {
-            width: 100%;
-            justify-content: center;
-        }
+        .page-header { padding: 24px 20px; }
 
         .page-title {
             font-size: 1.75rem;

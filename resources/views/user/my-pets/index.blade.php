@@ -9,18 +9,24 @@
         <div class="page-header mb-5">
             <div class="header-content">
                 <div class="header-text">
-                    <span class="label">Pet Management</span>
+                    <span class="label">
+                        <i class="fa-solid fa-paw" aria-hidden="true"></i>
+                        Pet Management
+                    </span>
                     <h1 class="page-title">My Pets</h1>
                     <p class="page-subtitle">Track and manage your registered pets</p>
                 </div>
-                <button type="button" class="btn-add-pet" data-bs-toggle="modal" data-bs-target="#addPetModal">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    <span>Add Pet</span>
-                </button>
             </div>
+        </div>
+
+        <div class="pets-toolbar">
+            <button type="button" class="btn-add-pet" data-bs-toggle="modal" data-bs-target="#addPetModal">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Add Pet</span>
+            </button>
         </div>
 
         <!-- Success Message -->
@@ -80,7 +86,7 @@
                                     <line x1="12" y1="8" x2="12" y2="12"></line>
                                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
                                 </svg>
-                                Report Missing
+                                <span>Report Missing</span>
                             </a>
 
                             <button type="button" class="btn-location" data-bs-toggle="modal" data-bs-target="#locationModal{{ $pet->id }}">
@@ -88,7 +94,7 @@
                                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                     <circle cx="12" cy="10" r="3"></circle>
                                 </svg>
-                                Pet Location
+                                <span>Pet Location</span>
                             </button>
 
                             <a href="{{ route('pet.multipet.edit', $pet) }}" class="btn-edit" data-modal data-modal-title="Edit Pet">
@@ -96,7 +102,7 @@
                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                 </svg>
-                                Edit
+                                <span>Edit</span>
                             </a>
                         </div>
                     </div>
@@ -269,6 +275,10 @@
 
     /* Page Header */
     .page-header {
+        padding: 30px 32px;
+        border: 1px solid #5b438e;
+        border-radius: 16px;
+        background: #6951a2;
         animation: fadeInDown 0.6s ease-out;
     }
 
@@ -292,49 +302,62 @@
     }
 
     .label {
-        display: block;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--blue);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         margin-bottom: 12px;
-        font-weight: 600;
+        color: #e8defc;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.13em;
+        font-weight: 700;
     }
+
+    .label i { font-size: 0.78rem; }
 
     .page-title {
         font-size: clamp(2rem, 4vw, 2.75rem);
         font-weight: 700;
-        color: var(--slate);
+        color: #fff;
         margin-bottom: 8px;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.04em;
     }
 
     .page-subtitle {
+        margin-bottom: 0;
         font-size: 1.05rem;
-        color: var(--gray);
+        color: rgba(255, 255, 255, 0.82);
     }
 
     .btn-add-pet {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 12px 24px;
-        background: var(--purple);
-        color: white;
-        border-radius: 8px;
+        padding: 12px 20px;
+        background: #fff;
+        color: #523c88;
+        border: 1px solid rgba(255, 255, 255, 0.75);
+        border-radius: 10px;
         font-weight: 600;
         font-size: 0.95rem;
         text-decoration: none;
-        transition: all 0.2s;
-        border: none;
+        box-shadow: 0 5px 14px rgba(27, 21, 46, 0.16);
+        transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
         cursor: pointer;
     }
 
     .btn-add-pet:hover {
-        background: #7c3aed;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-        color: white;
+        background: #f0ebf8;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(27, 21, 46, 0.2);
+        color: #523c88;
+    }
+
+    .pets-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        max-width: 1440px;
+        margin: -20px auto 28px;
     }
 
     /* Success Alert */
@@ -402,17 +425,18 @@
     }
 
     .pet-card {
-        background: white;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
+        background: #fff;
+        border: 2px solid #d8cde9;
+        border-radius: 18px;
         overflow: hidden;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 5px 16px rgba(38, 29, 59, 0.07);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     }
 
     .pet-card:hover {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-        border-color: var(--blue);
-        transform: translateY(-4px);
+        border-color: #8065b2;
+        box-shadow: 0 12px 26px rgba(66, 49, 103, 0.12);
+        transform: translateY(-3px);
     }
 
     .pet-image-wrapper {
@@ -464,25 +488,47 @@
     }
 
     .pet-card-footer {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 8px;
-        padding: 16px 20px;
-        border-top: 1px solid #e2e8f0;
+        padding: 14px 16px;
+        border-top: 1px solid #eeeaf4;
     }
 
     .btn-report-missing,
+    .btn-location,
     .btn-edit {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 6px;
-        padding: 10px 16px;
+        min-width: 0;
+        min-height: 66px;
+        gap: 4px;
+        padding: 8px 4px;
         border-radius: 8px;
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: 0.75rem;
+        line-height: 1.15;
         text-decoration: none;
         transition: all 0.2s;
-        flex: 1;
         justify-content: center;
+        text-align: center;
+    }
+
+    .btn-report-missing span,
+    .btn-location span,
+    .btn-edit span {
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+
+    .btn-report-missing svg,
+    .btn-location svg,
+    .btn-edit svg {
+        flex: 0 0 15px;
+        width: 15px;
+        height: 15px;
     }
 
     .btn-track {
@@ -507,9 +553,21 @@
         color: white;
     }
 
+    .btn-location {
+        background: #f3effa;
+        color: #4f3782;
+        border: 1px solid #c9b9e2;
+        cursor: pointer;
+    }
+
+    .btn-location:hover {
+        background: #e8e0f4;
+        border-color: var(--purple);
+    }
+
     .btn-edit {
-        background: white;
-        color: var(--purple);
+        background: #f3effa;
+        color: #4f3782;
         border: 1px solid var(--purple);
     }
 
@@ -664,24 +722,15 @@
             align-items: flex-start;
         }
 
-        .btn-add-pet {
-            width: 100%;
-            justify-content: center;
-        }
+        .page-header { padding: 24px 20px; }
+
+        .pets-toolbar { margin-top: -6px; margin-bottom: 24px; }
 
         .pets-grid {
             grid-template-columns: 1fr;
         }
 
-        .pet-card-footer {
-            flex-direction: column;
-        }
-
-        .btn-report-missing,
-        .btn-location,
-        .btn-edit {
-            width: 100%;
-        }
+        .pet-card-footer { gap: 6px; padding: 12px; }
     }
 
     @media (max-width: 576px) {

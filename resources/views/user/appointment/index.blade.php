@@ -6,30 +6,30 @@
 <div class="appointments-page">
     <div class="container-fluid px-4 py-5">
         <!-- Page Header -->
-        <div class="page-header mb-5">
+        <div class="page-header mb-3">
             <div class="header-content">
                 <div class="header-text">
                     <span class="label">Healthcare</span>
                     <h1 class="page-title">My Appointments</h1>
                     <p class="page-subtitle">Manage your pet's healthcare appointments</p>
                 </div>
-                <div class="header-actions">
-                    <a href="{{ route('appointments.history') }}" class="btn-history">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        <span>History</span>
-                    </a>
-                    <button type="button" class="btn-create-appointment" data-bs-toggle="modal" data-bs-target="#requestAppointmentModal">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Request Appointment</span>
-                    </button>
-                </div>
             </div>
+        </div>
+        <div class="page-toolbar">
+            <a href="{{ route('appointments.history') }}" class="btn-history">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>History</span>
+            </a>
+            <button type="button" class="btn-create-appointment" data-bs-toggle="modal" data-bs-target="#requestAppointmentModal">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Request Appointment</span>
+            </button>
         </div>
 
         <!-- Success Message -->
@@ -393,6 +393,10 @@
 
     /* Page Header */
     .page-header {
+        padding: 30px 32px;
+        border: 1px solid #5b438e;
+        border-radius: 16px;
+        background: #6951a2;
         animation: fadeInDown 0.6s ease-out;
     }
 
@@ -409,24 +413,26 @@
 
     .header-content {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         flex-wrap: wrap;
         gap: 24px;
     }
 
-    .header-actions {
+    .page-toolbar {
         display: flex;
+        justify-content: flex-end;
         gap: 12px;
         flex-wrap: wrap;
+        margin: 0 0 32px;
     }
 
     .label {
-        display: block;
+        display: inline-block;
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        color: var(--blue);
+        color: #e8defc;
         margin-bottom: 12px;
         font-weight: 600;
     }
@@ -434,14 +440,14 @@
     .page-title {
         font-size: clamp(2rem, 4vw, 2.75rem);
         font-weight: 700;
-        color: var(--slate);
+        color: #fff;
         margin-bottom: 8px;
         letter-spacing: -0.02em;
     }
 
     .page-subtitle {
         font-size: 1.05rem;
-        color: var(--gray);
+        color: rgba(255, 255, 255, 0.84);
     }
 
     .btn-history {
@@ -914,8 +920,9 @@
             align-items: flex-start;
         }
 
-        .header-actions {
+        .page-toolbar {
             width: 100%;
+            justify-content: flex-start;
         }
 
         .btn-history,
@@ -927,6 +934,8 @@
         .page-title {
             font-size: 1.75rem;
         }
+
+        .page-header { padding: 24px 20px; }
 
         .page-subtitle {
             font-size: 1rem;

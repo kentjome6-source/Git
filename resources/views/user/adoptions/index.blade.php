@@ -6,21 +6,22 @@
 <div class="adoption-center">
     <div class="container-fluid px-4 py-4">
         <!-- Header Section -->
-        <div class="page-header mb-4">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="page-header adoption-page-header mb-3">
+            <div class="adoption-header-copy">
                 <div>
+                    <span class="adoption-header-label">Find a friend</span>
                     <h1 class="page-title mb-1">Adoption Center</h1>
-                    <p class="page-subtitle text-muted mb-0">Find your perfect companion</p>
-                </div>
-                <div class="d-flex gap-2">
-                    <a href="{{ route('adoptions.history') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-history me-2"></i>History
-                    </a>
-                    <a href="{{ route('adoptions.create') }}" class="btn btn-primary btn-create">
-                        <i class="fas fa-plus me-2"></i>List Pet for Adoption
-                    </a>
+                    <p class="page-subtitle mb-0">Find your perfect companion</p>
                 </div>
             </div>
+        </div>
+        <div class="page-toolbar adoption-toolbar mb-4">
+            <a href="{{ route('adoptions.history') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-history me-2"></i>History
+            </a>
+            <a href="{{ route('adoptions.create') }}" class="btn btn-primary btn-create">
+                <i class="fas fa-plus me-2"></i>List Pet for Adoption
+            </a>
         </div>
 
         <!-- Search and Filter Section -->
@@ -228,6 +229,39 @@
 /* Page Header */
 .page-header {
     animation: fadeInDown 0.5s ease-out;
+}
+
+.adoption-page-header {
+    padding: 30px 32px;
+    border: 1px solid #5b438e;
+    border-radius: 16px;
+    background: #6951a2;
+}
+
+.adoption-header-copy {
+    display: flex;
+    align-items: center;
+    min-height: 82px;
+}
+
+.adoption-header-label {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #e8defc;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.adoption-page-header .page-title { color: #fff; }
+.adoption-page-header .page-subtitle { color: rgba(255, 255, 255, 0.84); }
+
+.adoption-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .page-title {
@@ -507,6 +541,8 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .adoption-page-header { padding: 24px 20px; }
+
     .page-title {
         font-size: 1.5rem;
     }

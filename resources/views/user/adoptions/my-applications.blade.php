@@ -6,16 +6,19 @@
 <div class="applications-page">
     <div class="container-fluid px-4 py-4">
         <!-- Header -->
-        <div class="page-header mb-4">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="page-header applications-page-header mb-3">
+            <div>
+                <span class="applications-header-label">Adoption Center</span>
                 <div>
                     <h1 class="page-title mb-1">My Adoption Applications</h1>
-                    <p class="page-subtitle text-muted mb-0">Track the status of your applications</p>
+                    <p class="page-subtitle mb-0">Track the status of your applications</p>
                 </div>
-                <a href="{{ route('adoptions.index') }}" class="btn btn-primary">
-                    <i class="fas fa-heart me-2"></i>Browse Pets
-                </a>
             </div>
+        </div>
+        <div class="page-toolbar applications-toolbar mb-4">
+            <a href="{{ route('adoptions.index') }}" class="btn btn-primary">
+                <i class="fas fa-heart me-2"></i>Browse Pets
+            </a>
         </div>
 
         @if($applications->count() > 0)
@@ -224,6 +227,33 @@
 
 .page-header {
     animation: fadeInDown 0.5s ease-out;
+}
+
+.applications-page-header {
+    padding: 30px 32px;
+    border: 1px solid #5b438e;
+    border-radius: 16px;
+    background: #6951a2;
+}
+
+.applications-page-header > div { min-height: 82px; }
+
+.applications-header-label {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #e8defc;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.applications-page-header .page-title { color: #fff; }
+.applications-page-header .page-subtitle { color: rgba(255, 255, 255, 0.84); }
+
+.applications-toolbar {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .page-title {
@@ -445,6 +475,8 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .applications-page-header { padding: 24px 20px; }
+
     .page-title {
         font-size: 1.5rem;
     }
